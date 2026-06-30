@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第30章 CAN总线项目实战</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
+<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
+<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html" class="">第7章 CAN收发器</a></li>
+<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
+<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
+<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
+<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
+<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
+<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
+<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html" class="active">第30章 CAN总线项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第30章：CAN总线项目实战：基于STM32的CAN总线数据采集系统、上位机显示、故障诊断</h2>
+
+<p>终于到了最后一章。</p>
+<p>说实话，前面29章讲了很多理论、协议、硬件、软件。但真正让CAN总线发挥价值的，是把它做成一个完整的系统。今天我们就来做一个实战项目：基于STM32的CAN数据采集系统，配上位机显示，再加故障诊断功能。</p>
+<p>这个项目我做过不下5个版本。最早是在一个工程机械项目上，客户要求实时监控发动机参数。那时候我熬夜调代码，踩了不少坑。今天我把经验都倒出来，你直接拿去用。</p>
+
+<h3>30.1 系统整体架构</h3>
+
+<p>先看整体框架。这个系统分三层：</p>
+
+<ul>
+  <li><strong>底层</strong>：STM32 + CAN收发器，负责采集传感器数据，通过CAN总线发送</li>
+  <li><strong>中间层</strong>：USB-CAN适配器，把CAN数据转成PC能识别的格式</li>
+  <li><strong>上层</strong>：上位机软件，显示数据、存储、故障诊断</li>
+</ul>
+
+<p>说白了，就是传感器→STM32→CAN总线→USB-CAN→PC上位机。这个链路我建议你用现成的USB-CAN工具，比如周立功的或者PCAN。自己写USB驱动？嗯，除非你想多花两周时间。</p>
+
+<div class="highlight">
+  <p><strong>硬件清单</strong>：</p>
+  <ul>
+    <li>STM32F103C8T6 开发板（便宜够用）</li>
+    <li>TJA1050 CAN收发器（或者SN65HVD230）</li>
+    <li>USB-CAN适配器（推荐PCAN-USB）</li>
+    <li>传感器：温度、压力、转速模拟信号</li>
+    <li>12V电源（工业现场常用）</li>
+  </ul>
+</div>
+
+<h3>30.2 STM32端程序设计</h3>
+
+<p>STM32这边要做三件事：采集数据、打包成CAN帧、发送出去。我习惯用HAL库，因为移植方便。</p>
+
+<p>先看CAN初始化。这里有个坑：波特率配置。我记得有一次项目，CAN通信死活不通，查了半天发现是时钟树配错了。STM32的CAN时钟来自APB1，最高36MHz。你算波特率的时候一定要确认这个时钟。</p>
+
+<pre><code>// CAN初始化配置
+void CAN_Init(void)
+{
+    CAN_HandleTypeDef hcan;
+    CAN_FilterTypeDef sFilterConfig;
+    
+    hcan.Instance = CAN1;
+    hcan.Init.TimeTriggeredMode = DISABLE;
+    hcan.Init.AutoBusOff = ENABLE;
+    hcan.Init.AutoWakeUp = DISABLE;
+    hcan.Init.AutoRetransmission = ENABLE;
+    hcan.Init.ReceiveFifoLocked = DISABLE;
+    hcan.Init.TransmitFifoPriority = DISABLE;
+    hcan.Init.Mode = CAN_MODE_NORMAL;
+    
+    // 波特率500kbps，APB1时钟36MHz
+    // 计算公式：Baud = APB1 / (Prescaler * (BS1 + BS2 + 1))
+    hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
+    hcan.Init.TimeSeg1 = CAN_BS1_8TQ;
+    hcan.Init.TimeSeg2 = CAN_BS2_7TQ;
+    hcan.Init.Prescaler = 4;  // 36M / (4 * (8+7+1)) = 500k
+    
+    if (HAL_CAN_Init(&hcan) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    
+    // 配置过滤器，接收所有ID
+    sFilterConfig.FilterBank = 0;
+    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+    sFilterConfig.FilterIdHigh = 0x0000;
+    sFilterConfig.FilterIdLow = 0x0000;
+    sFilterConfig.FilterMaskIdHigh = 0x0000;
+    sFilterConfig.FilterMaskIdLow = 0x0000;
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation = ENABLE;
+    
+    HAL_CAN_ConfigFilter(&hcan, &sFilterConfig);
+    
+    // 启动CAN
+    HAL_CAN_Start(&hcan);
+    HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+}
+</code></pre>
+
+<div class="tip">
+  <p><strong>个人经验</strong>：我习惯把CAN过滤器设置成接收所有ID，然后在应用层做过滤。这样调试方便，后期改ID也不用动底层。当然，量产产品建议用硬件过滤，省CPU资源。</p>
+</div>
+
+<p>数据采集部分，我用ADC采集模拟量。比如温度传感器，0-5V对应0-100度。采集后打包成CAN帧发送。</p>
+
+<pre><code>// 数据采集和发送任务
+void DataAcquisitionTask(void)
+{
+    CAN_TxHeaderTypeDef txHeader;
+    uint8_t txData[8];
+    uint32_t txMailbox;
+    
+    // 采集温度
+    uint16_t adc_value = HAL_ADC_GetValue(&hadc1);
+    float temperature = (adc_value / 4095.0) * 100.0;
+    
+    // 打包成CAN帧
+    txHeader.StdId = 0x100;  // 温度数据ID
+    txHeader.ExtId = 0;
+    txHeader.IDE = CAN_ID_STD;
+    txHeader.RTR = CAN_RTR_DATA;
+    txHeader.DLC = 4;  // 4字节数据
+    
+    // 温度值放大100倍，保留两位小数
+    uint16_t temp_int = (uint16_t)(temperature * 100);
+    txData[0] = (temp_int >> 8) & 0xFF;
+    txData[1] = temp_int & 0xFF;
+    txData[2] = 0;  // 预留
+    txData[3] = 0;
+    
+    // 发送
+    HAL_CAN_AddTxMessage(&hcan, &txHeader, txData, &txMailbox);
+}
+</code></pre>
+
+<p>这里要注意：CAN帧一次只能发8字节。如果你的数据多，就分多帧发。我一般一个传感器一帧，ID不同。比如0x100是温度，0x101是压力，0x102是转速。这样上位机解析也方便。</p>
+
+<h3>30.3 上位机显示设计</h3>
+
+<p>上位机我用C#写，因为开发快。核心功能就三个：接收CAN数据、解析显示、存储日志。</p>
+
+<p>接收部分，我用PCANBasic库。这个库是PEAK公司提供的，免费。你装好PCAN-USB驱动后，直接调用API就行。</p>
+
+<pre><code>// C# 接收CAN数据
+public void ReceiveCANData()
+{
+    TPCANMsg msg;
+    TPCANStatus status;
+    
+    while (true)
+    {
+        status = PCANBasic.Read(PCANBasic.PCAN_USBBUS1, out msg, out _);
+        
+        if (status == PCANBasic.PCAN_ERROR_OK)
+        {
+            // 根据ID解析数据
+            switch (msg.ID)
+            {
+                case 0x100:  // 温度
+                    float temp = (msg.DATA[0] << 8 | msg.DATA[1]) / 100.0f;
+                    UpdateTemperatureDisplay(temp);
+                    break;
+                    
+                case 0x101:  // 压力
+                    float pressure = (msg.DATA[0] << 8 | msg.DATA[1]) / 10.0f;
+                    UpdatePressureDisplay(pressure);
+                    break;
+                    
+                case 0x102:  // 转速
+                    uint16_t rpm = (uint16_t)(msg.DATA[0] << 8 | msg.DATA[1]);
+                    UpdateRPMDisplay(rpm);
+                    break;
+            }
+            
+            // 记录日志
+            LogCANMessage(msg);
+        }
+        
+        Thread.Sleep(10);  // 10ms轮询一次
+    }
+}
+</code></pre>
+
+<div class="highlight">
+  <p><strong>显示界面建议</strong>：</p>
+  <ul>
+    <li>仪表盘显示实时数据（温度表、压力表、转速表）</li>
+    <li>波形图显示趋势（最近100个点）</li>
+    <li>数据表格显示原始CAN帧（方便调试）</li>
+    <li>状态栏显示总线负载率、错误帧计数</li>
+  </ul>
+</div>
+
+<h3>30.4 故障诊断功能</h3>
+
+<p>故障诊断是项目的灵魂。没有诊断，出了问题你只能干瞪眼。</p>
+
+<p>我设计了三层诊断：</p>
+
+<ol>
+  <li><strong>物理层诊断</strong>：检查CAN_H和CAN_L电压、终端电阻</li>
+  <li><strong>数据链路层诊断</strong>：检查错误帧、总线负载率</li>
+  <li><strong>应用层诊断</strong>：检查数据合理性、超时判断</li>
+</ol>
+
+<p>物理层诊断，我建议你在上位机加一个“总线健康检查”按钮。点击后，STM32会返回当前总线的状态。</p>
+
+<pre><code>// 故障诊断命令处理
+void DiagnosticHandler(uint8_t cmd)
+{
+    CAN_TxHeaderTypeDef txHeader;
+    uint8_t txData[8];
+    uint32_t txMailbox;
+    
+    txHeader.StdId = 0x7DF;  // 诊断请求ID
+    txHeader.DLC = 8;
+    
+    switch (cmd)
+    {
+        case 0x01:  // 查询总线状态
+            txData[0] = 0x01;
+            txData[1] = (HAL_CAN_GetState(&hcan) == HAL_CAN_STATE_LISTENING) ? 0x01 : 0x00;
+            txData[2] = error_counter;  // 错误计数
+            txData[3] = bus_load;       // 总线负载率
+            break;
+            
+        case 0x02:  // 查询节点状态
+            txData[0] = 0x02;
+            txData[1] = node_status;    // 0:正常 1:警告 2:被动 3:离线
+            txData[2] = tx_error_count;
+            txData[3] = rx_error_count;
+            break;
+            
+        case 0x03:  // 复位节点
+            txData[0] = 0x03;
+            txData[1] = 0xAA;  // 复位确认码
+            HAL_CAN_Reset(&hcan);
+            break;
+    }
+    
+    HAL_CAN_AddTxMessage(&hcan, &txHeader, txData, &txMailbox);
+}
+</code></pre>
+
+<div class="warning">
+  <p><strong>曾经踩过的坑</strong>：有一次现场总线频繁报错，我查了三天。最后发现是一个节点的CAN收发器坏了，导致总线电压异常。从那以后，我每个项目都加物理层诊断。你想想看，如果连总线电压都监测不到，你怎么定位问题？</p>
+</div>
+
+<p>上位机的诊断界面，我习惯用颜色标识：绿色表示正常，黄色表示警告，红色表示故障。这样现场工程师一眼就能看出问题。</p>
+
+<table>
+  <tr>
+    <th>诊断项目</th>
+    <th>正常范围</th>
+    <th>警告范围</th>
+    <th>故障范围</th>
+  </tr>
+  <tr>
+    <td>CAN_H电压</td>
+    <td>2.5V ± 0.5V</td>
+    <td>2.0V-2.0V 或 3.0V-3.5V</td>
+    <td>&lt;2.0V 或 &gt;3.5V</td>
+  </tr>
+  <tr>
+    <td>CAN_L电压</td>
+    <td>2.5V ± 0.5V</td>
+    <td>2.0V-2.0V 或 3.0V-3.5V</td>
+    <td>&lt;2.0V 或 &gt;3.5V</td>
+  </tr>
+  <tr>
+    <td>终端电阻</td>
+    <td>60Ω ± 10%</td>
+    <td>50-54Ω 或 66-70Ω</td>
+    <td>&lt;50Ω 或 &gt;70Ω</td>
+  </tr>
+  <tr>
+    <td>总线负载率</td>
+    <td>&lt;30%</td>
+    <td>30%-60%</td>
+    <td>&gt;60%</td>
+  </tr>
+  <tr>
+    <td>错误帧率</td>
+    <td>0</td>
+    <td>1-5帧/分钟</td>
+    <td>&gt;5帧/分钟</td>
+  </tr>
+</table>
+
+<h3>30.5 数据存储与回放</h3>
+
+<p>数据存下来才有价值。我一般存两种格式：</p>
+
+<ul>
+  <li><strong>CSV格式</strong>：方便Excel打开，做数据分析</li>
+  <li><strong>二进制格式</strong>：方便回放，模拟现场工况</li>
+</ul>
+
+<p>回放功能特别有用。比如客户说“昨天下午3点设备出问题了”，你直接把那个时间段的CAN数据回放一遍，就能复现问题。我靠这个功能解决过好几个疑难杂症。</p>
+
+<pre><code>// 数据回放功能
+public void ReplayData(string filename)
+{
+    byte[] rawData = File.ReadAllBytes(filename);
+    int offset = 0;
+    
+    while (offset &lt; rawData.Length)
+    {
+        // 解析时间戳
+        uint timestamp = BitConverter.ToUInt32(rawData, offset);
+        offset += 4;
+        
+        // 解析CAN帧
+        TPCANMsg msg;
+        msg.ID = BitConverter.ToUInt32(rawData, offset);
+        offset += 4;
+        msg.LEN = rawData[offset++];
+        msg.MSGTYPE = rawData[offset++];
+        
+        for (int i = 0; i &lt; msg.LEN; i++)
+        {
+            msg.DATA[i] = rawData[offset++];
+        }
+        
+        // 模拟发送
+        PCANBasic.Write(PCANBasic.PCAN_USBBUS1, ref msg);
+        
+        // 按原始时间间隔发送
+        Thread.Sleep((int)(timestamp - lastTimestamp));
+        lastTimestamp = timestamp;
+    }
+}
+</code></pre>
+
+<h3>30.6 项目调试心得</h3>
+
+<p>最后分享几个实战经验：</p>
+
+<ol>
+  <li><strong>先跑通通信，再做功能</strong>。我见过太多人一上来就写应用层代码，结果CAN都没通。先用CAN分析仪发个标准帧，确认STM32能收到，再往下做。</li>
+  <li><strong>日志要详细</strong>。每个CAN帧的收发都要打日志，包括时间戳。出了问题，日志就是你的救命稻草。</li>
+  <li><strong>加看门狗</strong>。工业现场环境恶劣，STM32可能死机。加个独立看门狗，保证系统能自动恢复。</li>
+  <li><strong>预留升级接口</strong>。我习惯在CAN协议里留一个“固件升级”命令。这样现场设备不用拆下来，通过CAN就能升级程序。</li>
+</ol>
+
+<div class="tip">
+  <p><strong>我的习惯</strong>：每个项目做完，我都会写一份“调试记录”。把踩过的坑、解决的方法都记下来。下次遇到类似问题，直接翻记录。这个习惯帮我省了无数时间。</p>
+</div>
+
+<p>好了，30章的内容到这里就结束了。从CAN总线的基础知识，到协议细节，再到硬件设计、软件编程，最后到实战项目。这一路走来，我相信你已经具备了独立开发CAN总线系统的能力。</p>
+
+<p>记住，CAN总线不难，难的是细心和耐心。每个字节、每个位、每个时序，都可能影响整个系统的稳定性。多动手、多测试、多总结，你也能成为CAN总线专家。</p>
+
+<p>如果在实际项目中遇到问题，欢迎交流。毕竟，技术这东西，一个人闷头搞不如大家一起讨论进步快。</p>
+
+<p>祝你在CAN总线的路上越走越远！</p>
+        <div class="footer-nav">
+            <a href="29.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="javascript:void(0)">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

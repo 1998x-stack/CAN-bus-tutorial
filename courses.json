@@ -1,0 +1,307 @@
+{
+  "title": "CAN总线 · 从入门到精通",
+  "emoji": "🚌",
+  "subtitle": "📘 30章 实战体系",
+  "chapterCount": 30,
+  "chapters": [
+    {
+      "num": "01",
+      "title": "CAN总线概述",
+      "topics": [
+        "发展历史",
+        "汽车电子应用",
+        "物理层特性"
+      ],
+      "file": "01.html"
+    },
+    {
+      "num": "02",
+      "title": "CAN协议基础",
+      "topics": [
+        "分层结构",
+        "数据帧格式",
+        "远程帧/错误帧/过载帧"
+      ],
+      "file": "02.html"
+    },
+    {
+      "num": "03",
+      "title": "CAN总线仲裁机制",
+      "topics": [
+        "位仲裁原理",
+        "CSMA/CR机制",
+        "仲裁失败处理"
+      ],
+      "file": "03.html"
+    },
+    {
+      "num": "04",
+      "title": "CAN总线错误处理",
+      "topics": [
+        "错误类型",
+        "位/填充/CRC错误",
+        "错误状态机"
+      ],
+      "file": "04.html"
+    },
+    {
+      "num": "05",
+      "title": "CAN总线位时序与同步",
+      "topics": [
+        "位时间结构",
+        "同步段/传播段",
+        "硬同步/重同步"
+      ],
+      "file": "05.html"
+    },
+    {
+      "num": "06",
+      "title": "CAN控制器硬件",
+      "topics": [
+        "SJA1000/MCP2515",
+        "内部寄存器",
+        "工作模式"
+      ],
+      "file": "06.html"
+    },
+    {
+      "num": "07",
+      "title": "CAN收发器",
+      "topics": [
+        "TJA1050/SN65HVD230",
+        "电气特性",
+        "共模/差模信号"
+      ],
+      "file": "07.html"
+    },
+    {
+      "num": "08",
+      "title": "STM32 CAN外设",
+      "topics": [
+        "bxCAN控制器",
+        "时钟配置",
+        "GPIO复用"
+      ],
+      "file": "08.html"
+    },
+    {
+      "num": "09",
+      "title": "STM32 CAN初始化",
+      "topics": [
+        "初始化步骤",
+        "位时间配置",
+        "过滤器/中断配置"
+      ],
+      "file": "09.html"
+    },
+    {
+      "num": "10",
+      "title": "CAN报文发送",
+      "topics": [
+        "发送邮箱机制",
+        "发送优先级",
+        "发送完成中断"
+      ],
+      "file": "10.html"
+    },
+    {
+      "num": "11",
+      "title": "CAN报文接收",
+      "topics": [
+        "接收FIFO",
+        "过滤器匹配",
+        "接收中断/超时"
+      ],
+      "file": "11.html"
+    },
+    {
+      "num": "12",
+      "title": "CAN中断编程",
+      "topics": [
+        "中断优先级",
+        "中断服务函数",
+        "调试技巧"
+      ],
+      "file": "12.html"
+    },
+    {
+      "num": "13",
+      "title": "CAN过滤器深入",
+      "topics": [
+        "标识符列表/掩码模式",
+        "过滤器组",
+        "屏蔽位设计"
+      ],
+      "file": "13.html"
+    },
+    {
+      "num": "14",
+      "title": "CAN总线网络拓扑",
+      "topics": [
+        "总线/星型拓扑",
+        "终端电阻",
+        "长度与速率"
+      ],
+      "file": "14.html"
+    },
+    {
+      "num": "15",
+      "title": "CAN总线终端电阻",
+      "topics": [
+        "终端电阻作用",
+        "120Ω选择",
+        "放置位置/错误"
+      ],
+      "file": "15.html"
+    },
+    {
+      "num": "16",
+      "title": "CAN总线电平与差分信号",
+      "topics": [
+        "显性/隐性电平",
+        "差分信号优势",
+        "共模电压"
+      ],
+      "file": "16.html"
+    },
+    {
+      "num": "17",
+      "title": "CAN总线通信速率",
+      "topics": [
+        "125k~1Mbps",
+        "速率与距离",
+        "采样点设置"
+      ],
+      "file": "17.html"
+    },
+    {
+      "num": "18",
+      "title": "CANopen协议入门",
+      "topics": [
+        "协议栈结构",
+        "对象字典",
+        "PDO与SDO"
+      ],
+      "file": "18.html"
+    },
+    {
+      "num": "19",
+      "title": "CANopen NMT与心跳",
+      "topics": [
+        "NMT状态机",
+        "心跳报文",
+        "节点守护"
+      ],
+      "file": "19.html"
+    },
+    {
+      "num": "20",
+      "title": "CANopen SDO通信",
+      "topics": [
+        "SDO请求/响应",
+        "分段/块传输",
+        "超时处理"
+      ],
+      "file": "20.html"
+    },
+    {
+      "num": "21",
+      "title": "CANopen PDO通信",
+      "topics": [
+        "PDO映射",
+        "同步/异步PDO",
+        "触发方式"
+      ],
+      "file": "21.html"
+    },
+    {
+      "num": "22",
+      "title": "J1939协议入门",
+      "topics": [
+        "协议栈结构",
+        "PGN与SPN",
+        "地址声明"
+      ],
+      "file": "22.html"
+    },
+    {
+      "num": "23",
+      "title": "J1939多包传输",
+      "topics": [
+        "多包消息机制",
+        "连接管理",
+        "传输协议"
+      ],
+      "file": "23.html"
+    },
+    {
+      "num": "24",
+      "title": "CAN总线测试工具",
+      "topics": [
+        "PCAN/USBCAN",
+        "CANscope",
+        "CANstress"
+      ],
+      "file": "24.html"
+    },
+    {
+      "num": "25",
+      "title": "CAN总线调试技巧",
+      "topics": [
+        "逻辑分析仪抓包",
+        "负载率计算",
+        "故障排查"
+      ],
+      "file": "25.html"
+    },
+    {
+      "num": "26",
+      "title": "CAN总线硬件设计",
+      "topics": [
+        "PCB布局",
+        "隔离设计",
+        "ESD保护"
+      ],
+      "file": "26.html"
+    },
+    {
+      "num": "27",
+      "title": "CAN总线软件架构",
+      "topics": [
+        "分层设计",
+        "驱动/协议/应用层"
+      ],
+      "file": "27.html"
+    },
+    {
+      "num": "28",
+      "title": "CAN总线多节点通信实战",
+      "topics": [
+        "多节点组网",
+        "数据同步",
+        "冲突避免"
+      ],
+      "file": "28.html"
+    },
+    {
+      "num": "29",
+      "title": "CAN总线低功耗设计",
+      "topics": [
+        "休眠唤醒",
+        "局部网络",
+        "选择性唤醒"
+      ],
+      "file": "29.html"
+    },
+    {
+      "num": "30",
+      "title": "CAN总线项目实战",
+      "topics": [
+        "STM32数据采集",
+        "上位机显示",
+        "故障诊断"
+      ],
+      "file": "30.html"
+    }
+  ]
+}

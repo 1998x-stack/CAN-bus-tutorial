@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第16章 CAN总线电平与差分信号</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
+<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
+<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html" class="">第7章 CAN收发器</a></li>
+<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
+<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
+<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
+<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html" class="active">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
+<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
+<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
+<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第16章：CAN总线电平与差分信号</h2>
+
+<p>各位工程师朋友，今天我们来聊聊CAN总线最底层的物理基础——电平与差分信号。说实话，很多初学者一上来就研究协议、报文格式，却忽略了最基础的信号特性。我个人觉得，搞懂电平特性，你才算真正入了CAN的门。</p>
+
+<h3>16.1 显性电平与隐性电平</h3>
+
+<p>CAN总线只有两种逻辑状态：显性（Dominant）和隐性（Recessive）。这跟普通的UART、I2C不太一样。我刚开始接触时也纳闷，为什么非要搞两个名字？直接叫高电平低电平不就行了？</p>
+
+<p>嗯，这里要注意：CAN总线的电平是差分信号，不是单端信号。它靠CAN_H和CAN_L两根线的电压差来传递信息。</p>
+
+<ul>
+  <li><strong>隐性电平（Recessive）</strong>：CAN_H和CAN_L电压差接近0V。逻辑上代表"1"。</li>
+  <li><strong>显性电平（Dominant）</strong>：CAN_H比CAN_L高约2V。逻辑上代表"0"。</li>
+</ul>
+
+<p>你想想看，为什么叫"显性"和"隐性"？因为当多个节点同时发送时，显性电平会覆盖隐性电平。这就是CAN总线仲裁的基础。我在项目中遇到过一个问题：有个节点总是不响应，查了半天发现是它的CAN收发器坏了，一直输出隐性电平，根本抢不到总线控制权。</p>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>显性电平的优先级高于隐性电平。总线空闲时是隐性电平，任何节点想发送数据，必须先拉低总线到显性电平。</p>
+</div>
+
+<h3>16.2 差分信号的优势</h3>
+
+<p>为什么CAN要用差分信号？说白了，就是为了抗干扰。我做过一个项目，在工厂车间里布CAN总线，旁边就是大功率电机和变频器。如果用单端信号，早就被干扰得没法看了。</p>
+
+<p>差分信号的核心原理：</p>
+<ul>
+  <li>信号用两根线的电压差表示，不是对地电压</li>
+  <li>外部干扰同时作用在两根线上，差值基本不变</li>
+  <li>共模噪声被自然抵消</li>
+</ul>
+
+<p>举个例子：假设CAN_H是3.5V，CAN_L是1.5V，差值是2V。突然来了个1V的共模干扰，CAN_H变成4.5V，CAN_L变成2.5V，差值还是2V。你看，干扰被抵消了。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>在长距离传输（比如100米以上）或者电磁环境恶劣的场合，差分信号的优势特别明显。我曾经在一条200米的CAN总线上跑过，用示波器看波形，虽然单端对地噪声很大，但差分信号依然清晰。</p>
+</div>
+
+<h3>16.3 共模电压范围</h3>
+
+<p>共模电压，就是CAN_H和CAN_L对地的平均电压。公式很简单：Vcm = (CAN_H + CAN_L) / 2。</p>
+
+<p>为什么关心这个？因为CAN收发器有它的工作范围。常见的CAN收发器（比如TJA1050、SN65HVD230）的共模电压范围是-2V到+7V。超出这个范围，收发器可能无法正确识别差分信号。</p>
+
+<table>
+  <tr>
+    <th>参数</th>
+    <th>典型值</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td>隐性电平（CAN_H）</td>
+    <td>2.5V</td>
+    <td>总线空闲时</td>
+  </tr>
+  <tr>
+    <td>隐性电平（CAN_L）</td>
+    <td>2.5V</td>
+    <td>总线空闲时</td>
+  </tr>
+  <tr>
+    <td>显性电平（CAN_H）</td>
+    <td>3.5V</td>
+    <td>发送显性位时</td>
+  </tr>
+  <tr>
+    <td>显性电平（CAN_L）</td>
+    <td>1.5V</td>
+    <td>发送显性位时</td>
+  </tr>
+  <tr>
+    <td>共模电压范围</td>
+    <td>-2V ~ +7V</td>
+    <td>收发器正常工作范围</td>
+  </tr>
+</table>
+
+<p>为什么会超出共模范围？最常见的原因是地电位差。两个节点距离很远，它们的地电位可能相差几伏。我曾经在一个项目中，两个设备相距300米，地电位差达到了3V。结果CAN通信时好时坏，最后加了隔离才解决。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在调试一个车载CAN网络时，发现某个节点总是间歇性丢帧。排查了三天，最后用万用表一量，CAN_H对地电压只有1.8V，CAN_L对地电压是0.2V。原来这个节点的电源地线接触不良，导致共模电压偏移到了收发器的工作范围之外。从那以后，我每次调试CAN网络，第一件事就是量共模电压。</p>
+</div>
+
+<h3>16.4 实际测量与调试技巧</h3>
+
+<p>说点实用的。怎么用示波器看CAN信号？我建议你这样操作：</p>
+
+<ol>
+  <li>示波器探头CH1接CAN_H，CH2接CAN_L</li>
+  <li>地线夹子接GND（注意：不是接CAN_GND，是系统GND）</li>
+  <li>打开数学运算功能，设置CH1 - CH2</li>
+  <li>看差分波形，显性位应该是约2V，隐性位接近0V</li>
+</ol>
+
+<p>你想想看，如果只看单端波形，CAN_H和CAN_L都在跳变，很难判断信号质量。但看差分波形，一眼就能看出问题。</p>
+
+<div class="highlight">
+  <p><strong>判断信号质量的几个指标：</strong></p>
+  <ul>
+    <li>显性电平幅度：1.5V ~ 2.5V（标准是2V）</li>
+    <li>隐性电平幅度：-0.5V ~ +0.5V（标准是0V）</li>
+    <li>上升/下降时间：一般几十纳秒</li>
+    <li>共模电压：在-2V到+7V之间</li>
+  </ul>
+</div>
+
+<h3>16.5 总结</h3>
+
+<p>CAN总线的电平特性，说白了就是三件事：显性/隐性电平的定义、差分信号的优势、共模电压的范围。搞懂这些，你就能理解为什么CAN能在恶劣环境下稳定工作。</p>
+
+<p>我个人习惯，在设计CAN电路时，一定会预留共模电感和TVS管的位置。虽然大多数情况下用不上，但万一现场环境恶劣，这些预留能救你一命。记住一句话：CAN总线不怕干扰，怕的是你不懂它的脾气。</p>
+
+<div class="tip">
+  <p><strong>最后一个小技巧：</strong>如果你在调试时发现CAN通信不稳定，先别急着怀疑软件。拿示波器看看差分波形，量量共模电压。我敢说，80%的问题都出在物理层。</p>
+</div>
+        <div class="footer-nav">
+            <a href="15.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

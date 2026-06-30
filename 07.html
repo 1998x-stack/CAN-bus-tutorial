@@ -1,0 +1,388 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第7章 CAN收发器</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
+<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
+<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html" class="active">第7章 CAN收发器</a></li>
+<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
+<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
+<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
+<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
+<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
+<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
+<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第7章：CAN收发器——信号世界的翻译官</h2>
+
+<p>各位同学，今天我们来聊聊CAN收发器。说实话，很多初学者觉得收发器就是个电平转换芯片，没什么好学的。但我在汽车电子干了这么多年，可以负责任地告诉你：<strong>收发器选不好，整个CAN网络都可能瘫痪</strong>。</p>
+
+<p>CAN收发器，说白了就是连接CAN控制器和物理总线的桥梁。控制器输出的是逻辑电平（0或1），而总线上跑的是差分信号。收发器就是负责这两者之间的翻译工作。</p>
+
+<h3>7.1 收发器在CAN系统中的位置</h3>
+
+<p>先看一张典型的CAN节点框图：</p>
+
+<pre><code>┌─────────────────────────────────┐
+│          MCU/微控制器            │
+│  ┌──────────┐    ┌──────────┐   │
+│  │ CAN控制器 │←──→│  SPI/I2C │   │
+│  │ (内置)    │    │ 等外设   │   │
+│  └─────┬────┘    └──────────┘   │
+│        │ TXD/RXD                 │
+└────────┼────────────────────────┘
+         │
+    ┌────┴────┐
+    │ CAN收发器│  ← 我们今天的主角
+    │ TJA1050 │
+    └────┬────┘
+         │ CANH/CANL
+    ┌────┴────┐
+    │ 物理总线 │
+    │ 双绞线   │
+    └─────────┘</code></pre>
+
+<p>收发器有四个关键引脚：</p>
+<ul>
+  <li><strong>TXD</strong>：发送数据输入（来自控制器）</li>
+  <li><strong>RXD</strong>：接收数据输出（给控制器）</li>
+  <li><strong>CANH</strong>：CAN高电平总线</li>
+  <li><strong>CANL</strong>：CAN低电平总线</li>
+</ul>
+
+<p>嗯，这里要注意：TXD和RXD是逻辑电平（通常是3.3V或5V），而CANH/CANL是差分信号。收发器就是在这两种信号之间来回转换。</p>
+
+<h3>7.2 经典收发器：TJA1050</h3>
+
+<p>TJA1050是NXP（原飞利浦）的经典产品，也是我最早接触的CAN收发器之一。记得2008年做第一个车载项目时，用的就是它。到现在，这颗芯片依然活跃在很多设计中。</p>
+
+<p><strong>主要特性：</strong></p>
+<table>
+  <tr>
+    <th>参数</th>
+    <th>典型值</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td>工作电压</td>
+    <td>5V</td>
+    <td>单电源供电</td>
+  </tr>
+  <tr>
+    <td>总线电压</td>
+    <td>CANH: 3.5V, CANL: 1.5V</td>
+    <td>显性位时</td>
+  </tr>
+  <tr>
+    <td>速率</td>
+    <td>最高1Mbps</td>
+    <td>实际常用250k/500k</td>
+  </tr>
+  <tr>
+    <td>工作温度</td>
+    <td>-40℃ ~ +125℃</td>
+    <td>车规级</td>
+  </tr>
+  <tr>
+    <td>待机电流</td>
+    <td>＜5μA</td>
+    <td>低功耗模式</td>
+  </tr>
+</table>
+
+<p><strong>引脚功能：</strong></p>
+<ul>
+  <li>Pin1 TXD：发送数据输入。低电平驱动显性位，高电平驱动隐性位</li>
+  <li>Pin2 GND：接地</li>
+  <li>Pin3 VCC：5V电源</li>
+  <li>Pin4 RXD：接收数据输出。总线显性时输出低电平</li>
+  <li>Pin5 VREF：参考电压输出（1/2 VCC），用于共模偏置</li>
+  <li>Pin6 CANL：CAN低电平总线</li>
+  <li>Pin7 CANH：CAN高电平总线</li>
+  <li>Pin8 S：静音模式控制（高电平进入静音）</li>
+</ul>
+
+<div class="tip">
+  <strong>我的小技巧：</strong> 在设计PCB时，我习惯在TXD和RXD引脚上各加一个100Ω的串联电阻。这能有效抑制信号反射，特别是在长走线的情况下。有一次调试一个干扰严重的项目，就是靠这两个电阻搞定的。
+</div>
+
+<h3>7.3 另一款常用收发器：SN65HVD230</h3>
+
+<p>TI的SN65HVD230是3.3V系统的首选。现在很多MCU都是3.3V供电，如果用TJA1050还得加电平转换，而HVD230可以直接对接。</p>
+
+<p><strong>与TJA1050的主要区别：</strong></p>
+<table>
+  <tr>
+    <th>参数</th>
+    <th>TJA1050</th>
+    <th>SN65HVD230</th>
+  </tr>
+  <tr>
+    <td>供电电压</td>
+    <td>5V</td>
+    <td>3.3V</td>
+  </tr>
+  <tr>
+    <td>逻辑电平</td>
+    <td>5V TTL</td>
+    <td>3.3V CMOS</td>
+  </tr>
+  <tr>
+    <td>总线电压</td>
+    <td>CANH: 3.5V, CANL: 1.5V</td>
+    <td>CANH: 2.4V, CANL: 0.9V</td>
+  </tr>
+  <tr>
+    <td>待机模式</td>
+    <td>通过S引脚控制</td>
+    <td>通过RS引脚控制</td>
+  </tr>
+  <tr>
+    <td>斜率控制</td>
+    <td>无</td>
+    <td>有（通过Rs引脚）</td>
+  </tr>
+</table>
+
+<p>HVD230的Rs引脚很有意思。接不同电阻可以控制上升/下降斜率：</p>
+<ul>
+  <li>Rs接地：高速模式（斜率最快）</li>
+  <li>Rs接10kΩ到GND：中等斜率</li>
+  <li>Rs接100kΩ到GND：低斜率（适合低速、抗干扰）</li>
+</ul>
+
+<p>我个人建议：如果总线长度超过10米，或者环境干扰大，可以把斜率调低一点。虽然速率会受影响，但可靠性提升明显。</p>
+
+<h3>7.4 电气特性详解</h3>
+
+<p>收发器的电气特性直接决定了通信的可靠性。我挑几个关键参数说说：</p>
+
+<p><strong>1. 差分输出电压</strong></p>
+<p>显性位时，CANH - CANL 的电压差：</p>
+<ul>
+  <li>TJA1050：约2V（CANH=3.5V, CANL=1.5V）</li>
+  <li>SN65HVD230：约1.5V（CANH=2.4V, CANL=0.9V）</li>
+</ul>
+<p>隐性位时，CANH和CANL都偏置到2.5V（或1.2V），电压差接近0V。</p>
+
+<p><strong>2. 共模电压范围</strong></p>
+<p>CAN标准要求收发器能承受-2V到+7V的共模电压。为什么？因为总线两端的地电位可能有差异。我曾经在一条50米长的总线上测到过3V的地电位差，如果收发器共模范围不够，通信直接就挂了。</p>
+
+<p><strong>3. 输入阈值</strong></p>
+<p>接收器的差分输入阈值：</p>
+<ul>
+  <li>显性位识别：差分电压 > 0.9V</li>
+  <li>隐性位识别：差分电压 < 0.5V</li>
+  <li>中间区域（0.5V~0.9V）：不确定区，应避免</li>
+</ul>
+
+<div class="warning">
+  <strong>避坑指南：</strong> 我曾经遇到过一个项目，总线上的显性位差分电压只有0.8V。理论上应该能识别，但实际测试时偶尔会丢帧。后来发现是收发器供电电压偏低，导致驱动能力不足。所以，<strong>设计时一定要留足余量</strong>，显性位差分电压最好做到1.5V以上。
+</div>
+
+<h3>7.5 共模信号与差模信号</h3>
+
+<p>这是很多初学者容易混淆的概念。我尽量用大白话讲清楚。</p>
+
+<p><strong>差模信号：</strong> 就是CANH和CANL之间的电压差。这是我们真正要传输的信号。显性位时差2V，隐性位时差0V。接收器就是靠检测这个差值来还原数据的。</p>
+
+<p><strong>共模信号：</strong> 是CANH和CANL相对于GND的平均电压。比如CANH=3.5V, CANL=1.5V，共模电压就是(3.5+1.5)/2=2.5V。</p>
+
+<p>为什么CAN要用差分信号？说白了就是为了抗共模干扰。你想想看，如果外部电磁干扰同时耦合到CANH和CANL上，两根线上的干扰幅度几乎相同。差模信号（CANH-CANL）基本不受影响。这就是差分传输的魔力。</p>
+
+<p><strong>实际波形示例：</strong></p>
+<pre><code>示波器看到的CANH和CANL波形（显性位+隐性位）：
+
+电压
+│
+5V ┤
+   │     ┌───┐         ┌───┐
+3.5V┤─────┤   ├─────────┤   ├──── CANH
+   │     │   │         │   │
+2.5V┤─────┤   ├─────────┤   ├──── 共模电平
+   │     │   │         │   │
+1.5V┤─────┤   ├─────────┤   ├──── CANL
+   │     └───┘         └───┘
+0V ┤
+   └────────────────────────────── 时间
+       显性   隐性    显性</code></pre>
+
+<p>注意看：显性位时，CANH被拉到3.5V，CANL被拉到1.5V，差分电压2V。隐性位时，两根线都回到2.5V，差分电压0V。</p>
+
+<h3>7.6 收发器选型建议</h3>
+
+<p>根据我多年的经验，选型时考虑这几点：</p>
+
+<ol>
+  <li><strong>供电电压</strong>：5V系统用TJA1050，3.3V系统用SN65HVD230</li>
+  <li><strong>速率要求</strong>：普通应用500kbps以内，两款都够用</li>
+  <li><strong>功耗要求</strong>：需要低功耗待机的，选带待机模式的型号</li>
+  <li><strong>EMC性能</strong>：TJA1050的EMC表现更好，适合恶劣环境</li>
+  <li><strong>温度范围</strong>：车规必须选-40℃~125℃的</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>核心要点总结：</strong></p>
+  <ul>
+    <li>收发器是控制器和总线之间的桥梁</li>
+    <li>TJA1050是5V系统的经典选择，SN65HVD230适合3.3V系统</li>
+    <li>差分信号是CAN抗干扰的关键</li>
+    <li>共模电压范围决定了系统的鲁棒性</li>
+    <li>选型时留足余量，特别是差分电压和共模范围</li>
+  </ul>
+</div>
+
+<p>好了，关于CAN收发器就讲这么多。下一章我们聊聊CAN总线终端电阻和拓扑结构，那也是个容易踩坑的地方。各位有什么问题，欢迎在课程群里交流。</p>
+        <div class="footer-nav">
+            <a href="06.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="08.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

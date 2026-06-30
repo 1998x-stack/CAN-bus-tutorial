@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第8章 STM32 CAN外设</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
+<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
+<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html" class="">第7章 CAN收发器</a></li>
+<li><a href="08.html" class="active">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
+<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
+<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
+<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
+<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
+<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
+<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第8章：STM32 CAN外设：bxCAN控制器介绍、CAN外设时钟配置、GPIO复用功能配置</h2>
+
+<p>好，咱们今天来聊聊STM32的CAN外设。很多初学者一看到芯片手册里那一大堆寄存器，头就大了。其实没那么复杂，你把它拆开来看，就三个核心问题：<strong>用什么硬件、给它什么时钟、怎么连到外面去</strong>。搞明白这三件事，CAN通信的底层就算打通了。</p>
+
+<h3>8.1 bxCAN控制器：ST的“黑盒子”</h3>
+
+<p>STM32里集成的CAN控制器，官方叫<strong>bxCAN</strong>。这个“bx”是“Basic Extended”的缩写，说白了就是支持标准帧和扩展帧。我个人习惯把它看作一个智能的“黑盒子”——你只管把数据丢进去，它自动帮你完成帧封装、位填充、CRC校验、仲裁这些脏活累活。</p>
+
+<p>bxCAN有几个关键特性，我挑重要的说：</p>
+
+<ul>
+  <li><strong>支持CAN 2.0A和2.0B</strong>：标准帧（11位ID）和扩展帧（29位ID）都能处理。现在绝大多数车载网络都用扩展帧，但老一些的J1939设备可能还在用标准帧，兼容性你得心里有数。</li>
+  <li><strong>3个发送邮箱</strong>：可以缓存3个待发送的报文。发送优先级由硬件自动仲裁，你不需要操心。</li>
+  <li><strong>2个接收FIFO</strong>：每个FIFO深度为3个报文。也就是说，最多可以缓存6个接收报文而不丢失。我在项目里遇到过接收溢出导致丢帧的情况，后来发现是FIFO满了，而我的应用层还没来得及读走数据。嗯，这里要注意：<strong>接收中断服务程序一定要写得快</strong>。</li>
+  <li><strong>28个可配置的筛选器组</strong>：这是bxCAN最强大的功能之一。你可以设置筛选规则，只接收你关心的ID，其他报文一律过滤掉。这能大大减轻CPU的负担。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>bxCAN本质上是一个独立于CPU运行的硬件状态机。它有自己的时钟域，通过APB总线与CPU交互。你配置好寄存器后，它就开始自主工作。</p>
+</div>
+
+<h3>8.2 CAN外设时钟配置：别让时钟“饿着”</h3>
+
+<p>任何外设要工作，首先得有时钟。CAN外设挂在<strong>APB1总线</strong>上（对于STM32F1/F4系列）。时钟源通常来自<strong>HSE（外部高速晶振）</strong>经过PLL倍频后的系统时钟，再经过APB1预分频器得到。</p>
+
+<p>为什么我要强调这个？因为CAN通信的位时序（Bit Timing）完全依赖于这个时钟。如果时钟不准，你的波特率就会漂移，通信就会出错。我曾经在一个项目中，因为APB1时钟配置错了，导致CAN波特率从500kbps变成了480kbps，结果和ECU怎么都连不上，排查了整整一天……</p>
+
+<p>配置时钟的步骤其实很简单：</p>
+
+<ol>
+  <li><strong>使能CAN外设时钟</strong>：通过RCC寄存器，比如<code>RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);</code></li>
+  <li><strong>配置CAN的位时序参数</strong>：这包括<strong>BS1（时间段1）</strong>、<strong>BS2（时间段2）</strong>和<strong>SJW（同步跳转宽度）</strong>。这些参数决定了最终的波特率。</li>
+</ol>
+
+<p>波特率的计算公式是：</p>
+<pre><code>BaudRate = CAN_Clock / ( (1 + BS1 + BS2) * Prescaler )</code></pre>
+
+<p>举个例子，假设APB1时钟是36MHz，你想要500kbps的波特率，通常可以这样配：</p>
+<pre><code>CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;      // 同步跳转宽度为1个时间量子
+CAN_InitStructure.CAN_BS1 = CAN_BS1_8tq;      // 时间段1为8个时间量子
+CAN_InitStructure.CAN_BS2 = CAN_BS2_7tq;      // 时间段2为7个时间量子
+CAN_InitStructure.CAN_Prescaler = 4;           // 预分频系数为4
+// 计算：36MHz / ( (1 + 8 + 7) * 4 ) = 36MHz / 64 = 562.5kbps
+// 嗯，这个值不太对，说明需要调整参数。</code></pre>
+
+<p>你看，实际计算时，需要反复调整BS1、BS2和Prescaler，让结果尽量接近目标值。我建议你使用ST官方提供的<strong>CAN波特率计算工具</strong>，或者直接查芯片手册里的推荐配置表，省时省力。</p>
+
+<div class="tip">
+  <p><strong>个人经验：</strong>对于500kbps的常用波特率，在36MHz APB1时钟下，我常用的配置是：Prescaler=4, BS1=9tq, BS2=8tq, SJW=1tq。这样算出来正好是500kbps。你可以直接拿去用。</p>
+</div>
+
+<h3>8.3 GPIO复用功能配置：把信号引出来</h3>
+
+<p>时钟配好了，控制器也初始化了，但信号怎么从芯片引脚出去呢？这就涉及到<strong>GPIO复用功能</strong>。CAN的发送引脚（TX）和接收引脚（RX）必须连接到特定的GPIO引脚上。</p>
+
+<p>以STM32F103为例，CAN1的引脚通常是：</p>
+<ul>
+  <li><strong>CAN1_TX</strong>：PA12（复用推挽输出）</li>
+  <li><strong>CAN1_RX</strong>：PA11（浮空输入或上拉输入）</li>
+</ul>
+
+<p>配置GPIO的步骤，我一般这样写：</p>
+<pre><code>GPIO_InitTypeDef GPIO_InitStructure;
+
+// 使能GPIOA时钟
+RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+
+// 配置CAN1_TX (PA12) 为复用推挽输出
+GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;   // 复用推挽输出
+GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+// 配置CAN1_RX (PA11) 为上拉输入
+GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
+GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;     // 上拉输入
+GPIO_Init(GPIOA, &GPIO_InitStructure);</code></pre>
+
+<p>这里有几个坑，我踩过，你注意一下：</p>
+
+<ul>
+  <li><strong>TX引脚必须配置为复用推挽输出</strong>，不能是普通推挽输出。否则CAN控制器无法控制引脚电平。</li>
+  <li><strong>RX引脚建议配置为上拉输入</strong>。虽然浮空输入也能工作，但上拉可以保证在总线空闲时，RX引脚保持高电平，避免误触发。</li>
+  <li><strong>不同型号的STM32，CAN引脚可能不同</strong>。比如STM32F4系列，CAN1的引脚可能是PB8（RX）和PB9（TX）。一定要查数据手册的“Alternate function mapping”表格。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个项目中，因为偷懒没查手册，直接复制了F1的代码到F4上，结果CAN死活不通。后来发现F4的CAN1引脚映射到了PB8/PB9，而我配置的是PA11/PA12。所以，<strong>换芯片型号时，务必重新确认引脚复用功能</strong>。</p>
+</div>
+
+<h3>8.4 完整的初始化流程</h3>
+
+<p>把上面三块内容串起来，一个完整的CAN初始化流程大概是这样的：</p>
+
+<ol>
+  <li><strong>使能时钟</strong>：RCC使能CAN外设时钟和对应GPIO时钟。</li>
+  <li><strong>配置GPIO</strong>：将TX和RX引脚设置为正确的复用模式。</li>
+  <li><strong>配置CAN控制器</strong>：设置波特率、工作模式（正常/环回/静默）、筛选器等。</li>
+  <li><strong>使能CAN</strong>：调用<code>CAN_Cmd(CAN1, ENABLE);</code>启动CAN外设。</li>
+</ol>
+
+<p>代码示例（简化版）：</p>
+<pre><code>void CAN_Config(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    CAN_InitTypeDef CAN_InitStructure;
+
+    // 1. 使能时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
+
+    // 2. 配置GPIO
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+    // 3. 配置CAN控制器
+    CAN_DeInit(CAN1);
+    CAN_StructInit(&CAN_InitStructure);
+    CAN_InitStructure.CAN_TTCM = DISABLE;
+    CAN_InitStructure.CAN_ABOM = ENABLE;   // 自动离线管理
+    CAN_InitStructure.CAN_AWUM = ENABLE;   // 自动唤醒
+    CAN_InitStructure.CAN_NART = DISABLE;  // 禁止自动重传
+    CAN_InitStructure.CAN_RFLM = DISABLE;  // 接收FIFO锁定模式
+    CAN_InitStructure.CAN_TXFP = DISABLE;  // 发送优先级由ID决定
+    CAN_InitStructure.CAN_Mode = CAN_Mode_Normal; // 正常模式
+    CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;
+    CAN_InitStructure.CAN_BS1 = CAN_BS1_9tq;
+    CAN_InitStructure.CAN_BS2 = CAN_BS2_8tq;
+    CAN_InitStructure.CAN_Prescaler = 4;
+    CAN_Init(CAN1, &CAN_InitStructure);
+
+    // 4. 使能CAN
+    CAN_Cmd(CAN1, ENABLE);
+}</code></pre>
+
+<p>你看，其实就这么几步。你想想看，只要时钟对了、引脚对了、参数对了，CAN通信的硬件基础就搭好了。剩下的就是发送和接收的逻辑了。</p>
+
+<div class="highlight">
+  <p><strong>总结一下：</strong>bxCAN控制器是核心，时钟配置是基础，GPIO复用是桥梁。这三者缺一不可。我建议你在实际调试时，先用逻辑分析仪抓一下CAN_TX和CAN_RX引脚的波形，确认时钟和波特率是否正确。这是最快定位问题的方法。</p>
+</div>
+
+<p>好，这一章就到这里。下一章我们聊聊CAN的发送和接收流程，以及中断处理。到时候我会分享一些我在实际项目中遇到的“血泪史”，保证让你印象深刻。</p>
+        <div class="footer-nav">
+            <a href="07.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="09.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

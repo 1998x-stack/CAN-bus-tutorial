@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第9章 STM32 CAN初始化</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
+<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
+<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html" class="">第7章 CAN收发器</a></li>
+<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html" class="active">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
+<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
+<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
+<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
+<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
+<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
+<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第9章 STM32 CAN初始化：CAN初始化步骤、位时间配置、过滤器配置、中断配置</h2>
+
+<p>好，咱们今天来聊聊STM32的CAN初始化。说实话，很多新手朋友一上来就急着发数据，结果发现CAN总线死活没反应。嗯，我当年也干过这事儿。后来才明白，初始化这一步要是没走稳，后面全是白搭。</p>
+
+<p>我个人习惯把CAN初始化拆成四个大块：<strong>时钟与GPIO配置、CAN工作模式与位时间、过滤器设置、中断使能</strong>。咱们一个一个来啃。</p>
+
+<h3>9.1 初始化步骤：先打好地基</h3>
+
+<p>先说说整体流程。你想想看，CAN外设就像一台精密仪器，你得先给它通电、接好线、告诉它怎么工作，它才能干活。</p>
+
+<p>具体步骤我总结了一下：</p>
+
+<ol>
+  <li><strong>使能时钟</strong>：打开CAN外设时钟，还有它对应的GPIO时钟。别忘了，CAN用的是复用功能。</li>
+  <li><strong>配置GPIO</strong>：把CAN_TX设为复用推挽输出，CAN_RX设为浮空输入。我习惯把这两个引脚的速度调到最高，省得出问题。</li>
+  <li><strong>复位CAN外设</strong>：调用<code>CAN_DeInit()</code>，让CAN回到初始状态。这一步很多人会漏掉，但我觉得挺重要的。</li>
+  <li><strong>设置工作模式</strong>：正常模式、环回模式、静默模式，根据需求选。调试阶段我一般先用环回模式。</li>
+  <li><strong>配置位时间</strong>：也就是波特率。这个后面细说。</li>
+  <li><strong>配置过滤器</strong>：决定哪些报文能进，哪些得挡在外面。</li>
+  <li><strong>使能中断</strong>：如果你要用中断接收，这一步不能少。</li>
+  <li><strong>启动CAN</strong>：调用<code>CAN_Start()</code>，让CAN进入工作状态。</li>
+</ol>
+
+<p>你看，一共八步。我在项目中遇到过有人把启动CAN放在过滤器前面，结果过滤器没生效，数据乱飞。所以顺序很重要，别搞反了。</p>
+
+<h3>9.2 位时间配置：波特率是怎么算出来的？</h3>
+
+<p>位时间配置，说白了就是决定CAN通信的快慢。CAN总线的波特率不是随便设的，它跟你的时钟频率、分频系数、时间段都有关系。</p>
+
+<p>STM32的CAN位时间由三部分组成：</p>
+
+<ul>
+  <li><strong>SYNC_SEG</strong>：同步段，固定为1个时间量子（tq）。</li>
+  <li><strong>BS1</strong>：时间段1，可以设1~16个tq。</li>
+  <li><strong>BS2</strong>：时间段2，可以设1~8个tq。</li>
+</ul>
+
+<p>波特率的计算公式是：</p>
+
+<pre><code>波特率 = CAN时钟频率 / (分频系数 × (1 + BS1 + BS2))</code></pre>
+
+<p>举个例子。假设CAN时钟是36MHz，我想跑到500kbps。那分频系数设多少？</p>
+
+<p>先算一下：500k = 36M / (分频 × (1 + BS1 + BS2))。我习惯把BS1设4，BS2设3，这样加起来是1+4+3=8个tq。那么分频系数就是36M / (500k × 8) = 9。</p>
+
+<p>嗯，这里要注意：<strong>采样点位置</strong>也很关键。采样点一般在BS1结束的位置，也就是(1+BS1)/(1+BS1+BS2)这个比例。我建议采样点设在75%~85%之间，太靠前或太靠后都容易误采样。</p>
+
+<div class="highlight">
+  <p><strong>重要提示：</strong>位时间配置直接影响总线通信的稳定性。我曾经在一个项目中，因为BS1和BS2设得不合理，导致总线在高温下频繁出错。后来把BS1调大了一点，问题就解决了。</p>
+</div>
+
+<h3>9.3 过滤器配置：只收你想收的</h3>
+
+<p>过滤器，说白了就是CAN的看门人。它决定哪些报文能进入你的接收缓冲区。STM32的CAN有28个过滤器组，每个组可以工作在两种模式下：</p>
+
+<ul>
+  <li><strong>标识符列表模式</strong>：只接收指定ID的报文。适合节点数量少的场景。</li>
+  <li><strong>标识符屏蔽模式</strong>：接收符合掩码规则的报文。适合需要过滤一段ID范围的场景。</li>
+</ul>
+
+<p>我个人习惯用屏蔽模式，因为它更灵活。举个例子：</p>
+
+<pre><code>CAN_FilterInitStructure.CAN_FilterNumber = 0;          // 使用过滤器组0
+CAN_FilterInitStructure.CAN_FilterMode = CAN_FilterMode_IdMask;  // 屏蔽模式
+CAN_FilterInitStructure.CAN_FilterScale = CAN_FilterScale_32bit; // 32位宽度
+CAN_FilterInitStructure.CAN_FilterIdHigh = 0x0000;     // 标准ID高16位
+CAN_FilterInitStructure.CAN_FilterIdLow = 0x0000;      // 标准ID低16位
+CAN_FilterInitStructure.CAN_FilterMaskIdHigh = 0x0000; // 掩码高16位
+CAN_FilterInitStructure.CAN_FilterMaskIdLow = 0x0000;  // 掩码低16位
+CAN_FilterInitStructure.CAN_FilterFIFOAssignment = CAN_FIFO0; // 关联到FIFO0
+CAN_FilterInitStructure.CAN_FilterActivation = ENABLE; // 使能过滤器
+CAN_FilterInit(&amp;CAN_FilterInitStructure);</code></pre>
+
+<p>你看，掩码全为0表示接收所有报文。如果我只想收ID为0x123的报文，那把掩码设成全1，ID设成0x123就行了。</p>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>调试阶段我建议先把过滤器设成接收所有报文，等通信正常了再慢慢收紧过滤规则。这样能快速定位问题是出在发送端还是接收端。</p>
+</div>
+
+<h3>9.4 中断配置：别让CPU一直等着</h3>
+
+<p>中断配置，说白了就是让CAN在收到报文时主动通知CPU，而不是让CPU轮询。这样CPU就能腾出手干别的活儿。</p>
+
+<p>STM32的CAN中断有好几种：</p>
+
+<ul>
+  <li><strong>接收中断</strong>：FIFO0或FIFO1收到报文时触发。</li>
+  <li><strong>发送中断</strong>：发送邮箱空时触发。</li>
+  <li><strong>错误中断</strong>：总线错误或状态变化时触发。</li>
+  <li><strong>唤醒中断</strong>：CAN从休眠状态唤醒时触发。</li>
+</ul>
+
+<p>我一般只开接收中断和错误中断。发送中断用得少，因为发送通常是主动的，用轮询就够了。</p>
+
+<p>配置中断的步骤：</p>
+
+<ol>
+  <li>在NVIC中使能CAN的中断通道。</li>
+  <li>设置中断优先级。我习惯把CAN中断优先级设高一点，毕竟通信实时性很重要。</li>
+  <li>在CAN初始化中使能对应的中断源。</li>
+</ol>
+
+<p>代码示例：</p>
+
+<pre><code>NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;    // 接收中断通道
+NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0; // 抢占优先级
+NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;       // 子优先级
+NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+NVIC_Init(&amp;NVIC_InitStructure);
+
+CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE); // 使能FIFO0消息挂起中断</code></pre>
+
+<p>然后在中断服务函数里读取报文：</p>
+
+<pre><code>void CAN1_RX0_IRQHandler(void)
+{
+    CanRxMsg RxMessage;
+    CAN_Receive(CAN1, CAN_FIFO0, &amp;RxMessage);
+    // 处理接收到的报文
+}</code></pre>
+
+<div class="warning">
+  <p><strong>警告：</strong>中断服务函数里别干太多活儿。我曾经在中断里做复杂的报文解析，结果导致后续报文丢失。记住，中断里只做最必要的事，比如把数据拷贝到缓冲区，然后设置一个标志位，让主循环去处理。</p>
+</div>
+
+<h3>9.5 完整初始化示例</h3>
+
+<p>最后，我把上面这些串起来，给一个完整的初始化函数。你直接拿去用，改改参数就行。</p>
+
+<pre><code>void CAN_Init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    CAN_InitTypeDef CAN_InitStructure;
+    CAN_FilterInitTypeDef CAN_FilterInitStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+
+    // 1. 使能时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
+
+    // 2. 配置GPIO
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8; // CAN1_TX
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &amp;GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9; // CAN1_RX
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_Init(GPIOB, &amp;GPIO_InitStructure);
+
+    // 3. 复位CAN
+    CAN_DeInit(CAN1);
+
+    // 4. 配置位时间（500kbps，时钟36MHz）
+    CAN_InitStructure.CAN_TTCM = DISABLE;
+    CAN_InitStructure.CAN_ABOM = ENABLE;
+    CAN_InitStructure.CAN_AWUM = DISABLE;
+    CAN_InitStructure.CAN_NART = DISABLE;
+    CAN_InitStructure.CAN_RFLM = DISABLE;
+    CAN_InitStructure.CAN_TXFP = DISABLE;
+    CAN_InitStructure.CAN_Mode = CAN_Mode_Normal;
+    CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;
+    CAN_InitStructure.CAN_BS1 = CAN_BS1_4tq;
+    CAN_InitStructure.CAN_BS2 = CAN_BS2_3tq;
+    CAN_InitStructure.CAN_Prescaler = 9;
+    CAN_Init(CAN1, &amp;CAN_InitStructure);
+
+    // 5. 配置过滤器（接收所有报文）
+    CAN_FilterInitStructure.CAN_FilterNumber = 0;
+    CAN_FilterInitStructure.CAN_FilterMode = CAN_FilterMode_IdMask;
+    CAN_FilterInitStructure.CAN_FilterScale = CAN_FilterScale_32bit;
+    CAN_FilterInitStructure.CAN_FilterIdHigh = 0x0000;
+    CAN_FilterInitStructure.CAN_FilterIdLow = 0x0000;
+    CAN_FilterInitStructure.CAN_FilterMaskIdHigh = 0x0000;
+    CAN_FilterInitStructure.CAN_FilterMaskIdLow = 0x0000;
+    CAN_FilterInitStructure.CAN_FilterFIFOAssignment = CAN_FIFO0;
+    CAN_FilterInitStructure.CAN_FilterActivation = ENABLE;
+    CAN_FilterInit(&amp;CAN_FilterInitStructure);
+
+    // 6. 配置中断
+    NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&amp;NVIC_InitStructure);
+
+    CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
+
+    // 7. 启动CAN
+    CAN_Cmd(CAN1, ENABLE);
+}</code></pre>
+
+<p>好了，这就是CAN初始化的全部内容。你想想看，其实没那么复杂，就是按部就班地把每个环节配好。我在项目中遇到过最坑的事，就是忘了使能GPIO时钟，结果CAN_TX死活拉不出波形。嗯，从那以后我每次初始化都会先检查时钟有没有开。</p>
+
+<p>下一章咱们聊聊CAN数据的发送和接收，到时候我会分享一些实际项目中的调试技巧。</p>
+        <div class="footer-nav">
+            <a href="08.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="10.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

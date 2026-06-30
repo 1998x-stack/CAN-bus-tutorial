@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第10章 CAN报文发送</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
+<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
+<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html" class="">第7章 CAN收发器</a></li>
+<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html" class="active">第10章 CAN报文发送</a></li>
+<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
+<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
+<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
+<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
+<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
+<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>10. CAN报文发送：发送邮箱机制、发送优先级、发送流程、发送完成中断</h2>
+
+<p>好，咱们今天聊聊CAN报文的发送。说实话，很多初学者觉得发送就是往寄存器里写数据，然后等着发出去就行了。嗯，要是真这么简单，那汽车上就不会有那么多通信故障了。</p>
+
+<p>我个人习惯把CAN发送比作「快递发货」。你想想看，一个快递站有多个发货口，每个口一次只能发一个包裹，而且包裹还有轻重缓急之分。CAN的发送邮箱，说白了就是干这个的。</p>
+
+<h3>10.1 发送邮箱机制</h3>
+
+<p>CAN控制器内部一般有3个发送邮箱（有些芯片更多，比如STM32有3个，有些高端芯片有8个甚至16个）。每个邮箱就是一个独立的「发货窗口」。</p>
+
+<p><strong>邮箱的结构</strong>：每个邮箱包含标识符、数据长度、数据场、控制位这些信息。你往邮箱里填好数据，告诉控制器「发吧」，剩下的硬件自己搞定。</p>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>发送邮箱是硬件资源，不是软件队列。你往邮箱里写数据，硬件就自动开始发送流程。如果三个邮箱都满了，你再想发，就得等其中一个发完。</p>
+</div>
+
+<p>我在项目中遇到过一个问题：某个节点需要频繁发送诊断报文，结果因为邮箱被其他报文占满了，诊断响应超时了。后来怎么解决的？我把诊断报文单独用一个邮箱，并且优先级设得最高。</p>
+
+<h3>10.2 发送优先级</h3>
+
+<p>CAN总线的优先级，不是靠邮箱编号决定的，而是靠报文ID。ID越小，优先级越高。这个大家应该都知道。</p>
+
+<p>但这里有个细节：<strong>当多个邮箱同时有数据要发送时，硬件会怎么选？</strong></p>
+
+<p>答案是：硬件会先看哪个邮箱的报文ID最小，就优先发哪个。如果ID相同，再看邮箱编号，编号小的优先。</p>
+
+<table>
+  <tr>
+    <th>邮箱编号</th>
+    <th>报文ID</th>
+    <th>发送优先级</th>
+  </tr>
+  <tr>
+    <td>邮箱0</td>
+    <td>0x100</td>
+    <td>最高（ID最小）</td>
+  </tr>
+  <tr>
+    <td>邮箱1</td>
+    <td>0x200</td>
+    <td>中等</td>
+  </tr>
+  <tr>
+    <td>邮箱2</td>
+    <td>0x300</td>
+    <td>最低</td>
+  </tr>
+</table>
+
+<p>我曾经踩过一个坑：把紧急报文放在邮箱2里，结果邮箱0和邮箱1一直有数据在发，紧急报文死活发不出去。后来我把紧急报文放在邮箱0，问题就解决了。</p>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>把最紧急、最关键的报文放在邮箱0，次紧急的放邮箱1，普通的放邮箱2。这样即使邮箱满了，关键报文也能优先发出。</p>
+</div>
+
+<h3>10.3 发送流程</h3>
+
+<p>CAN报文的发送流程，其实就三步：填数据、请求发送、等待完成。</p>
+
+<p><strong>第一步：填数据</strong></p>
+<p>你要往邮箱的寄存器里写：</p>
+<ul>
+  <li>标识符（ID）</li>
+  <li>数据长度码（DLC）</li>
+  <li>数据场（最多8字节）</li>
+  <li>控制位（比如是否使用扩展帧）</li>
+</ul>
+
+<p><strong>第二步：请求发送</strong></p>
+<p>把邮箱的发送请求位置1。硬件检测到这个位被置1，就开始尝试发送。</p>
+
+<p><strong>第三步：等待完成</strong></p>
+<p>硬件发送完成后，会把发送完成位置1。你可以轮询这个位，也可以开中断。</p>
+
+<p>下面是一个典型的发送代码示例：</p>
+
+<pre><code>// 假设使用邮箱0发送
+void CAN_SendMessage(uint32_t id, uint8_t *data, uint8_t len)
+{
+    // 1. 等待邮箱0空闲
+    while (CAN-&gt;TSR &amp; CAN_TSR_TME0) {
+        // 等待，或者超时处理
+    }
+    
+    // 2. 填写标识符
+    CAN-&gt;sTxMailBox[0].TIR = (id &lt;&lt; 21) | CAN_TIxR_IDE;  // 标准帧
+    
+    // 3. 填写数据长度
+    CAN-&gt;sTxMailBox[0].TDTR = len;
+    
+    // 4. 填写数据
+    CAN-&gt;sTxMailBox[0].TDLR = data[0] | (data[1] &lt;&lt; 8) | 
+                                (data[2] &lt;&lt; 16) | (data[3] &lt;&lt; 24);
+    CAN-&gt;sTxMailBox[0].TDHR = data[4] | (data[5] &lt;&lt; 8) | 
+                                (data[6] &lt;&lt; 16) | (data[7] &lt;&lt; 24);
+    
+    // 5. 请求发送
+    CAN-&gt;sTxMailBox[0].TIR |= CAN_TIxR_TXRQ;
+}</code></pre>
+
+<p>嗯，这里要注意：<strong>发送请求位一旦置1，就不能再修改邮箱里的数据了</strong>。否则会导致发送错误。我见过有人一边发一边改数据，结果报文内容乱套了。</p>
+
+<h3>10.4 发送完成中断</h3>
+
+<p>轮询发送完成位，其实挺浪费CPU的。你想想看，CPU一直在那傻等，啥也干不了。所以，更高效的做法是用中断。</p>
+
+<p>发送完成中断，就是硬件发完一个报文后，自动触发一个中断。你在中断服务函数里处理后续逻辑，比如释放邮箱、更新状态、或者发送下一条报文。</p>
+
+<p><strong>中断的配置步骤：</strong></p>
+<ol>
+  <li>使能发送完成中断（一般有个寄存器位控制）</li>
+  <li>在中断向量表中注册中断服务函数</li>
+  <li>在中断服务函数里读取状态，清除中断标志</li>
+</ol>
+
+<p>代码示例：</p>
+
+<pre><code>// 发送完成中断服务函数
+void CAN_TX_IRQHandler(void)
+{
+    // 检查是哪个邮箱完成了发送
+    if (CAN-&gt;TSR &amp; CAN_TSR_RQCP0) {
+        // 邮箱0发送完成
+        CAN-&gt;TSR |= CAN_TSR_RQCP0;  // 清除中断标志
+        
+        // 处理后续逻辑，比如发送下一条报文
+        SendNextMessage();
+    }
+    
+    if (CAN-&gt;TSR &amp; CAN_TSR_RQCP1) {
+        // 邮箱1发送完成
+        CAN-&gt;TSR |= CAN_TSR_RQCP1;
+        // ...
+    }
+    
+    if (CAN-&gt;TSR &amp; CAN_TSR_RQCP2) {
+        // 邮箱2发送完成
+        CAN-&gt;TSR |= CAN_TSR_RQCP2;
+        // ...
+    }
+}</code></pre>
+
+<div class="warning">
+  <p><strong>警告：</strong>中断服务函数里不要做太多事情！我曾经见过有人在中断里调用延时函数，结果整个系统卡死了。中断里只做最必要的事情，比如置个标志位，复杂逻辑放到主循环里处理。</p>
+</div>
+
+<p>还有一个坑：<strong>发送完成中断和发送错误中断是共用一个中断源的</strong>。你处理的时候，一定要区分是正常完成还是错误导致的完成。否则，你可能会把错误报文当成正常报文处理。</p>
+
+<h3>10.5 避坑指南</h3>
+
+<p>最后，我总结几个实际项目中容易踩的坑：</p>
+
+<ul>
+  <li><strong>邮箱溢出：</strong>三个邮箱都满了，你还往里写数据，数据就丢了。解决办法：要么增加邮箱数量（换芯片），要么用软件队列缓冲。</li>
+  <li><strong>优先级反转：</strong>低优先级报文占着邮箱，高优先级报文发不出去。解决办法：合理分配邮箱，紧急报文用独立邮箱。</li>
+  <li><strong>中断嵌套：</strong>发送完成中断里又触发了发送完成中断，导致递归。解决办法：中断里只清标志，不做发送操作。</li>
+  <li><strong>总线关闭：</strong>发送错误太多，节点进入总线关闭状态。解决办法：监控错误计数器，及时复位。</li>
+</ul>
+
+<p>我曾经在一个项目中，因为发送完成中断里调用了发送函数，导致中断递归，堆栈溢出。查了两天才找到原因。从那以后，我定了个规矩：<strong>中断里只做标志位操作，不做任何函数调用</strong>。</p>
+
+<p>好了，关于CAN报文发送，今天就聊这么多。下一章咱们讲讲接收，那又是另一番天地了。</p>
+
+<div class="tip">
+  <p><strong>课后思考：</strong>如果三个邮箱都满了，你又想发一条紧急报文，你会怎么处理？是丢弃一条低优先级的报文，还是等待？欢迎在评论区讨论。</p>
+</div>
+        <div class="footer-nav">
+            <a href="09.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="11.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

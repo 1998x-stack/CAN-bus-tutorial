@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第12章 CAN中断编程</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
+<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
+<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html" class="">第7章 CAN收发器</a></li>
+<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
+<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
+<li><a href="12.html" class="active">第12章 CAN中断编程</a></li>
+<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
+<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
+<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
+<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第12章 CAN中断编程：中断优先级配置、中断服务函数编写、中断调试技巧</h2>
+
+<p>说到CAN通信，中断处理绝对是绕不开的核心话题。我见过不少新手，CAN配置得挺顺，但一上中断就翻车。说白了，中断就像汽车的刹车系统——平时用不上，关键时刻必须可靠。</p>
+
+<p>这一章，我带你把CAN中断的优先级配置、服务函数编写、还有调试技巧，一次性讲透。</p>
+
+<h3>12.1 中断优先级配置——别让优先级坑了你</h3>
+
+<p>先问个问题：你的MCU里，CAN中断该排第几？</p>
+
+<p>我个人习惯，把CAN中断放在中等偏高的优先级。为什么？因为CAN通信对实时性有要求，但也不是最高优先级——你总不能让CAN中断把系统滴答定时器给抢了吧？</p>
+
+<p>以STM32为例，NVIC配置是这样的：</p>
+
+<pre><code>// 配置CAN接收中断优先级
+NVIC_InitTypeDef NVIC_InitStructure;
+
+NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;  // CAN1接收中断
+NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;  // 抢占优先级
+NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;         // 子优先级
+NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+NVIC_Init(&NVIC_InitStructure);</code></pre>
+
+<p>这里有个坑，我踩过。抢占优先级和子优先级，很多人搞混。抢占优先级决定能否打断正在执行的中断，子优先级决定同抢占优先级下的响应顺序。</p>
+
+<div class="warning">
+  <strong>⚠️ 我曾经犯过的错：</strong> 把CAN中断优先级设得和定时器中断一样，结果两个中断互相抢，系统直接卡死。记住：同优先级的中断不会互相打断，只能排队。
+</div>
+
+<p>我建议你遵循这个原则：</p>
+<ul>
+  <li>时间敏感的中断（如电机控制PWM）→ 最高优先级</li>
+  <li>CAN通信中断 → 中等优先级</li>
+  <li>非实时任务（如按键扫描）→ 低优先级</li>
+</ul>
+
+<h3>12.2 中断服务函数编写——短小精悍是王道</h3>
+
+<p>中断服务函数（ISR）怎么写？四个字：短小精悍。</p>
+
+<p>你想想看，中断服务函数执行时间越长，其他中断被阻塞的时间就越长。我在项目中遇到过，有人把CAN报文解析逻辑直接写在ISR里，结果CAN总线负载一高，系统直接崩了。</p>
+
+<p>正确的做法：ISR里只做最必要的事，比如把数据搬到缓冲区，然后置一个标志位。真正的处理逻辑，放到主循环里做。</p>
+
+<pre><code>// 正确的CAN接收中断服务函数
+void CAN1_RX0_IRQHandler(void)
+{
+    CanRxMsg RxMessage;
+    
+    // 1. 读取接收到的报文
+    CAN_Receive(CAN1, CAN_FIFO0, &RxMessage);
+    
+    // 2. 把数据存入环形缓冲区（快速操作）
+    if (ring_buffer_write(&can_rx_buf, &RxMessage) == 0)
+    {
+        // 缓冲区满了？记录溢出标志
+        can_overflow_flag = 1;
+    }
+    
+    // 3. 清除中断标志
+    CAN_ClearITPendingBit(CAN1, CAN_IT_FMP0);
+    
+    // 注意：这里没有报文解析，没有协议处理！
+}</code></pre>
+
+<div class="tip">
+  <strong>💡 我的小技巧：</strong> ISR里尽量不用printf、不用延时、不用malloc。这些函数执行时间不可控，而且printf本身可能触发中断，搞不好就递归了。
+</div>
+
+<p>嗯，这里还要注意一点：CAN有多个中断源——接收中断、发送中断、错误中断。每个中断源最好单独写一个ISR，别图省事写在一起。否则调试的时候，你根本分不清是哪个事件触发了中断。</p>
+
+<h3>12.3 中断调试技巧——没有示波器也能定位问题</h3>
+
+<p>中断调试，说实话比普通代码调试难。为什么？因为中断是异步的，你打断点的时候，中断可能已经跑飞了。</p>
+
+<p>我总结了几招，很实用：</p>
+
+<ol>
+  <li><strong>用GPIO翻转做“软示波器”</strong></li>
+</ol>
+
+<p>在ISR入口和出口各翻转一次GPIO，用逻辑分析仪或者示波器看这个引脚。你能直观看到：中断多久触发一次？ISR执行了多长时间？有没有嵌套？</p>
+
+<pre><code>void CAN1_RX0_IRQHandler(void)
+{
+    GPIO_SetBits(GPIOB, GPIO_Pin_0);  // 入口拉高
+    
+    // ... 中断处理 ...
+    
+    GPIO_ResetBits(GPIOB, GPIO_Pin_0); // 出口拉低
+}</code></pre>
+
+<ol start="2">
+  <li><strong>统计中断触发次数</strong></li>
+</ol>
+
+<p>定义一个全局变量，每次进ISR就加1。主循环里打印这个值。如果实际值和预期不符，说明中断配置有问题。</p>
+
+<pre><code>volatile uint32_t can_irq_count = 0;
+
+void CAN1_RX0_IRQHandler(void)
+{
+    can_irq_count++;
+    // ... 其他处理 ...
+}</code></pre>
+
+<ol start="3">
+  <li><strong>检查中断标志位</strong></li>
+</ol>
+
+<p>有时候中断没响应，不是因为没触发，而是标志位没清干净。我建议你在ISR开头先读一下中断状态寄存器，确认是哪个事件触发的。</p>
+
+<div class="highlight">
+  <p><strong>🔑 核心要点：</strong> CAN中断调试，80%的问题出在优先级配置和标志位处理上。先检查这两个，别一上来就怀疑硬件。</p>
+</div>
+
+<h3>12.4 实战中的那些坑</h3>
+
+<p>讲几个我亲身踩过的坑，你遇到了能少走弯路：</p>
+
+<table>
+  <tr>
+    <th>问题现象</th>
+    <th>原因</th>
+    <th>解决方案</th>
+  </tr>
+  <tr>
+    <td>CAN中断只触发一次</td>
+    <td>中断标志位没清除</td>
+    <td>ISR末尾调用清除函数</td>
+  </tr>
+  <tr>
+    <td>系统卡死，无法响应</td>
+    <td>ISR里调用了阻塞函数</td>
+    <td>ISR只做数据搬运</td>
+  </tr>
+  <tr>
+    <td>中断响应延迟大</td>
+    <td>优先级设置太低</td>
+    <td>提高抢占优先级</td>
+  </tr>
+  <tr>
+    <td>中断频繁触发</td>
+    <td>CAN总线错误导致错误中断</td>
+    <td>检查总线终端电阻和电平</td>
+  </tr>
+</table>
+
+<p>我曾经遇到一个特别诡异的bug：CAN接收中断偶尔丢包。查了两天，最后发现是ISR里用了一个全局变量，而这个变量在主循环里被修改了——没有加volatile关键字。编译器优化后，ISR读到的永远是旧值。</p>
+
+<p>所以，记住：ISR和主循环共享的变量，一定要加volatile！</p>
+
+<h3>12.5 总结一下</h3>
+
+<p>CAN中断编程，说白了就三件事：</p>
+<ul>
+  <li>优先级配好——别太高也别太低</li>
+  <li>ISR写短——只做搬运工</li>
+  <li>调试有招——GPIO翻转+计数统计</li>
+</ul>
+
+<p>你把这些掌握了，CAN中断这块基本就稳了。下一章，我们聊聊CAN的错误处理——那才是真正考验功底的地方。</p>
+
+<div class="tip">
+  <p><strong>📌 课后练习：</strong> 试着在你的开发板上，用GPIO翻转法测量CAN中断的响应时间。看看从报文到达MCU到ISR开始执行，到底花了多少微秒？</p>
+</div>
+        <div class="footer-nav">
+            <a href="11.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="13.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

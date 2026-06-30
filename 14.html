@@ -1,0 +1,321 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第14章 CAN总线网络拓扑</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
+<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
+<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html" class="">第7章 CAN收发器</a></li>
+<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
+<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
+<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
+<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html" class="active">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
+<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
+<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
+<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第14章：CAN总线网络拓扑：总线拓扑、星型拓扑、终端电阻匹配、总线长度与速率关系</h2>
+
+<p>大家好，我是你们的老朋友。今天咱们聊聊CAN总线的网络拓扑。说实话，这块内容看着简单，但实际项目中踩坑的人真不少。我见过太多工程师，原理图画得漂漂亮亮，一上电就是各种通信故障，最后发现是拓扑结构出了问题。</p>
+
+<h3>14.1 总线拓扑：CAN的“正统”玩法</h3>
+
+<p>CAN总线最标准、最推荐的拓扑结构，就是总线型拓扑。说白了，就是一根主干线，所有节点都挂在这根线上。像一串葡萄，每个节点都是其中一颗。</p>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>CAN总线是“多主从”通信，所有节点共享同一物理介质。总线拓扑能保证信号反射最小，通信最稳定。</p>
+</div>
+
+<p>我在项目中遇到过一件事。有个同事非要用星型拓扑，说布线方便。结果呢？通信距离一拉长，各种错误帧就冒出来了。最后乖乖改回总线拓扑，问题全消。嗯，这就是经验教训。</p>
+
+<p>总线拓扑的几个关键参数：</p>
+<ul>
+  <li><strong>主干线</strong>：就是那根贯穿所有节点的线，一般用双绞线</li>
+  <li><strong>分支线（stub）</strong>：从主干线分到节点的短线，越短越好</li>
+  <li><strong>节点间距</strong>：任意两个节点间的距离，受速率限制</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的习惯：</strong>分支线长度尽量控制在0.3米以内。实在没办法，也别超过0.5米。你想想看，分支线越长，信号反射越严重，通信质量就越差。</p>
+</div>
+
+<h3>14.2 星型拓扑：能用，但别乱用</h3>
+
+<p>星型拓扑，就是所有节点都连到一个中心节点上。像车轮的辐条。这种拓扑在工业现场偶尔能看到，但说实话，我不推荐。</p>
+
+<p>为什么会这样？因为星型拓扑会引入严重的信号反射问题。每个分支的末端如果不做特殊处理，信号到了那里就会反弹回来，干扰正常通信。</p>
+
+<p>我曾经在一个项目中，客户非要搞星型拓扑，说这样方便维护。我劝了半天没用，只好在中心节点加了中继器，每个分支末端都加了终端电阻。折腾了整整一周，总算能跑了。但通信速率只能降到100kbps，原本设计是500kbps的。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>如果你非要用星型拓扑，记住三点：</p>
+  <ul>
+    <li>每个分支末端必须加终端电阻（120Ω）</li>
+    <li>分支长度尽量短，最好小于1米</li>
+    <li>通信速率要降档，别想着跑高速</li>
+  </ul>
+  <p>我曾经见过一个案例，星型拓扑没加终端电阻，结果整个网络像抽风一样，时不时丢帧。查了三天才找到原因。</p>
+</div>
+
+<h3>14.3 终端电阻匹配：小电阻，大作用</h3>
+
+<p>终端电阻，说白了就是防止信号反射的。CAN总线两端各放一个120Ω的电阻，这是标准做法。为什么是120Ω？因为CAN双绞线的特性阻抗大约是120Ω，匹配了才能吸收信号能量，不让它反弹。</p>
+
+<p>我记得刚入行时，有个老工程师跟我说：“终端电阻就是CAN总线的刹车片，没有它，信号会像脱缰的野马一样乱窜。”这个比喻很形象，我一直记到现在。</p>
+
+<p>终端电阻的选型要点：</p>
+<table>
+  <tr>
+    <th>参数</th>
+    <th>推荐值</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td>阻值</td>
+    <td>120Ω ±1%</td>
+    <td>匹配双绞线特性阻抗</td>
+  </tr>
+  <tr>
+    <td>功率</td>
+    <td>0.25W 或 0.5W</td>
+    <td>一般应用足够，高电压场景需计算</td>
+  </tr>
+  <tr>
+    <td>精度</td>
+    <td>±1% 或更高</td>
+    <td>精度越高，匹配效果越好</td>
+  </tr>
+</table>
+
+<div class="highlight">
+  <p><strong>重要提醒：</strong>终端电阻必须放在总线的两端，不是随便哪个节点都行。我见过有人把两个电阻放在同一个节点上，结果通信距离一长就出问题。记住，是“两端”，不是“两头凑”。</p>
+</div>
+
+<h3>14.4 总线长度与速率关系：鱼和熊掌不可兼得</h3>
+
+<p>CAN总线的长度和速率是成反比的。速率越高，能跑的距离就越短。这个关系不是线性的，而是受信号传播延迟和采样点位置共同决定的。</p>
+
+<p>标准CAN（ISO 11898-2）给出的参考数据：</p>
+<table>
+  <tr>
+    <th>速率（kbps）</th>
+    <th>最大总线长度（m）</th>
+    <th>典型应用场景</th>
+  </tr>
+  <tr>
+    <td>1000</td>
+    <td>40</td>
+    <td>车内短距离高速通信</td>
+  </tr>
+  <tr>
+    <td>500</td>
+    <td>100</td>
+    <td>常见车载网络</td>
+  </tr>
+  <tr>
+    <td>250</td>
+    <td>250</td>
+    <td>工业控制</td>
+  </tr>
+  <tr>
+    <td>125</td>
+    <td>500</td>
+    <td>楼宇自动化</td>
+  </tr>
+  <tr>
+    <td>50</td>
+    <td>1000</td>
+    <td>远程监控</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>5000</td>
+    <td>超远距离通信</td>
+  </tr>
+</table>
+
+<p>你想想看，为什么速率高了距离就短？因为CAN总线是依靠电平变化来传输数据的。速率越高，每个bit的时间就越短。如果总线太长，信号在线上传播的时间就会超过一个bit的时间，那接收端就分不清哪个bit是哪个了。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>实际项目中，我一般会留20%的余量。比如需要跑500kbps，我按100米设计，但实际布线控制在80米以内。这样即使线缆质量差一点，或者环境干扰大一点，系统也能稳定运行。</p>
+</div>
+
+<h3>14.5 实战中的拓扑设计建议</h3>
+
+<p>好了，理论讲完了，咱们聊聊实战。我总结了几条经验，希望对你有帮助：</p>
+
+<ol>
+  <li><strong>优先选总线拓扑</strong>：这是最省心的方案，没有之一。除非有特殊原因，否则别折腾星型。</li>
+  <li><strong>终端电阻别省</strong>：两个120Ω电阻，成本不到一毛钱，但能省你几天的调试时间。</li>
+  <li><strong>分支线越短越好</strong>：我个人的极限是0.3米，超过这个长度，我会考虑加中继器。</li>
+  <li><strong>速率和长度要匹配</strong>：别想着用1Mbps跑1000米，那是做梦。老老实实按表格来。</li>
+  <li><strong>预留测试点</strong>：在每个节点附近留个CAN_H和CAN_L的测试点，方便以后排查问题。</li>
+</ol>
+
+<div class="warning">
+  <p><strong>最后提醒一句：</strong>我曾经在一个项目中，为了省成本，用了劣质双绞线。结果通信距离只能跑到标称值的60%。后来换了正规的CAN专用线缆，问题全解决了。线缆的钱，真不能省。</p>
+</div>
+
+<p>好了，这一章就到这里。下一章咱们聊聊CAN总线的错误处理机制，那可是个有意思的话题。到时候见！</p>
+
+<div class="highlight">
+  <p><strong>本章小结：</strong></p>
+  <ul>
+    <li>总线拓扑是CAN的标准玩法，星型拓扑慎用</li>
+    <li>终端电阻必须放在总线两端，阻值120Ω</li>
+    <li>总线长度和速率成反比，设计时要留余量</li>
+    <li>分支线越短越好，线缆质量不能省</li>
+  </ul>
+</div>
+        <div class="footer-nav">
+            <a href="13.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="15.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

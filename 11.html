@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第11章 CAN报文接收</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
+<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
+<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html" class="">第7章 CAN收发器</a></li>
+<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
+<li><a href="11.html" class="active">第11章 CAN报文接收</a></li>
+<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
+<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
+<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
+<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
+<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第11章 CAN报文接收：接收FIFO机制、接收过滤器匹配、接收中断处理、接收超时处理</h2>
+
+<p>好，咱们今天聊聊CAN报文的接收。说实话，很多初学者觉得发送比接收难，其实恰恰相反。接收才是真正考验系统稳定性的地方。我见过太多项目，发送跑得挺欢，一收数据就丢帧、乱序、甚至死机。嗯，这里面的门道，咱们一个一个掰开讲。</p>
+
+<h3>11.1 接收FIFO机制：为什么需要它？</h3>
+
+<p>先问个问题：CPU处理一条报文需要多久？假设你的主频是72MHz，处理一条中断服务函数大概要几十微秒。而CAN总线在500kbps速率下，一条标准帧也就134微秒左右。你想想看，如果每来一条报文就中断一次CPU，那CPU基本啥也别干了，光顾着响应中断了。</p>
+
+<p>所以，硬件上引入了FIFO（先进先出队列）。说白了，就是一个硬件缓冲区。报文来了，先存到FIFO里，CPU有空了再慢慢取。这样CPU就不用被频繁打断，系统吞吐量自然就上去了。</p>
+
+<div class="highlight">
+  <p><strong>FIFO的核心作用：</strong></p>
+  <ul>
+    <li>缓冲多条报文，防止丢帧</li>
+    <li>降低CPU中断频率</li>
+    <li>提供时间戳，方便超时判断</li>
+  </ul>
+</div>
+
+<p>我在项目中遇到过一个问题：某款MCU的FIFO深度只有3个槽位，而总线负载率高达70%。结果就是，连续来4条报文，第4条直接覆盖了第1条。后来我换了个FIFO深度8的芯片，问题才解决。所以选型时，FIFO深度是个硬指标，别忽视。</p>
+
+<h3>11.2 接收过滤器匹配：别让CPU处理无关数据</h3>
+
+<p>CAN总线上挂着几十个节点，每个节点只关心特定ID的报文。如果所有报文都进FIFO，CPU得一个个过滤，效率太低了。所以硬件提供了接收过滤器。</p>
+
+<p>接收过滤器的工作原理，说白了就是：硬件帮你做ID匹配。匹配上了，报文进FIFO；匹配不上，直接丢弃。CPU根本不知道有这回事。</p>
+
+<p>常见的过滤器模式有两种：</p>
+
+<table>
+  <tr>
+    <th>模式</th>
+    <th>说明</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>掩码模式</td>
+    <td>通过掩码指定哪些位需要匹配</td>
+    <td>需要接收一组连续ID</td>
+  </tr>
+  <tr>
+    <td>列表模式</td>
+    <td>列出所有需要接收的ID</td>
+    <td>只接收几个特定ID</td>
+  </tr>
+</table>
+
+<p>我个人习惯用掩码模式。比如我需要接收ID范围为0x100到0x10F的报文，掩码设为0x7F0，ID设为0x100，这样高7位匹配即可。省事，也省过滤器资源。</p>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>配置过滤器时，记得把IDE位和RTR位也考虑进去。我曾经因为没配IDE位，导致扩展帧和标准帧混在一起，排查了半天才发现问题。</p>
+</div>
+
+<h3>11.3 接收中断处理：别在中断里干重活</h3>
+
+<p>报文匹配成功进入FIFO后，硬件会触发接收中断。这时候CPU该干嘛？很多新手会直接在中断里处理报文——解析、校验、甚至调用上层函数。这是大忌！</p>
+
+<p>为什么？因为中断服务函数执行时间越长，其他中断被阻塞的风险就越大。CAN总线本身就有实时性要求，你这边处理报文花了500微秒，那边发动机转速信号可能就丢了。</p>
+
+<p>正确的做法是：中断里只做一件事——把报文从FIFO搬到内存缓冲区。然后置一个标志位，退出中断。主循环里再慢慢处理。</p>
+
+<pre><code>// 接收中断服务函数（精简版）
+void CAN_RX_IRQHandler(void)
+{
+    CanRxMsg rxMsg;
+    
+    // 从FIFO读取报文
+    CAN_Receive(CAN1, CAN_FIFO0, &amp;rxMsg);
+    
+    // 存入环形缓冲区
+    if (RingBuf_Write(&amp;g_rxBuf, &amp;rxMsg) == 0)
+    {
+        // 缓冲区满了，记录丢帧
+        g_rxOverflowCount++;
+    }
+    
+    // 清除中断标志
+    CAN_ClearITPendingBit(CAN1, CAN_IT_FMP0);
+}
+</code></pre>
+
+<p>你看，这个中断函数只做了三件事：读FIFO、写缓冲区、清标志。耗时不超过10微秒。主循环里再慢慢解析报文，这样就不会影响其他中断了。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>环形缓冲区一定要设计成无锁的。如果主循环和中断同时操作同一个缓冲区，可能会出问题。我一般用读写指针分离的方式，中断只写，主循环只读，互不干扰。</p>
+</div>
+
+<h3>11.4 接收超时处理：别让报文烂在缓冲区里</h3>
+
+<p>报文进了缓冲区，不代表万事大吉。如果主循环处理不过来，或者某个任务被阻塞了，报文就会一直积压在缓冲区里。时间一长，这些报文就失去了时效性。</p>
+
+<p>比如，车速信号每10ms发一次，你20ms后才处理，那这数据就没意义了。所以，我们需要超时处理机制。</p>
+
+<p>具体做法：每条报文入缓冲区时，记录一个时间戳。主循环处理时，检查当前时间减去时间戳是否超过阈值。如果超时，直接丢弃，不处理。</p>
+
+<pre><code>// 报文结构体，带时间戳
+typedef struct {
+    uint32_t id;
+    uint8_t data[8];
+    uint8_t len;
+    uint32_t timestamp;  // 入队时的时间戳
+} CanMsgWithTs;
+
+// 主循环处理函数
+void ProcessRxMessages(void)
+{
+    CanMsgWithTs msg;
+    uint32_t now = GetSysTick();
+    
+    while (RingBuf_Read(&amp;g_rxBuf, &amp;msg) == 1)
+    {
+        // 检查是否超时（阈值设为50ms）
+        if ((now - msg.timestamp) &gt; 50)
+        {
+            g_rxTimeoutCount++;
+            continue;  // 直接丢弃
+        }
+        
+        // 正常处理报文
+        HandleCanMessage(&amp;msg);
+    }
+}
+</code></pre>
+
+<p>我曾经在一个项目中，因为某个任务被高优先级任务抢占，导致报文处理延迟了200ms。结果就是，ECU根据过时的车速数据算出了错误的喷油量，发动机抖得跟筛子似的。从那以后，我每个接收模块都加了超时检查，再也没出过类似问题。</p>
+
+<div class="highlight">
+  <p><strong>避坑指南：</strong>超时阈值设多少合适？我一般按报文周期的1.5倍来设。比如10ms周期的报文，阈值设15ms。太短容易误丢，太长又失去意义。你可以根据实际负载调整。</p>
+</div>
+
+<h3>11.5 综合实战：一个完整的接收流程</h3>
+
+<p>好了，咱们把上面几个知识点串起来，看看一个完整的接收流程长什么样：</p>
+
+<ol>
+  <li><strong>硬件过滤：</strong>报文进入CAN控制器，过滤器匹配ID。不匹配的直接丢弃。</li>
+  <li><strong>FIFO缓冲：</strong>匹配成功的报文进入FIFO。如果FIFO满了，新报文会覆盖最旧的报文（取决于芯片设计）。</li>
+  <li><strong>中断触发：</strong>FIFO非空时，硬件触发接收中断。中断服务函数将报文从FIFO搬到环形缓冲区，并记录时间戳。</li>
+  <li><strong>主循环处理：</strong>主循环检查缓冲区是否有新报文。有则读取，检查超时，未超时则解析处理。</li>
+  <li><strong>错误统计：</strong>记录丢帧次数、超时次数，用于系统健康监测。</li>
+</ol>
+
+<p>这个流程看起来简单，但每个环节都可能出问题。我建议你在调试阶段，把丢帧计数和超时计数通过串口打印出来。如果发现丢帧，先看FIFO深度够不够；如果超时多，说明主循环处理不过来，得优化代码或者提高优先级。</p>
+
+<div class="tip">
+  <p><strong>最后说一句：</strong>接收这块，硬件能做的尽量让硬件做，CPU只做最核心的解析工作。别想着用软件去弥补硬件的不足，那只会让系统越来越复杂，越来越不稳定。</p>
+</div>
+
+<p>好，这一章就到这里。下一章咱们聊聊CAN的错误处理机制，那可是个容易踩坑的地方，我到时候多分享几个实战案例。</p>
+        <div class="footer-nav">
+            <a href="10.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="12.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

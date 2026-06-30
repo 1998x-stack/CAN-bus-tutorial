@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第1章 CAN总线概述</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="active">第1章 CAN总线概述</a></li>
+<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
+<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html" class="">第7章 CAN收发器</a></li>
+<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
+<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
+<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
+<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
+<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
+<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
+<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第一章：CAN总线概述</h2>
+
+<p>大家好，我是你们的讲师。在汽车电子这行摸爬滚打十几年，CAN总线可以说是我最熟悉的"老伙计"了。今天咱们就来聊聊这个看似简单、实则门道不少的话题。</p>
+
+<h3>1.1 CAN总线的发展历史</h3>
+
+<p>说到CAN总线，得从上世纪80年代说起。那时候汽车里的电子设备越来越多，线束复杂得像蜘蛛网。我记得刚入行时，老师傅跟我说过一句话："一辆豪华车的线束，拉直了能绕操场一圈。"这话一点都不夸张。</p>
+
+<p>1983年，德国博世公司开始研发一种新的串行通信协议。说白了，就是要用两根线代替原来几十根甚至上百根线。1986年，CAN（Controller Area Network）协议正式发布。嗯，这里要注意，最初的目标就是解决汽车内部点对点连线的痛点。</p>
+
+<p>为什么会选择CAN？我给大家列几个关键节点：</p>
+
+<ul>
+  <li><strong>1986年</strong>：博世在SAE大会上首次提出CAN总线概念</li>
+  <li><strong>1991年</strong>：奔驰W140成为首款搭载CAN总线的量产车</li>
+  <li><strong>1993年</strong>：CAN 2.0A/B标准正式发布，成为ISO 11898标准</li>
+  <li><strong>2003年</strong>：CAN FD（灵活数据速率）开始酝酿</li>
+  <li><strong>2012年</strong>：博世发布CAN FD规范，数据传输速率提升到8Mbps</li>
+</ul>
+
+<p>我个人习惯把CAN总线的发展分为三个阶段：第一阶段是"能用"，第二阶段是"好用"，第三阶段是"够快"。现在咱们正处于第三阶段，CAN FD正在逐步替代传统CAN。</p>
+
+<div class="highlight">
+  <p><strong>核心要点</strong>：CAN总线从诞生到现在快40年了，依然活跃在汽车电子领域。为什么？因为它可靠、实时、成本低。我在项目中遇到过不少工程师想用其他总线替代CAN，最后都绕回来了。</p>
+</div>
+
+<h3>1.2 CAN总线在汽车电子中的应用</h3>
+
+<p>你想想看，一辆现代汽车上有多少个电子控制单元（ECU）？从发动机控制、变速箱控制，到ABS、安全气囊、空调、车窗...少说也有30-50个。这些ECU之间需要实时交换数据，CAN总线就是它们的"神经系统"。</p>
+
+<p>我给大家画个应用场景图（用文字描述）：</p>
+
+<ul>
+  <li><strong>动力系统</strong>：发动机ECU、变速箱ECU、电池管理系统（BMS）——这些节点对实时性要求极高，通常使用高速CAN（500kbps）</li>
+  <li><strong>底盘系统</strong>：ABS/ESP、转向系统、悬架控制——安全关键，需要冗余设计</li>
+  <li><strong>车身系统</strong>：车门模块、车窗控制、座椅调节——对速率要求不高，常用低速CAN（125kbps）</li>
+  <li><strong>信息娱乐系统</strong>：导航、音响、仪表盘——数据量大，现在很多已转向CAN FD或以太网</li>
+</ul>
+
+<table>
+  <tr>
+    <th>应用领域</th>
+    <th>典型节点</th>
+    <th>通信速率</th>
+    <th>优先级</th>
+  </tr>
+  <tr>
+    <td>动力总成</td>
+    <td>ECU、TCU、BMS</td>
+    <td>500kbps</td>
+    <td>最高</td>
+  </tr>
+  <tr>
+    <td>底盘安全</td>
+    <td>ABS、ESP、EPS</td>
+    <td>500kbps</td>
+    <td>高</td>
+  </tr>
+  <tr>
+    <td>车身控制</td>
+    <td>BCM、门窗、灯光</td>
+    <td>125kbps</td>
+    <td>中</td>
+  </tr>
+  <tr>
+    <td>信息娱乐</td>
+    <td>IVI、仪表、T-Box</td>
+    <td>500kbps~1Mbps</td>
+    <td>低</td>
+  </tr>
+</table>
+
+<p>我曾经参与过一个项目，客户抱怨车窗升降偶尔失灵。排查了整整两周，最后发现是CAN总线负载率过高，导致车窗控制报文被延迟了。从那以后，我设计CAN网络时一定会预留30%以上的带宽余量。</p>
+
+<div class="tip">
+  <p><strong>实战技巧</strong>：设计CAN网络时，建议把安全相关的节点（如制动、转向）放在同一个网段，并且使用独立的电源和地线。别问我怎么知道的，都是教训换来的。</p>
+</div>
+
+<h3>1.3 CAN总线的物理层特性</h3>
+
+<p>物理层，说白了就是CAN总线长什么样、怎么连、电气特性如何。这部分内容比较枯燥，但非常重要——很多通信问题都出在物理层。</p>
+
+<p><strong>1. 总线拓扑结构</strong></p>
+<p>CAN总线采用多主总线结构，所有节点都挂在两根线上：CAN_H和CAN_L。我习惯叫它们"双绞线兄弟"。为什么用双绞线？为了抗干扰。你想想看，发动机舱里电磁环境多恶劣，不用双绞线根本扛不住。</p>
+
+<p><strong>2. 差分信号传输</strong></p>
+<p>CAN总线用差分信号传输数据。简单说就是：</p>
+<ul>
+  <li>显性电平（逻辑0）：CAN_H比CAN_L高2V左右</li>
+  <li>隐性电平（逻辑1）：CAN_H和CAN_L电压相等（约2.5V）</li>
+</ul>
+
+<p>这种设计的好处是抗共模干扰。我在实验室做过测试，在CAN线上施加±10V的共模干扰，数据依然能正确传输。换成单端信号线，早就乱码了。</p>
+
+<p><strong>3. 终端电阻</strong></p>
+<p>CAN总线两端必须各接一个120Ω的终端电阻。为什么是120Ω？因为双绞线的特性阻抗大约是120Ω。不接终端电阻会怎样？信号反射，通信失败。我曾经见过一个新手工程师，把终端电阻焊在了中间节点上，结果总线怎么都跑不起来。</p>
+
+<div class="warning">
+  <p><strong>⚠️ 避坑指南</strong>：我曾经在产线上遇到过一批ECU通信不稳定，查了三天发现是终端电阻焊错了位置。记住：终端电阻只能放在总线的最两端，不能放在中间节点上。另外，电阻精度要选1%的，别为了省几分钱用5%的。</p>
+</div>
+
+<p><strong>4. 总线长度与速率的关系</strong></p>
+<p>CAN总线的通信距离和速率成反比。我给大家一个经验数据：</p>
+
+<table>
+  <tr>
+    <th>通信速率</th>
+    <th>最大总线长度</th>
+    <th>典型应用</th>
+  </tr>
+  <tr>
+    <td>1Mbps</td>
+    <td>40m</td>
+    <td>CAN FD、动力系统</td>
+  </tr>
+  <tr>
+    <td>500kbps</td>
+    <td>100m</td>
+    <td>高速CAN、底盘系统</td>
+  </tr>
+  <tr>
+    <td>250kbps</td>
+    <td>250m</td>
+    <td>中速CAN、车身系统</td>
+  </tr>
+  <tr>
+    <td>125kbps</td>
+    <td>500m</td>
+    <td>低速CAN、诊断系统</td>
+  </tr>
+  <tr>
+    <td>50kbps</td>
+    <td>1000m</td>
+    <td>工业控制、远程监控</td>
+  </tr>
+</table>
+
+<p>嗯，这里要注意，上面说的总线长度是指主干线的长度，不包括支线（stub）。支线长度也有讲究，一般不超过0.3m，速率越高支线要越短。</p>
+
+<p><strong>5. 节点数量限制</strong></p>
+<p>标准CAN总线最多支持110个节点（理论上），但实际上我建议不要超过32个。为什么？节点越多，总线电容越大，信号边沿会变缓，容易出错。我做过一个项目，挂了48个节点，结果通信误码率飙升到1%。后来分成两个网段，问题就解决了。</p>
+
+<div class="highlight">
+  <p><strong>总结一下</strong>：CAN总线的物理层看似简单，但细节决定成败。双绞线、差分信号、终端电阻、总线长度、节点数量，每一个参数都要仔细设计。我建议初学者先拿一个简单的两节点网络练手，跑通了再逐步增加复杂度。</p>
+</div>
+
+<p>好了，第一章的内容就到这里。下一章咱们聊聊CAN总线的数据链路层，看看报文是怎么在总线上"跑"起来的。有什么问题，欢迎在课程群里交流。</p>
+        <div class="footer-nav">
+            <a href="javascript:void(0)">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="02.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第17章 CAN总线通信速率</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
+<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
+<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html" class="">第7章 CAN收发器</a></li>
+<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
+<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
+<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
+<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html" class="active">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
+<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
+<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
+<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第17章 CAN总线通信速率：标准速率、速率与距离关系、采样点设置</h2>
+
+<p>各位同学，今天咱们聊聊CAN总线的通信速率。说实话，这个知识点看着简单，但坑特别多。我见过不少项目，硬件设计没问题，代码也没毛病，就是跑不起来——最后发现，全是速率和采样点设置惹的祸。</p>
+
+<h3>17.1 标准速率：125kbps、250kbps、500kbps、1Mbps</h3>
+
+<p>CAN总线支持哪些速率？嗯，标准里其实没强制规定死。但行业里形成了几个约定俗成的速率：<strong>125kbps、250kbps、500kbps、1Mbps</strong>。你想想看，为什么是这几个数？</p>
+
+<p>说白了，它们跟晶振频率、分频系数有关。比如一个8MHz的晶振，经过合适的预分频和位时间配置，就能整出这些整数倍的速率来。我个人习惯，能用500kbps就别用250kbps，除非距离实在拉得太长。</p>
+
+<table>
+  <tr>
+    <th>标准速率</th>
+    <th>典型应用场景</th>
+    <th>位时间（μs）</th>
+  </tr>
+  <tr>
+    <td>125 kbps</td>
+    <td>工业控制、楼宇自动化</td>
+    <td>8.0</td>
+  </tr>
+  <tr>
+    <td>250 kbps</td>
+    <td>汽车车身控制、诊断系统</td>
+    <td>4.0</td>
+  </tr>
+  <tr>
+    <td>500 kbps</td>
+    <td>动力系统、底盘控制</td>
+    <td>2.0</td>
+  </tr>
+  <tr>
+    <td>1 Mbps</td>
+    <td>高速数据采集、测试系统</td>
+    <td>1.0</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <strong>我的小建议：</strong> 做产品选型时，优先选500kbps。这个速率在大多数MCU上都能稳定实现，而且兼容性最好。1Mbps虽然快，但距离一超过10米就容易出问题。
+</div>
+
+<h3>17.2 速率与距离的关系</h3>
+
+<p>这里有个核心概念：<strong>速率越高，通信距离越短</strong>。为什么会这样？</p>
+
+<p>CAN总线用的是差分信号，信号在线上传输会有衰减和延迟。速率高了，位时间就短。比如1Mbps时，一个位只有1微秒。如果总线太长，信号反射回来还没稳定，下一个位就来了——这不就乱套了吗？</p>
+
+<p>我在项目中遇到过一件事：客户要求用1Mbps跑50米总线。我当时就摇头，这不可能。后来实测，30米就开始丢帧了。最后妥协到250kbps，稳稳当当跑了80米。</p>
+
+<table>
+  <tr>
+    <th>通信速率</th>
+    <th>最大理论距离</th>
+    <th>实际推荐距离</th>
+  </tr>
+  <tr>
+    <td>1 Mbps</td>
+    <td>40 m</td>
+    <td>10 - 20 m</td>
+  </tr>
+  <tr>
+    <td>500 kbps</td>
+    <td>100 m</td>
+    <td>50 - 80 m</td>
+  </tr>
+  <tr>
+    <td>250 kbps</td>
+    <td>200 m</td>
+    <td>100 - 150 m</td>
+  </tr>
+  <tr>
+    <td>125 kbps</td>
+    <td>500 m</td>
+    <td>200 - 400 m</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <strong>注意：</strong> 上表是理论值。实际项目中，线缆质量、节点数量、终端电阻精度都会影响实际距离。我曾经在一条旧电缆上跑250kbps，30米就出错了——换了好线，直接干到150米。
+</div>
+
+<h3>17.3 采样点设置</h3>
+
+<p>采样点，说白了就是控制器在什么时候去读总线上的电平。这个点设得不对，再好的硬件也白搭。</p>
+
+<p>CAN的位时间分成四段：<strong>同步段（Sync_Seg）、传播段（Prop_Seg）、相位缓冲段1（Phase_Seg1）、相位缓冲段2（Phase_Seg2）</strong>。采样点就在Phase_Seg1和Phase_Seg2之间。</p>
+
+<p>我建议采样点设置在<strong>75% - 87.5%</strong>之间。为什么是这个范围？因为太早了，信号还没稳定；太晚了，留给下一个位的同步时间不够。</p>
+
+<pre><code>// 以500kbps为例，假设系统时钟为8MHz
+// 位时间 = 16个TQ（Time Quantum）
+// 采样点 = (Sync_Seg + Prop_Seg + Phase_Seg1) / 总TQ
+
+// 推荐配置：
+// Sync_Seg = 1 TQ
+// Prop_Seg = 3 TQ
+// Phase_Seg1 = 8 TQ
+// Phase_Seg2 = 4 TQ
+// 采样点 = (1 + 3 + 8) / 16 = 75%
+
+// 另一种常用配置：
+// Sync_Seg = 1 TQ
+// Prop_Seg = 2 TQ
+// Phase_Seg1 = 7 TQ
+// Phase_Seg2 = 6 TQ
+// 采样点 = (1 + 2 + 7) / 16 = 62.5%  ← 这个偏低，不推荐
+</code></pre>
+
+<div class="highlight">
+  <strong>核心要点：</strong> 采样点设置要遵循「<strong>三点原则</strong>」：
+  <ul>
+    <li>不能太靠前（信号未稳定）</li>
+    <li>不能太靠后（同步裕量不足）</li>
+    <li>最好在75% - 87.5%之间</li>
+  </ul>
+</div>
+
+<h3>17.4 实际项目中的避坑指南</h3>
+
+<p>嗯，这里我总结几个实战经验，你们记一下：</p>
+
+<ul>
+  <li><strong>不同速率混用？不行。</strong> 一条CAN总线上所有节点必须用同一个速率。我曾经见过有人想用125kbps和500kbps混跑，结果总线直接瘫痪。</li>
+  <li><strong>采样点要统一。</strong> 不光速率要一样，采样点设置也要一样。不同MCU的默认采样点可能不同，比如STM32默认是75%，有些芯片默认是62.5%。不统一的话，长距离通信容易出错。</li>
+  <li><strong>距离不够？降速。</strong> 如果总线长度超过推荐值，别硬撑。降一档速率，往往比加中继器更靠谱。</li>
+  <li><strong>用示波器看波形。</strong> 我每次调试CAN，第一件事就是拿示波器看CAN_H和CAN_L的差分波形。看看上升沿、下降沿是否陡峭，有没有振铃。这个习惯帮我省了不少排查时间。</li>
+</ul>
+
+<div class="tip">
+  <strong>一个小技巧：</strong> 如果你不确定采样点设多少合适，可以用CAN分析仪自带的采样点计算工具。输入晶振频率和目标速率，它会自动推荐一组参数。但记住，工具只是参考，最终还是要实测验证。
+</div>
+
+<p>好了，这一章的内容就这些。速率、距离、采样点，这三个参数是CAN总线通信的「铁三角」。任何一个设错了，通信都跑不稳。下一章咱们聊聊CAN的帧结构，那个更精彩。</p>
+        <div class="footer-nav">
+            <a href="16.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="18.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>
