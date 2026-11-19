@@ -195,20 +195,18 @@
 
 <p>CAN的CRC算法是15位的，生成多项式是x¹⁵ + x¹⁴ + x¹⁰ + x⁸ + x⁷ + x⁴ + x³ + 1。你不需要记住这个，但要知道它的检错能力很强。</p>
 
-<pre><code>// CRC计算示例（伪代码）
-uint16_t calc_can_crc(uint8_t *data, uint8_t len) {
+<pre><code>// 经典 CAN CRC-15：输入为从 SOF 到数据场末尾、已去填充的线上位流
+// CRC计算不能只读取数据场的data[]字节，也不包含CRC字段自身
+#include &lt;stdint.h&gt;
+#include &lt;stddef.h&gt;
+uint16_t can_crc15_bits(const uint8_t *bits, size_t count) {
     uint16_t crc = 0;
-    for (int i = 0; i &lt; len; i++) {
-        crc ^= (data[i] &lt;&lt; 7);
-        for (int j = 0; j &lt; 8; j++) {
-            if (crc & 0x8000) {
-                crc = (crc &lt;&lt; 1) ^ 0x4599;  // 生成多项式
-            } else {
-                crc &lt;&lt;= 1;
-            }
-        }
+    for (size_t i = 0; i &lt; count; ++i) {
+        uint16_t feedback = ((crc &gt;&gt; 14) &amp; 1u) ^ (bits[i] &amp; 1u);
+        crc = (uint16_t)((crc &lt;&lt; 1) &amp; 0x7FFFu);
+        if (feedback) crc ^= 0x4599u;
     }
-    return crc & 0x7FFF;  // 取15位
+    return crc;
 }</code></pre>
 
 <h4>4.2.4 格式错误（Form Error）</h4>
@@ -275,7 +273,7 @@ uint16_t calc_can_crc(uint8_t *data, uint8_t len) {
 <p>这个状态很危险。一个节点总线关闭，意味着它完全失联了。在汽车上，这可能导致某个功能彻底失效。</p>
 
 <div class="warning">
-  <p><strong>重要提醒：</strong>总线关闭后，节点需要等待128个连续的11个隐性位（即128个总线空闲状态）才能重新进入主动错误状态。这个机制是为了防止频繁出错的节点反复干扰总线。</p>
+  <p><strong>Bus Off恢复：</strong>规范要求检测到128次、每次连续11个隐性位的序列。具体由控制器自动恢复还是软件请求恢复，取决于配置；务必记录恢复事件，避免未消除故障就持续重启节点。</p>
 </div>
 
 <h3>4.4 错误计数规则</h3>
@@ -285,13 +283,13 @@ uint16_t calc_can_crc(uint8_t *data, uint8_t len) {
 <ul>
   <li><strong>发送成功：</strong>TEC减1（前提是TEC &gt; 0）</li>
   <li><strong>接收成功：</strong>REC减1（前提是REC &gt; 0）</li>
-  <li><strong>发送错误：</strong>TEC加8</li>
-  <li><strong>接收错误：</strong>REC加1</li>
-  <li><strong>主动错误帧发送后：</strong>TEC加8</li>
-  <li><strong>被动错误帧发送后：</strong>TEC加8</li>
+  <li><strong>发送错误：</strong>多数典型发送错误TEC增加8（有例外）</li>
+  <li><strong>接收错误：</strong>多数典型接收错误REC增加1（有例外）</li>
+  <li><strong>主动错误帧：</strong>计数变化应按具体错误触发规则判断</li>
+  <li><strong>被动错误帧：</strong>并非无条件使TEC增加8</li>
 </ul>
 
-<p>这个规则设计得很巧妙。发送错误的惩罚比接收错误重得多。因为发送错误往往意味着节点本身有问题，而接收错误可能是临时的干扰。</p>
+<p>TEC/REC变化由CAN规范的完整计数规则决定，存在仲裁、ACK、错误被动等例外。常见发送错误可能使TEC增加8，接收错误通常使REC增加1，但不能将这些概括为无条件规则；输掉仲裁不会增加错误计数。</p>
 
 <h3>4.5 实际项目中的经验</h3>
 
