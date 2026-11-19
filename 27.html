@@ -242,20 +242,17 @@ int CAN_Driver_Receive(CanFrame_t *frame);</code></pre>
 
 <p>举个例子，假设我们有一个车速信号，定义在ID=0x100的报文里，起始位bit 8，长度16位，分辨率0.01 km/h：</p>
 
-<pre><code>/* 协议层 - 解析车速信号 */
-float Protocol_GetVehicleSpeed(CanFrame_t *frame)
+<pre><code>/* 教学示例：自定义ID=0x100的小端16位车速信号。
+   实际项目须使用可信DBC并验证信号有效性与时效性。 */
+float Protocol_GetVehicleSpeed(const CanFrame_t *frame)
 {
-    if (frame->id != 0x100) {
-        return -1.0f;  /* 不是车速报文 */
+    if (frame == NULL || frame-&gt;id != 0x100u ||
+        frame-&gt;is_ext || frame-&gt;is_rtr || frame-&gt;dlc &lt; 3u) {
+        return -1.0f;
     }
-    
-    /* 从bit 8开始取16位数据 */
-    uint16_t raw = (frame->data[1] << 8) | frame->data[2];
-    
-    /* 应用分辨率 */
-    float speed = raw * 0.01f;
-    
-    return speed;
+    uint16_t raw = (uint16_t)frame-&gt;data[1] |
+                   ((uint16_t)frame-&gt;data[2] &lt;&lt; 8);
+    return raw * 0.01f; /* km/h */
 }</code></pre>
 
 <p>你看，协议层只处理数据格式。它不关心这个车速值最终用来做什么——那是应用层的事。</p>

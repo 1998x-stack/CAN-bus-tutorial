@@ -179,7 +179,7 @@
 
 <p>但这里有个细节：<strong>当多个邮箱同时有数据要发送时，硬件会怎么选？</strong></p>
 
-<p>答案是：硬件会先看哪个邮箱的报文ID最小，就优先发哪个。如果ID相同，再看邮箱编号，编号小的优先。</p>
+<p><strong>bxCAN需要区分邮箱调度与总线仲裁：</strong>CAN_TXFP=DISABLE时，本地待发报文按标识符优先级调度；CAN_TXFP=ENABLE时按发送请求顺序调度。真正的线上仲裁仍按CAN标识符及帧格式进行，不能仅根据邮箱编号断言优先级。</p>
 
 <table>
   <tr>
@@ -207,7 +207,7 @@
 <p>我曾经踩过一个坑：把紧急报文放在邮箱2里，结果邮箱0和邮箱1一直有数据在发，紧急报文死活发不出去。后来我把紧急报文放在邮箱0，问题就解决了。</p>
 
 <div class="tip">
-  <p><strong>我的建议：</strong>把最紧急、最关键的报文放在邮箱0，次紧急的放邮箱1，普通的放邮箱2。这样即使邮箱满了，关键报文也能优先发出。</p>
+  <p>关键业务报文应采用明确的标识符优先级、软件队列容量控制和发送截止期限。仅把某条报文放入邮箱0不能保证它在本地队列拥塞或总线占用时按时发送；应记录邮箱溢出和实际发送延迟。</p>
 </div>
 
 <h3>10.3 发送流程</h3>
@@ -231,28 +231,21 @@
 
 <p>下面是一个典型的发送代码示例：</p>
 
-<pre><code>// 假设使用邮箱0发送
-void CAN_SendMessage(uint32_t id, uint8_t *data, uint8_t len)
-{
-    // 1. 等待邮箱0空闲
-    while (CAN-&gt;TSR &amp; CAN_TSR_TME0) {
-        // 等待，或者超时处理
-    }
-    
-    // 2. 填写标识符
-    CAN-&gt;sTxMailBox[0].TIR = (id &lt;&lt; 21) | CAN_TIxR_IDE;  // 标准帧
-    
-    // 3. 填写数据长度
-    CAN-&gt;sTxMailBox[0].TDTR = len;
-    
-    // 4. 填写数据
-    CAN-&gt;sTxMailBox[0].TDLR = data[0] | (data[1] &lt;&lt; 8) | 
-                                (data[2] &lt;&lt; 16) | (data[3] &lt;&lt; 24);
-    CAN-&gt;sTxMailBox[0].TDHR = data[4] | (data[5] &lt;&lt; 8) | 
-                                (data[6] &lt;&lt; 16) | (data[7] &lt;&lt; 24);
-    
-    // 5. 请求发送
-    CAN-&gt;sTxMailBox[0].TIR |= CAN_TIxR_TXRQ;
+<pre><code>// STM32F1 Standard Peripheral Library 示例。假设 CAN1 已正常初始化。
+// CAN_Transmit 自动选择可用邮箱；不应直接操作忙碌邮箱寄存器。
+#include &lt;stdint.h&gt;
+#include &lt;stddef.h&gt;
+uint8_t CAN_SendStd(uint16_t id, const uint8_t *data, uint8_t len) {
+    if (id &gt; 0x7FFu || len &gt; 8u || (len &amp;&amp; data == NULL))
+        return CAN_TxStatus_NoMailBox;
+    CanTxMsg tx = {0};
+    tx.StdId = id;
+    tx.IDE = CAN_Id_Standard;
+    tx.RTR = CAN_RTR_Data;
+    tx.DLC = len;
+    for (uint8_t i = 0; i &lt; len; ++i) tx.Data[i] = data[i];
+    // 返回邮箱号0..2或CAN_TxStatus_NoMailBox；须异步检查最终发送状态。
+    return CAN_Transmit(CAN1, &amp;tx);
 }</code></pre>
 
 <p>嗯，这里要注意：<strong>发送请求位一旦置1，就不能再修改邮箱里的数据了</strong>。否则会导致发送错误。我见过有人一边发一边改数据，结果报文内容乱套了。</p>
