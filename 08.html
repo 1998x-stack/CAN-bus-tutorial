@@ -166,7 +166,7 @@
 <p>bxCAN有几个关键特性，我挑重要的说：</p>
 
 <ul>
-  <li><strong>支持CAN 2.0A和2.0B</strong>：标准帧（11位ID）和扩展帧（29位ID）都能处理。现在绝大多数车载网络都用扩展帧，但老一些的J1939设备可能还在用标准帧，兼容性你得心里有数。</li>
+  <li><strong>支持CAN 2.0A和2.0B</strong>：标准帧（11位ID）和扩展帧（29位ID）都能处理。经典CAN网络同时使用11位和29位标识符；J1939主要使用29位扩展帧，兼容性你得心里有数。</li>
   <li><strong>3个发送邮箱</strong>：可以缓存3个待发送的报文。发送优先级由硬件自动仲裁，你不需要操心。</li>
   <li><strong>2个接收FIFO</strong>：每个FIFO深度为3个报文。也就是说，最多可以缓存6个接收报文而不丢失。我在项目里遇到过接收溢出导致丢帧的情况，后来发现是FIFO满了，而我的应用层还没来得及读走数据。嗯，这里要注意：<strong>接收中断服务程序一定要写得快</strong>。</li>
   <li><strong>28个可配置的筛选器组</strong>：这是bxCAN最强大的功能之一。你可以设置筛选规则，只接收你关心的ID，其他报文一律过滤掉。这能大大减轻CPU的负担。</li>
@@ -193,17 +193,18 @@
 <pre><code>BaudRate = CAN_Clock / ( (1 + BS1 + BS2) * Prescaler )</code></pre>
 
 <p>举个例子，假设APB1时钟是36MHz，你想要500kbps的波特率，通常可以这样配：</p>
-<pre><code>CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;      // 同步跳转宽度为1个时间量子
-CAN_InitStructure.CAN_BS1 = CAN_BS1_8tq;      // 时间段1为8个时间量子
-CAN_InitStructure.CAN_BS2 = CAN_BS2_7tq;      // 时间段2为7个时间量子
-CAN_InitStructure.CAN_Prescaler = 4;           // 预分频系数为4
-// 计算：36MHz / ( (1 + 8 + 7) * 4 ) = 36MHz / 64 = 562.5kbps
-// 嗯，这个值不太对，说明需要调整参数。</code></pre>
+<pre><code>// STM32F1 SPL，假定 PCLK1 = 36 MHz
+CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;
+CAN_InitStructure.CAN_BS1 = CAN_BS1_14tq;
+CAN_InitStructure.CAN_BS2 = CAN_BS2_3tq;
+CAN_InitStructure.CAN_Prescaler = 4;
+// 36 MHz / [4 * (1+14+3)] = 500 kbps
+// 采样点 = (1+14)/18 = 83.33%</code></pre>
 
 <p>你看，实际计算时，需要反复调整BS1、BS2和Prescaler，让结果尽量接近目标值。我建议你使用ST官方提供的<strong>CAN波特率计算工具</strong>，或者直接查芯片手册里的推荐配置表，省时省力。</p>
 
 <div class="tip">
-  <p><strong>个人经验：</strong>对于500kbps的常用波特率，在36MHz APB1时钟下，我常用的配置是：Prescaler=4, BS1=9tq, BS2=8tq, SJW=1tq。这样算出来正好是500kbps。你可以直接拿去用。</p>
+  <p>在PCLK1=36MHz前提下，一组可复算的500kbps示例配置是Prescaler=4、BS1=14TQ、BS2=3TQ、SJW=1TQ；采样点约83.33%。还需满足具体MCU与线束延迟裕量。</p>
 </div>
 
 <h3>8.3 GPIO复用功能配置：把信号引出来</h3>
@@ -282,18 +283,18 @@ GPIO_Init(GPIOA, &GPIO_InitStructure);</code></pre>
     CAN_InitStructure.CAN_TTCM = DISABLE;
     CAN_InitStructure.CAN_ABOM = ENABLE;   // 自动离线管理
     CAN_InitStructure.CAN_AWUM = ENABLE;   // 自动唤醒
-    CAN_InitStructure.CAN_NART = DISABLE;  // 禁止自动重传
+    CAN_InitStructure.CAN_NART = DISABLE;  // NART=DISABLE表示允许自动重传
     CAN_InitStructure.CAN_RFLM = DISABLE;  // 接收FIFO锁定模式
     CAN_InitStructure.CAN_TXFP = DISABLE;  // 发送优先级由ID决定
     CAN_InitStructure.CAN_Mode = CAN_Mode_Normal; // 正常模式
     CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;
-    CAN_InitStructure.CAN_BS1 = CAN_BS1_9tq;
-    CAN_InitStructure.CAN_BS2 = CAN_BS2_8tq;
+    CAN_InitStructure.CAN_BS1 = CAN_BS1_14tq;
+    CAN_InitStructure.CAN_BS2 = CAN_BS2_3tq;
     CAN_InitStructure.CAN_Prescaler = 4;
-    CAN_Init(CAN1, &CAN_InitStructure);
+    if (CAN_Init(CAN1, &CAN_InitStructure) != CAN_InitStatus_Success) { /* 初始化失败处理 */ }
 
     // 4. 使能CAN
-    CAN_Cmd(CAN1, ENABLE);
+    // SPL CAN_Init() 完成初始化；没有CAN_Cmd()接口。
 }</code></pre>
 
 <p>你看，其实就这么几步。你想想看，只要时钟对了、引脚对了、参数对了，CAN通信的硬件基础就搭好了。剩下的就是发送和接收的逻辑了。</p>
