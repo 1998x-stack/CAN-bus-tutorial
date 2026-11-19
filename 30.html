@@ -188,14 +188,17 @@
 
 <p>STM32这边要做三件事：采集数据、打包成CAN帧、发送出去。我习惯用HAL库，因为移植方便。</p>
 
-<p>先看CAN初始化。这里有个坑：波特率配置。我记得有一次项目，CAN通信死活不通，查了半天发现是时钟树配错了。STM32的CAN时钟来自APB1，最高36MHz。你算波特率的时候一定要确认这个时钟。</p>
+<p>先看CAN初始化。这里有个坑：波特率配置。我记得有一次项目，CAN通信死活不通，查了半天发现是时钟树配错了。在本STM32F1示例中CAN控制器使用PCLK1=36MHz，具体芯片的时钟上限以手册为准。你算波特率的时候一定要确认这个时钟。</p>
 
-<pre><code>// CAN初始化配置
-void CAN_Init(void)
+<pre><code>// STM32F1 HAL / bxCAN：示例假定PCLK1 = 36 MHz。
+// hcan定义在文件作用域，供后续发送/诊断函数共享。
+// GPIO、复用与NVIC请在HAL_CAN_MspInit()或CubeMX生成代码中配置。
+#include "stm32f1xx_hal.h"
+static CAN_HandleTypeDef hcan;
+
+void MX_CAN1_Init(void)
 {
-    CAN_HandleTypeDef hcan;
-    CAN_FilterTypeDef sFilterConfig;
-    
+    CAN_FilterTypeDef filter = {0};
     hcan.Instance = CAN1;
     hcan.Init.TimeTriggeredMode = DISABLE;
     hcan.Init.AutoBusOff = ENABLE;
@@ -204,37 +207,28 @@ void CAN_Init(void)
     hcan.Init.ReceiveFifoLocked = DISABLE;
     hcan.Init.TransmitFifoPriority = DISABLE;
     hcan.Init.Mode = CAN_MODE_NORMAL;
-    
-    // 波特率500kbps，APB1时钟36MHz
-    // 计算公式：Baud = APB1 / (Prescaler * (BS1 + BS2 + 1))
     hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-    hcan.Init.TimeSeg1 = CAN_BS1_8TQ;
-    hcan.Init.TimeSeg2 = CAN_BS2_7TQ;
-    hcan.Init.Prescaler = 4;  // 36M / (4 * (8+7+1)) = 500k
-    
-    if (HAL_CAN_Init(&hcan) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    
-    // 配置过滤器，接收所有ID
-    sFilterConfig.FilterBank = 0;
-    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = 0x0000;
-    sFilterConfig.FilterIdLow = 0x0000;
-    sFilterConfig.FilterMaskIdHigh = 0x0000;
-    sFilterConfig.FilterMaskIdLow = 0x0000;
-    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
-    sFilterConfig.FilterActivation = ENABLE;
-    
-    HAL_CAN_ConfigFilter(&hcan, &sFilterConfig);
-    
-    // 启动CAN
-    HAL_CAN_Start(&hcan);
-    HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
-}
-</code></pre>
+    hcan.Init.TimeSeg1 = CAN_BS1_14TQ;
+    hcan.Init.TimeSeg2 = CAN_BS2_3TQ;
+    hcan.Init.Prescaler = 4; // 36MHz/[4*(1+14+3)] = 500kbps
+
+    if (HAL_CAN_Init(&amp;hcan) != HAL_OK) Error_Handler();
+
+    filter.FilterBank = 0;
+    filter.FilterMode = CAN_FILTERMODE_IDMASK;
+    filter.FilterScale = CAN_FILTERSCALE_32BIT;
+    filter.FilterIdHigh = 0;
+    filter.FilterIdLow = 0;
+    filter.FilterMaskIdHigh = 0;
+    filter.FilterMaskIdLow = 0;
+    filter.FilterFIFOAssignment = CAN_RX_FIFO0;
+    filter.FilterActivation = ENABLE;
+    filter.SlaveStartFilterBank = 14; // 双bxCAN变体需按设备手册分配
+    if (HAL_CAN_ConfigFilter(&amp;hcan, &amp;filter) != HAL_OK) Error_Handler();
+    if (HAL_CAN_Start(&amp;hcan) != HAL_OK) Error_Handler();
+    if (HAL_CAN_ActivateNotification(&amp;hcan,
+            CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) Error_Handler();
+}</code></pre>
 
 <div class="tip">
   <p><strong>个人经验</strong>：我习惯把CAN过滤器设置成接收所有ID，然后在应用层做过滤。这样调试方便，后期改ID也不用动底层。当然，量产产品建议用硬件过滤，省CPU资源。</p>
@@ -242,35 +236,27 @@ void CAN_Init(void)
 
 <p>数据采集部分，我用ADC采集模拟量。比如温度传感器，0-5V对应0-100度。采集后打包成CAN帧发送。</p>
 
-<pre><code>// 数据采集和发送任务
+<pre><code>// 示例温度0..100°C，编码为0.01°C/bit的大端16位整数。
+// 实际项目必须按传感器和DBC约定处理范围、无效值及时间戳。
 void DataAcquisitionTask(void)
 {
-    CAN_TxHeaderTypeDef txHeader;
-    uint8_t txData[8];
-    uint32_t txMailbox;
-    
-    // 采集温度
-    uint16_t adc_value = HAL_ADC_GetValue(&hadc1);
-    float temperature = (adc_value / 4095.0) * 100.0;
-    
-    // 打包成CAN帧
-    txHeader.StdId = 0x100;  // 温度数据ID
-    txHeader.ExtId = 0;
-    txHeader.IDE = CAN_ID_STD;
-    txHeader.RTR = CAN_RTR_DATA;
-    txHeader.DLC = 4;  // 4字节数据
-    
-    // 温度值放大100倍，保留两位小数
-    uint16_t temp_int = (uint16_t)(temperature * 100);
-    txData[0] = (temp_int >> 8) & 0xFF;
-    txData[1] = temp_int & 0xFF;
-    txData[2] = 0;  // 预留
-    txData[3] = 0;
-    
-    // 发送
-    HAL_CAN_AddTxMessage(&hcan, &txHeader, txData, &txMailbox);
-}
-</code></pre>
+    CAN_TxHeaderTypeDef tx = {0};
+    uint8_t payload[8] = {0};
+    uint32_t mailbox;
+    uint16_t adc = HAL_ADC_GetValue(&amp;hadc1); // 假定hadc1由板级代码初始化
+    uint16_t centi_deg = (uint16_t)((adc * 10000UL) / 4095UL);
+    tx.StdId = 0x100;      // 仅教学示例，需按项目分配ID
+    tx.IDE = CAN_ID_STD;
+    tx.RTR = CAN_RTR_DATA;
+    tx.DLC = 2;
+    tx.TransmitGlobalTime = DISABLE;
+    payload[0] = (uint8_t)(centi_deg &gt;&gt; 8);
+    payload[1] = (uint8_t)centi_deg;
+    if (HAL_CAN_GetTxMailboxesFreeLevel(&amp;hcan) == 0U) return;
+    if (HAL_CAN_AddTxMessage(&amp;hcan, &amp;tx, payload, &amp;mailbox) != HAL_OK) {
+        // 记录发送失败；不可视为已成功上总线
+    }
+}</code></pre>
 
 <p>这里要注意：CAN帧一次只能发8字节。如果你的数据多，就分多帧发。我一般一个传感器一帧，ID不同。比如0x100是温度，0x101是压力，0x102是转速。这样上位机解析也方便。</p>
 
@@ -344,42 +330,39 @@ public void ReceiveCANData()
 
 <p>物理层诊断，我建议你在上位机加一个“总线健康检查”按钮。点击后，STM32会返回当前总线的状态。</p>
 
-<pre><code>// 故障诊断命令处理
-void DiagnosticHandler(uint8_t cmd)
+<pre><code>// 自定义台架诊断响应，仅在隔离实验网络使用。
+// 不使用保留给OBD功能请求的0x7DF，不把“重置HAL错误码”当成Bus Off恢复。
+void DemoDiagnosticReply(uint8_t cmd)
 {
-    CAN_TxHeaderTypeDef txHeader;
-    uint8_t txData[8];
-    uint32_t txMailbox;
-    
-    txHeader.StdId = 0x7DF;  // 诊断请求ID
-    txHeader.DLC = 8;
-    
-    switch (cmd)
-    {
-        case 0x01:  // 查询总线状态
-            txData[0] = 0x01;
-            txData[1] = (HAL_CAN_GetState(&hcan) == HAL_CAN_STATE_LISTENING) ? 0x01 : 0x00;
-            txData[2] = error_counter;  // 错误计数
-            txData[3] = bus_load;       // 总线负载率
-            break;
-            
-        case 0x02:  // 查询节点状态
-            txData[0] = 0x02;
-            txData[1] = node_status;    // 0:正常 1:警告 2:被动 3:离线
-            txData[2] = tx_error_count;
-            txData[3] = rx_error_count;
-            break;
-            
-        case 0x03:  // 复位节点
-            txData[0] = 0x03;
-            txData[1] = 0xAA;  // 复位确认码
-            HAL_CAN_Reset(&hcan);
-            break;
+    CAN_TxHeaderTypeDef tx = {0};
+    uint8_t payload[8] = {0};
+    uint32_t mailbox;
+    tx.StdId = 0x621; // 示例自定义ID，部署前必须检查ID冲突
+    tx.IDE = CAN_ID_STD;
+    tx.RTR = CAN_RTR_DATA;
+    tx.DLC = 4;
+    tx.TransmitGlobalTime = DISABLE;
+    if (cmd == 0x01) {
+        uint32_t err = HAL_CAN_GetError(&amp;hcan);
+        payload[0] = cmd;
+        payload[1] = (uint8_t)HAL_CAN_GetState(&amp;hcan);
+        payload[2] = (uint8_t)err;
+        payload[3] = (uint8_t)(err &gt;&gt; 8);
+    } else if (cmd == 0x02) {
+        uint32_t esr = hcan.Instance-&gt;ESR;
+        payload[0] = cmd;
+        payload[1] = (uint8_t)(esr &gt;&gt; 16); // TEC
+        payload[2] = (uint8_t)(esr &gt;&gt; 24); // REC
+        payload[3] = (uint8_t)(esr &amp; 0x07u); // LEC
+    } else {
+        payload[0] = 0x7Fu; // 不支持此命令，尤其不允许远程直接复位
+        payload[1] = cmd;
     }
-    
-    HAL_CAN_AddTxMessage(&hcan, &txHeader, txData, &txMailbox);
-}
-</code></pre>
+    if (HAL_CAN_GetTxMailboxesFreeLevel(&amp;hcan) == 0U) return;
+    if (HAL_CAN_AddTxMessage(&amp;hcan, &amp;tx, payload, &amp;mailbox) != HAL_OK) {
+        // 记录失败，由上层处理
+    }
+}</code></pre>
 
 <div class="warning">
   <p><strong>曾经踩过的坑</strong>：有一次现场总线频繁报错，我查了三天。最后发现是一个节点的CAN收发器坏了，导致总线电压异常。从那以后，我每个项目都加物理层诊断。你想想看，如果连总线电压都监测不到，你怎么定位问题？</p>
