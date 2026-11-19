@@ -284,7 +284,7 @@ CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE); // 使能FIFO0消息挂起中断</code>
 
 <p>最后，我把上面这些串起来，给一个完整的初始化函数。你直接拿去用，改改参数就行。</p>
 
-<pre><code>void CAN_Init(void)
+<pre><code>void CAN_BusInit(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     CAN_InitTypeDef CAN_InitStructure;
@@ -292,16 +292,18 @@ CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE); // 使能FIFO0消息挂起中断</code>
     NVIC_InitTypeDef NVIC_InitStructure;
 
     // 1. 使能时钟
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
 
-    // 2. 配置GPIO
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8; // CAN1_TX
+    // 2. STM32F103 CAN1重映射至PB8(RX) / PB9(TX)
+    GPIO_PinRemapConfig(GPIO_Remap1_CAN1, ENABLE);
+    // 配置GPIO
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9; // CAN1_TX（PB9，重映射）
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &amp;GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9; // CAN1_RX
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8; // CAN1_RX（PB8，重映射）
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
     GPIO_Init(GPIOB, &amp;GPIO_InitStructure);
 
@@ -317,10 +319,10 @@ CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE); // 使能FIFO0消息挂起中断</code>
     CAN_InitStructure.CAN_TXFP = DISABLE;
     CAN_InitStructure.CAN_Mode = CAN_Mode_Normal;
     CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;
-    CAN_InitStructure.CAN_BS1 = CAN_BS1_4tq;
+    CAN_InitStructure.CAN_BS1 = CAN_BS1_14tq;
     CAN_InitStructure.CAN_BS2 = CAN_BS2_3tq;
-    CAN_InitStructure.CAN_Prescaler = 9;
-    CAN_Init(CAN1, &amp;CAN_InitStructure);
+    CAN_InitStructure.CAN_Prescaler = 4; // 36 MHz/[4*(1+14+3)]=500kbps
+    if (CAN_Init(CAN1, &amp;CAN_InitStructure) != CAN_InitStatus_Success) { /* 初始化失败 */ return; }
 
     // 5. 配置过滤器（接收所有报文）
     CAN_FilterInitStructure.CAN_FilterNumber = 0;
@@ -344,7 +346,7 @@ CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE); // 使能FIFO0消息挂起中断</code>
     CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
 
     // 7. 启动CAN
-    CAN_Cmd(CAN1, ENABLE);
+    // SPL CAN_Init() 已完成控制器初始化；无 CAN_Cmd() 接口。
 }</code></pre>
 
 <p>好了，这就是CAN初始化的全部内容。你想想看，其实没那么复杂，就是按部就班地把每个环节配好。我在项目中遇到过最坑的事，就是忘了使能GPIO时钟，结果CAN_TX死活拉不出波形。嗯，从那以后我每次初始化都会先检查时钟有没有开。</p>

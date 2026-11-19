@@ -6,12 +6,14 @@
 
 ## 🚀 快速开始
 
-无需安装任何依赖，直接用浏览器打开 `index.html` 即可在线阅读全部章节：
+课程本身是纯静态HTML，但目录页会通过 `fetch('courses.json')` 加载章节数据。为了避免浏览器 `file://` 同源限制，建议在项目根目录开启本地HTTP服务器：
 
 ```bash
-open index.html   # macOS
-# 或在浏览器中直接打开 index.html
+python3 -m http.server 8000
+# 浏览器访问 http://127.0.0.1:8000/
 ```
+
+单独的 `01.html` 到 `30.html` 章节文件也可以直接打开阅读。
 
 ## 📖 章节目录
 
@@ -47,6 +49,16 @@ open index.html   # macOS
 | 28 | CAN总线多节点通信实战 | 多节点组网、数据同步、冲突避免 |
 | 29 | CAN总线低功耗设计 | 休眠唤醒、局部网络、选择性唤醒 |
 | 30 | CAN总线项目实战 | STM32数据采集、上位机显示、故障诊断 |
+
+## ✅ P0 准确性修复与回归测试
+
+针对CAN仲裁、错误计数、位时序、STM32 bxCAN示例和CANopen SDO/PDO等关键内容，已补充可复算的参考模型与自动化回归检查。
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+具体修复清单、计算基准与实机验证边界见 [docs/P0_VERIFICATION.md](docs/P0_VERIFICATION.md)。Python单元测试通过不代表某块STM32开发板已经完成交叉编译或硬件总线验证。
 
 ## 📂 项目结构
 
