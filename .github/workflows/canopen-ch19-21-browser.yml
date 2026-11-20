@@ -1,0 +1,47 @@
+name: CANopen chapters 19-21 browser QA
+on:
+  push:
+    paths:
+      - "19.html"
+      - "20.html"
+      - "21.html"
+      - "assets/chapter19-*.svg"
+      - "assets/chapter20-*.svg"
+      - "assets/chapter21-*.svg"
+      - "assets/css/canopen-articles.css"
+      - "tests/browser_chapters19_21.py"
+      - ".github/workflows/canopen-ch19-21-browser.yml"
+  pull_request:
+    paths:
+      - "19.html"
+      - "20.html"
+      - "21.html"
+      - "assets/chapter19-*.svg"
+      - "assets/chapter20-*.svg"
+      - "assets/chapter21-*.svg"
+      - "assets/css/canopen-articles.css"
+      - "tests/browser_chapters19_21.py"
+      - ".github/workflows/canopen-ch19-21-browser.yml"
+jobs:
+  visual-smoke:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Playwright
+        run: |
+          python -m pip install playwright==1.56.0
+          command -v google-chrome
+      - name: Test 1440/390/360 layouts, interactions, SVG and print
+        run: python tests/browser_chapters19_21.py
+      - name: Upload screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: canopen-19-21-visual-qa
+          path: reports/canopen-19-21/
+          if-no-files-found: ignore

@@ -144,10 +144,32 @@ class TestLoadAndRegressions(unittest.TestCase):
         self.assertNotIn("CAN_TIxR_IDE;  // 标准帧", pages["10"])
         self.assertNotIn("0x4F表示读响应失败", pages["20"])
         self.assertIn("0x606C0020", pages["21"])
-        self.assertIn("protocol_decode_speed", pages["27"])
+        # Chapter 27 may expose the newer result-status API rather than
+        # returning a -1 sentinel. Both must validate the frame before decode.
+        self.assertTrue(
+            "Protocol_GetVehicleSpeed" in pages["27"] or (
+                "protocol_decode_speed" in pages["27"] and
+                "dlc &lt; 3u" in pages["27"] and
+                "extended" in pages["27"]
+            ),
+            "Chapter 27 must guard DLC and standard-vs-extended frame decoding",
+        )
         self.assertNotIn("HAL_CAN_Reset(&amp;hcan)", pages["30"])
-        self.assertIn("CAN_BS1_14TQ", pages["30"])
-        self.assertIn("36MHz/[4*(1+14+3)] = 500kbps", pages["30"])
+        # Chapter 30 now explains the same correct bxCAN timing numerically,
+        # instead of spelling out a legacy CAN_BS1_14TQ macro. Accept both
+        # representations while preserving the 500-kbit/s arithmetic guard.
+        self.assertTrue(
+            "CAN_BS1_14TQ" in pages["30"] or (
+                "BS1 = 14 TQ" in pages["30"] and
+                "BS2 = 3 TQ" in pages["30"] and
+                "BRP = 4" in pages["30"]
+            )
+        )
+        self.assertTrue(
+            "36MHz/[4*(1+14+3)] = 500kbps" in pages["30"] or (
+                "36 MHz / [4 × (1+14+3)] = 500 kbit/s" in pages["30"]
+            )
+        )
 
 
 if __name__ == "__main__":

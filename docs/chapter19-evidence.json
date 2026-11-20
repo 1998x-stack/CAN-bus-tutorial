@@ -1,0 +1,69 @@
+{
+  "chapter": 19,
+  "scope": "Classic CANopen CiA 301 / examples; source anchors and assumptions",
+  "claims": [
+    {
+      "id": "nmt-state",
+      "claim": "NMT has Initialization, Pre-operational, Operational and Stopped states; PDO is disabled in Pre-operational.",
+      "kind": "protocol",
+      "source_url": "https://www.can-cia.org/can-knowledge/network-management/",
+      "locator": "Network management, paragraphs 1–2",
+      "status": "verified",
+      "notes": "CiA description of classic CANopen communication permissions"
+    },
+    {
+      "id": "bootup",
+      "claim": "Boot-up reports transition from initialization to Pre-operational; normal state codes are 7F, 05, 04.",
+      "kind": "protocol",
+      "source_url": "https://canopennode.github.io/CANopenNode/group__CO__NMT__Heartbeat.html",
+      "locator": "NMT/Heartbeat, NMT internal state enumeration and first heartbeat",
+      "status": "verified",
+      "notes": "00 is the Boot-up payload, not generic periodic initialization state"
+    },
+    {
+      "id": "nmt-command",
+      "claim": "NMT frame uses CAN-ID 0 with two data bytes command and node ID, zero broadcasts.",
+      "kind": "protocol",
+      "source_url": "https://www.can-cia.org/can-knowledge/network-management/",
+      "locator": "NMT protocol section",
+      "status": "verified",
+      "notes": "01,02,80,81,82 detailed by CANopenNode"
+    },
+    {
+      "id": "heartbeat-settings",
+      "claim": "Producer heartbeat interval is OD 1017 and consumer supervision is OD 1016.",
+      "kind": "protocol",
+      "source_url": "https://canopennode.github.io/CANopenNode/group__CO__NMT__Heartbeat.html",
+      "locator": "CO_NMT_init and OD_1017_ProducerHbTime",
+      "status": "verified",
+      "notes": "1016 encoding cross-checked with CiA 301 convention"
+    },
+    {
+      "id": "consumer-example",
+      "claim": "Monitoring node 5 with 600-ms timeout gives 0x00050258.",
+      "kind": "calculation",
+      "source_url": "https://canopennode.github.io/CANopenNode/group__CO__NMT__Heartbeat.html",
+      "locator": "OD heartbeat settings; calculation in reference/canopen_ch19_21.py",
+      "status": "derived",
+      "notes": "5<<16 plus 600 decimal"
+    },
+    {
+      "id": "guarding",
+      "claim": "Legacy node guarding replies carry toggle bit and NMT state; heartbeat does not.",
+      "kind": "protocol",
+      "source_url": "https://infosys.beckhoff.com/content/1033/fc510x/2519205899.html",
+      "locator": "Network Management guarding examples",
+      "status": "verified",
+      "notes": "Do not parse guarding alternation as heartbeat"
+    },
+    {
+      "id": "monitoring-illustration",
+      "claim": "A 200-ms heartbeat and 600-ms consumer timeout demonstrate an engineering margin, not a mandated ratio.",
+      "kind": "protocol",
+      "source_url": "https://www.can-cia.org/can-knowledge/network-management/",
+      "locator": "Local illustration, section #heartbeats",
+      "status": "illustrative",
+      "notes": "Actual timeout depends on load, jitter and safety analysis"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc" viewBox="0 0 900 311"><title id="title">SDO 加速上传逐字节示例</title><desc id="desc">客户端请求 0x605 读取 0x2000:01，服务端使用 0x585 响应两字节 0x1234；控制字 4B 为两字节加速上传成功。</desc><rect width="900" height="311" fill="#fffdf9"/><style>text{font-family:system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;fill:#253e40} .label{font-weight:700;font-size:19px}.small{font-size:15px}.tiny{font-size:13px}.arrow{stroke:#647e7b;stroke-width:2.4;fill:none;marker-end:url(#tip)} .teal{fill:#e1f3ec;stroke:#168377} .peach{fill:#fff0e4;stroke:#d27b54} .violet{fill:#f0eafb;stroke:#8267b3} .gray{fill:#f1f5f3;stroke:#849d9b} .box{stroke-width:2;rx:13} </style><defs><marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#647e7b"/></marker></defs>
+<text class="label" x="47" y="49">客户端（主站）</text><text class="label" x="680" y="49">服务端（节点 5）</text>
+<rect x="30" y="84" width="820" height="70" rx="11" fill="#eef8f5" stroke="#a5d4c4"/>
+<text class="small" x="46" y="108">请求 ID 0x605</text><text class="small" x="46" y="135">40 00 20 01 00 00 00 00</text>
+<path class="arrow" d="M390 118H650"/><text class="tiny" x="521" y="105" text-anchor="middle">读取 0x2000:01</text>
+<rect x="30" y="179" width="820" height="70" rx="11" fill="#fbefe8" stroke="#d9b4a0"/>
+<text class="small" x="46" y="206">响应 ID 0x585</text><text class="small" x="46" y="233">4B 00 20 01 34 12 00 00</text>
+<path class="arrow" d="M650 214H390"/><text class="tiny" x="521" y="201" text-anchor="middle">2 字节小端 0x1234</text>
+<text class="small" x="40" y="285">字节 0 = 命令；1–2 = 索引小端；3 = 子索引；4–7 = 数据 / 长度 / Abort 码</text>
+</svg>

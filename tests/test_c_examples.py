@@ -86,12 +86,71 @@ int main(void) {
         self.compile_and_run(source.replace("CAN_SendStd(", function_name + "("))
 
     def test_chapter_27_signal_decode(self):
-        """Run the new portable chapter 27 pipeline example, including negative cases."""
-        source = (ROOT / "examples" / "can_ch27_pipeline.c").read_text(
-            encoding="utf-8"
-        )
-        self.compile_and_run(source)
+        fragment = snippet("27", 0)
+        if "protocol_decode_speed(" in fragment:
+            # Chapter 27's revised architecture uses a boolean status + output
+            # sample rather than a sentinel float. Compile that real decoder.
+            source = r"""
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <assert.h>
+typedef struct {
+    uint32_t id;
+    uint32_t timestamp_ms;
+    uint8_t dlc;
+    uint8_t extended;
+    uint8_t rtr;
+    uint8_t data[8];
+} CanFrame;
+""" + fragment + r"""
+int main(void) {
+    CanFrame frame = {0};
+    SpeedSample out = {0};
+    frame.id = 0x100u;
+    frame.dlc = 3;
+    frame.timestamp_ms = 42;
+    frame.data[1] = 0xB8;
+    frame.data[2] = 0x0B;
+    assert(protocol_decode_speed(&frame, &out));
+    assert(out.kmh > 29.99f && out.kmh < 30.01f);
+    assert(out.received_ms == 42u);
+    frame.dlc = 2;
+    assert(!protocol_decode_speed(&frame, &out));
+    frame.dlc = 3;
+    frame.extended = 1;
+    assert(!protocol_decode_speed(&frame, &out));
+    frame.extended = 0;
+    frame.rtr = 1;
+    assert(!protocol_decode_speed(&frame, &out));
+    return 0;
+}
+"""
+            self.compile_and_run(source)
+            return
 
+        source = r"""
+#include <stdint.h>
+#include <stddef.h>
+#include <assert.h>
+""" + snippet("27", 0) + "\n" + snippet("27", 1) + r"""
+int main(void) {
+    CanFrame_t frame = {0};
+    frame.id = 0x100;
+    frame.dlc = 3;
+    frame.data[1] = 0xB8;
+    frame.data[2] = 0x0B;
+    float v = Protocol_GetVehicleSpeed(&frame);
+    assert(v > 29.99f && v < 30.01f);
+    frame.dlc = 2;
+    assert(Protocol_GetVehicleSpeed(&frame) == -1.0f);
+    frame.dlc = 3;
+    frame.is_ext = 1;
+    assert(Protocol_GetVehicleSpeed(&frame) == -1.0f);
+    return 0;
+}
+"""
+        self.compile_and_run(source)
 
 
 if __name__ == "__main__":
