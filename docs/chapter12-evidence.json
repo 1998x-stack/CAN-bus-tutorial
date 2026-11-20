@@ -1,0 +1,49 @@
+{
+  "chapter": 12,
+  "platform": "STM32F103xB / bxCAN Classic CAN / STM32F10x SPL",
+  "scope_note": "Register/event semantics are tied to bxCAN. Code examples require board, startup-vector and interrupt integration review.",
+  "claims": [
+    {
+      "id": "ch12-1",
+      "claim": "STM32F103xB shares USB LP and CAN1 RX0 vector",
+      "locator": "STM32F103xB startup vector table",
+      "source_url": "https://github.com/STMicroelectronics/cmsis-device-f1/blob/master/Source/Templates/gcc/startup_stm32f103xb.s",
+      "status": "verified"
+    },
+    {
+      "id": "ch12-2",
+      "claim": "STM32F103xB shares USB HP and CAN1 TX vector",
+      "locator": "STM32F103xB startup vector table",
+      "source_url": "https://github.com/STMicroelectronics/cmsis-device-f1/blob/master/Source/Templates/gcc/startup_stm32f103xb.s",
+      "status": "verified"
+    },
+    {
+      "id": "ch12-3",
+      "claim": "FMP0 pending follows unread FIFO0 message count, not a generic clear-all flag",
+      "locator": "RM0008 bxCAN, CAN_RF0R / interrupt generation",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "ch12-4",
+      "claim": "TX RQCPx is write-one-to-clear and TXOKx reports successful transmission",
+      "locator": "RM0008 bxCAN, CAN_TSR register",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "ch12-5",
+      "claim": "Error conditions and receive/transmit sources use distinct interrupt/event bits",
+      "locator": "RM0008 bxCAN, CAN_IER / bxCAN interrupts",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "ch12-6",
+      "claim": "720 cycles at 72MHz equals 10us; this is a calculation not measured ISR latency",
+      "locator": "Chapter 12 illustrative cycle-count example",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "derived"
+    }
+  ]
+}
