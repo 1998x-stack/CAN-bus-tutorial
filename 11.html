@@ -185,7 +185,7 @@
 <rect x="700" y="103" width="81" height="65" rx="9" fill="#fdf3e4" stroke="#d7ad76"/><text x="740" y="127" font-size="14" text-anchor="middle" fill="#8d612d">软件队列</text><text x="740" y="148" font-size="12" text-anchor="middle" fill="#8d612d">业务消费</text>
 <text x="391" y="17" font-size="13" fill="#516a70" text-anchor="middle">每个 FIFO 都只有 3 个槽；不是无限缓冲</text>
 <text x="391" y="272" font-size="13" fill="#516a70" text-anchor="middle">过滤决定去哪里；FMP 非零时需及时读取并释放；应用还需检查数据年龄</text>
-</svg></div><figcaption>图 11-1：bxCAN 有两个独立的三深度接收 FIFO。FIFO 缓冲突发报文，但不会自动替你合并中断或减少消息数。</figcaption></figure>
+</svg></div><figcaption>图 11-1：bxCAN 有两个独立的三深度接收 FIFO。FIFO 缓冲突发报文，但不会自动替你合并中断或减少消息数。 <a href="assets/chapter11-rx-flow.svg">单独查看图 11-1</a></figcaption></figure>
 <div class="callout"><p><strong>关键区别：</strong>FIFO 是硬件暂存区；软件环形队列是 CPU 复制后的第二层缓冲。两个地方都可能溢出，应分别统计。</p></div>
 </section>
 
