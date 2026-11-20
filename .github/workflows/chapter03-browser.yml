@@ -1,0 +1,38 @@
+name: Chapter 03 browser QA
+on:
+  push:
+    paths:
+      - "03.html"
+      - "assets/chapter03-*.svg"
+      - "tests/browser_chapter03.py"
+      - ".github/workflows/chapter03-browser.yml"
+  pull_request:
+    paths:
+      - "03.html"
+      - "assets/chapter03-*.svg"
+      - "tests/browser_chapter03.py"
+      - ".github/workflows/chapter03-browser.yml"
+jobs:
+  visual-smoke:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Playwright and locate Chrome
+        run: |
+          python -m pip install playwright==1.56.0
+          command -v google-chrome
+      - name: Verify 1440, 768, 390, 360px, interactions and printing
+        run: python tests/browser_chapter03.py
+      - name: Upload QA report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chapter03-visual-qa
+          path: reports/chapter03/
+          if-no-files-found: ignore
+
