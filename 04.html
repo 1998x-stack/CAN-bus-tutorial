@@ -1,319 +1,315 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>第4章 CAN总线错误处理</title>
-    <link rel="stylesheet" href="theme.css">
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            padding: 20px;
-        }
-        /* 双边框设计：外边框 + 内阴影 */
-        .double-border {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #ffffff;
-            border: 2px solid #f1c40f;
-            border-radius: 24px;
-            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
-            overflow: hidden;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 0;
-        }
-        .sidebar {
-            background: #fefcf5;
-            border-right: 2px solid #fdebb3;
-            padding: 24px 16px;
-        }
-        .sidebar h3 {
-            font-size: 1.4rem;
-            color: #b45f06;
-            border-left: 5px solid #f39c12;
-            padding-left: 15px;
-            margin-bottom: 25px;
-        }
-        .chapter-list {
-            list-style: none;
-        }
-        .chapter-list li {
-            margin-bottom: 6px;
-        }
-        .chapter-list a {
-            display: block;
-            padding: 8px 12px;
-            text-decoration: none;
-            color: #2c3e50;
-            border-radius: 12px;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .chapter-list a:hover {
-            background: #fdebd0;
-            transform: translateX(3px);
-        }
-        .chapter-list .active {
-            background: #3b82f6;
-            color: white;
-            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
-        }
-        .main-content {
-            padding: 30px 35px;
-            background: white;
-        }
-        .footer-nav {
-            margin-top: 45px;
-            padding-top: 20px;
-            border-top: 2px solid #f0e6d2;
-            display: flex;
-            justify-content: space-between;
-        }
-        .footer-nav a {
-            padding: 8px 24px;
-            background: #f1f5f9;
-            text-decoration: none;
-            color: #1e40af;
-            border-radius: 40px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .footer-nav a:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            color: #64748b;
-            border-top: 1px dashed #e2e8f0;
-            font-size: 0.9rem;
-        }
-        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
-        h3 { color: #2c3e50; margin: 20px 0 10px; }
-        pre {
-            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
-            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
-        }
-        table {
-            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
-        }
-        th, td {
-            border: 1px solid #fcd34d; padding: 10px; text-align: left;
-        }
-        th { background: #fffbeb; }
-        .tip, .warning, .highlight {
-            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
-        }
-        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
-        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
-        .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📚 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
-<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
-<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
-<li><a href="04.html" class="active">第4章 CAN总线错误处理</a></li>
-<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
-<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
-<li><a href="07.html" class="">第7章 CAN收发器</a></li>
-<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
-<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
-<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
-<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
-<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
-<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
-<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
-<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
-<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
-<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
-<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
-<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
-<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
-<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
-<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
-<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
-<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
-<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
-<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
-<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
-<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
-<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
-<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-        <h2>第4章 CAN总线错误处理：错误类型与状态机</h2>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第四章 · CAN 错误检测、故障限制与 Bus-Off 恢复</title><link rel="stylesheet" href="theme.css"><style>
+:root{--paper:#fffdf9;--ink:#203035;--muted:#53676d;--teal:#147f80;--border:#d9e6e3;--warm:#fff6e9}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;padding:0;background:#edf5f3;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.85}
+a{color:#126a71;text-underline-offset:3px}a:hover{color:#8c4d20}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #147f80;outline-offset:4px}
+.skip{position:absolute;top:-60px;left:15px;background:#fff;padding:8px 15px;z-index:5}.skip:focus{top:10px}
+.layout{max-width:1310px;margin:24px auto;display:grid;grid-template-columns:246px minmax(0,1fr);gap:28px;padding:0 18px;align-items:start}
+.course-nav{position:sticky;top:20px;border:1px solid #d8e5e1;background:#fff;border-radius:15px;padding:19px;max-height:calc(100vh - 40px);overflow-y:auto;font-size:14px;line-height:1.55}
+.course-nav .nav-brand{font-size:18px;font-weight:750;text-decoration:none;color:#214d4a;display:block;margin-bottom:12px}
+.course-nav summary{cursor:pointer;font-weight:650;color:#3e625d}
+.course-nav ol{list-style:none;margin:14px 0 0;padding:0}.course-nav li{margin:0}.course-nav li a{display:block;border-radius:7px;padding:5px 7px;color:#4c6268;text-decoration:none;font-size:13px}
+.course-nav li a[aria-current]{background:#e2f2ee;font-weight:750;color:#09695e}
+.course-nav li a:hover{background:#f3f4f4}
+.paper{background:var(--paper);padding:48px clamp(22px,5vw,72px) 60px;border:1px solid #e4e9e6;border-radius:16px;box-shadow:0 9px 35px #163f3810;min-width:0}
+.paper article{max-width:820px;margin:0 auto}
+.eyebrow{font-size:14px;font-weight:750;letter-spacing:.1em;color:#1a7c74}
+h1{font-size:clamp(34px,4vw,48px);line-height:1.23;letter-spacing:-.025em;margin:12px 0 20px;color:#1a3838}
+.dek{font-size:20px;line-height:1.7;color:#465d63;margin:0 0 24px}
+.jump{display:flex;flex-wrap:wrap;gap:10px;margin:23px 0 0}.jump a{border:1px solid #cfe4df;padding:5px 12px;border-radius:20px;text-decoration:none;font-size:14px;background:#f5fbf8}
+section{margin-top:70px}h2{font-size:clamp(24px,2.8vw,31px);color:#1a4442;border:0;padding:0;line-height:1.35;margin:0 0 22px}h3{font-size:21px;margin:30px 0 10px;color:#254e4b}p{margin:15px 0;line-height:1.86;color:var(--ink)}strong{color:#1a4240}
+.kicker{font-size:13px;letter-spacing:.08em;font-weight:700;color:#9a6231;display:block;margin-bottom:8px}
+figure{margin:30px 0;padding:18px;border:1px solid var(--border);border-radius:14px;background:#fff;min-width:0}
+figure img,figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:14px;line-height:1.65;color:var(--muted);margin-top:12px}
+.compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px 0}.stat{border-left:3px solid #27877b;background:#f1faf7;padding:12px 16px;border-radius:7px}.stat b{display:block;font-size:23px;color:#17655e}
+.callout{border-left:4px solid #d49a4e;background:#fff7e9;padding:12px 19px;margin:25px 0;border-radius:0 9px 9px 0}
+.table-scroll{overflow-x:auto;margin:24px 0}table{width:100%;border-collapse:collapse;min-width:540px;font-size:15px;background:#fff}th,td{padding:12px;border-bottom:1px solid #dce9e4;text-align:left;vertical-align:top}th{background:#eff7f4;color:#31564e;font-weight:700}
+.equation{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:18px;background:#eff7f5;border:1px solid #d4e6e0;padding:17px;border-radius:9px;margin:20px 0;overflow-wrap:anywhere}
+.demo-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:15px 0}
+.demo-controls button{font:inherit;border:1px solid #8fbfb6;background:#fff;color:#235955;border-radius:999px;padding:5px 18px;cursor:pointer}
+.demo-controls button[aria-pressed="true"]{background:#166e69;color:#fff;border-color:#166e69}
+#signal-svg[data-selected="recessive"] #dominant-panel{stroke:#bac8da;stroke-width:2}
+#signal-svg[data-selected="recessive"] #recessive-panel{stroke:#5aaba1;stroke-width:3}
+#signal-svg[data-selected="dominant"] #recessive-panel{opacity:.66}
+#signal-svg[data-selected="recessive"] #dominant-panel{opacity:.66}
+.demo-result{background:#f1faf7;border-radius:9px;padding:12px 16px;font-weight:650;color:#235d57}
+pre{background:#1b3335;color:#f0f8f5;padding:20px;border-radius:11px;overflow-x:auto;font-size:14px;line-height:1.65}
+pre code{background:transparent;color:inherit;padding:0}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}
+.small{font-size:14px;color:#5b706d}
+summary{cursor:pointer;font-weight:650}
+details.question{border-bottom:1px solid #dce6e2;padding:12px 0}
+.refs{font-size:15px;overflow-wrap:anywhere}
+.refs li{padding:3px 0}
+.next{display:flex;flex-wrap:wrap;justify-content:space-between;gap:15px;border-top:1px solid #cfdfda;margin-top:54px;padding-top:22px;font-size:15px}
+.next a{text-decoration:none;font-weight:650}
+@media(max-width:900px){.layout{grid-template-columns:minmax(0,1fr);margin:0;gap:0;padding:0}.course-nav{position:static;max-height:none;border-radius:0;padding:10px 20px;display:flex;align-items:center;gap:16px;justify-content:space-between}.course-nav .nav-brand{margin:0}.course-nav details{position:relative}.course-nav ol{max-height:260px;overflow-y:auto}.paper{border:0;border-radius:0;padding:30px clamp(18px,4vw,45px) 45px}}
+@media(max-width:480px){.paper{padding:26px 18px 38px}.compare{grid-template-columns:1fr}figure{padding:8px}section{margin-top:55px}.course-nav{font-size:13px;flex-wrap:wrap}.course-nav .nav-brand{font-size:15px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+@media print{body{background:#fff;color:#000}.layout{display:block;max-width:none;margin:0;padding:0}.skip,.course-nav,.jump,.demo-controls,.next{display:none!important}.paper{border:0;padding:0;box-shadow:none}.paper article{max-width:none}section{margin-top:35px}figure{break-inside:avoid}a{color:#000}pre{white-space:pre-wrap;overflow:visible}}
 
-<p>各位同学，咱们今天聊聊CAN总线的错误处理。说实话，这是很多工程师容易忽略的部分。我刚入行时也觉得，只要报文能发出去不就行了？直到有一次在项目现场，整车的ECU突然集体“罢工”，我才意识到——错误处理机制，才是CAN总线稳定运行的基石。</p>
 
-<h3>4.1 为什么需要错误处理？</h3>
 
-<p>你想想看，汽车在高速上跑着，电磁干扰、温度变化、线束老化，这些都会让总线上的信号出问题。如果没有一套完善的错误处理机制，一个节点发错了数据，整个网络都可能被污染。</p>
 
-<p>CAN总线的设计者很聪明。他们搞了一套“分布式错误检测”机制。每个节点都能检测错误，而且一旦发现错误，会立刻通知其他节点。说白了，就是让所有节点互相监督。</p>
 
-<h3>4.2 五种错误类型</h3>
 
-<p>CAN协议定义了五种错误类型。我在项目中基本都遇到过，一个一个说。</p>
-
-<h4>4.2.1 位错误（Bit Error）</h4>
-
-<p>这个最好理解。节点往总线上发了一个显性位（0），结果自己读回来发现是隐性位（1）。或者反过来。这就叫位错误。</p>
-
-<p>为什么会这样？可能是总线被其他节点拉低了，也可能是信号反射导致的。我记得有一次调试，发现某个节点总是在特定温度下报位错误。查了半天，原来是PCB走线太长，信号质量不行。</p>
-
-<div class="highlight">
-  <p><strong>关键点：</strong>发送节点会在发送每一位后，立即回读总线电平。如果读到的和自己发的不一致，就报位错误。但仲裁期间和ACK时隙除外——这两个场景下，位电平不一致是正常的。</p>
+/* 第四章：错误状态探针与分组阅读 */
+.error-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:22px 0}
+.error-grid>div{background:#fff;border:1px solid #d0e3dc;border-radius:12px;padding:16px}
+.error-grid strong{display:block;color:#195e57;margin-bottom:4px}
+.error-grid p{font-size:15px;line-height:1.7;margin:5px 0}
+.state-lab{margin:28px 0;border:1px solid #afdbd1;border-radius:15px;background:#f8fcfa;padding:23px}
+.state-lab h3{margin-top:0}
+.state-controls{display:flex;gap:15px;flex-wrap:wrap;margin:18px 0}
+.state-controls label{display:flex;flex-direction:column;gap:5px;font-size:14px;color:#355b57;font-weight:700;min-width:125px;flex:1}
+.state-controls input{font:inherit;font-variant-numeric:tabular-nums;width:100%;padding:8px 11px;background:white;border:1px solid #a7ccc4;border-radius:8px;color:#203e3b}
+.preset-buttons,.error-choices{display:flex;gap:8px;flex-wrap:wrap;margin:17px 0}
+.preset-buttons button,.error-choices button{font:inherit;font-size:14px;cursor:pointer;background:white;border:1px solid #a3c8bf;border-radius:28px;padding:7px 13px;color:#235751}
+.preset-buttons button[aria-pressed="true"],.error-choices button[aria-pressed="true"]{background:#176d68;color:#fff;border-color:#176d68}
+.state-result{border:1px solid #cfe3dc;background:#fff;border-radius:10px;padding:16px 17px;margin:13px 0}
+.state-result[data-state="active"]{border-left:5px solid #258a75}
+.state-result[data-state="passive"]{border-left:5px solid #d48a38}
+.state-result[data-state="off"]{border-left:5px solid #b45145}
+.state-result[data-state="invalid"]{border-left:5px solid #9c6b72}
+.state-result strong{font-size:21px;display:block;color:#284744}
+.state-result p{margin:7px 0 0;line-height:1.75;font-size:15px}
+.inspector{background:#fff;border:1px solid #d4e5df;border-radius:13px;padding:20px;margin:22px 0}
+.inspector h3{margin-top:0}
+.inspector-result{padding:12px 17px;border-left:4px solid #218177;background:#edf7f3;border-radius:6px;margin:13px 0;line-height:1.75}
+.inspector-result strong{display:block}
+.figure-scroll{max-width:100%;overflow-x:auto}
+.figure-scroll img{max-width:100%;height:auto}
+.fact-note{padding:12px 17px;background:#fff6e8;border-left:4px solid #d6a05b;border-radius:6px;margin:22px 0}
+.question{padding:12px 0;border-bottom:1px solid #d8e5e0}
+.question summary{cursor:pointer}
+.reference-code{background:#1b3335;color:#f1faf7;padding:18px;border-radius:11px;white-space:pre;overflow-x:auto;font-size:14px}
+@media(max-width:480px){.error-grid{grid-template-columns:1fr}.state-lab,.inspector{padding:14px}.figure-scroll img{min-width:600px;max-width:none;width:600px}}
+@media print{.state-lab,.inspector{background:white}.preset-buttons,.error-choices{display:none}.figure-scroll{overflow:visible}.figure-scroll img{width:100%;min-width:0}.state-controls input{border:1px solid #444}}
+</style></head>
+<body><a class="skip" href="#content">跳转至正文</a><div class="layout"><nav class="course-nav" aria-label="课程导航"><a class="nav-brand" href="index.html">CAN 总线课程</a><details><summary>切换章节（共 30 章）</summary><ol><li><a href="01.html">第1章 CAN总线概述</a></li>
+<li><a href="02.html">第2章 CAN协议基础</a></li>
+<li><a href="03.html">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html" aria-current="page">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html">第7章 CAN收发器</a></li>
+<li><a href="08.html">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html">第10章 CAN报文发送</a></li>
+<li><a href="11.html">第11章 CAN报文接收</a></li>
+<li><a href="12.html">第12章 CAN中断编程</a></li>
+<li><a href="13.html">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html">第18章 CANopen协议入门</a></li>
+<li><a href="19.html">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html">第22章 J1939协议入门</a></li>
+<li><a href="23.html">第23章 J1939多包传输</a></li>
+<li><a href="24.html">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html">第30章 CAN总线项目实战</a></li></ol></details></nav><main id="content" class="paper"><article><header>
+<div class="eyebrow">CAN 基础知识 · 第四章</div>
+<h1>一帧 CAN 报文出错后，总线如何阻止故障蔓延？</h1>
+<p class="dek">从 ACK 错误的抓包现场出发，逐层拆开五类错误、主动与被动错误标志、TEC/REC 状态机，以及 Bus-Off 的恢复条件。</p>
+<p>假设只有一块 CAN 开发板接在总线上，收发器和终端电阻都正常，但控制器却反复报 <code>ACK Error</code>。这是线路一定损坏了吗？不一定：在正常发送模式下，发送者必须获得<strong>其他节点</strong>在 ACK 槽中的确认。没有能应答的接收者，即使线路本身无故障，发送者也可能遇到 ACK 错误。理解这一点，需要把<strong>检测到什么错误</strong>和<strong>节点因此进入什么状态</strong>拆开看。</p>
+<nav class="jump" aria-label="本章导航"><a href="#overview">全局路径</a><a href="#errors">五种错误</a><a href="#error-flags">错误标志</a><a href="#crc">CRC 校验</a><a href="#states">错误状态</a><a href="#recover">Bus-Off 恢复</a><a href="#debug">故障排查</a><a href="#exercise">代码验证</a></nav>
+</header>
+<section id="overview" aria-labelledby="overview-title"><span class="kicker">01 · 先看到全貌</span>
+<h2 id="overview-title">检测、通知、限制故障：其实是三件不同的事</h2>
+<p>一个正常通信的 CAN 控制器会检查总线位和帧结构；若发现协议错误，就按自身错误状态发送相应的错误标志。其他节点可能因此发现当前帧无效，发送器通常会根据工作模式重新尝试。与此同时，每个控制器用自己的发送错误计数 <strong>TEC</strong> 与接收错误计数 <strong>REC</strong> 追踪故障影响，避免反复出错的节点长期破坏整个网络。<a href="https://kvaser.com/lesson/can-error-handling/">Kvaser · CAN Error Handling</a></p>
+<figure><img src="assets/chapter04-detection-map.svg" width="960" height="400" loading="lazy" alt="从 CAN 帧中的位、填充、CRC、固定格式与 ACK 分支汇总到错误检测，再指向错误标志和 TEC/REC 故障限制。"><figcaption>图 1 · 五类检测手段回答“出了什么问题”，错误标志回答“如何对其他控制器发信号”，TEC/REC 与节点状态回答“反复出错的节点还能怎样参与总线”。它们不是五种不同的节点状态。</figcaption></figure>
+<p>CAN 的逐位仲裁失败是正常优先级退让，<strong>不是这里的位错误</strong>。第三章解释了仲裁，本章讨论的是另一个机制：实际传输或接收过程违反协议检查条件。<a href="03.html">复习第三章的非破坏性仲裁</a>。</p>
+</section>
+<section id="errors" aria-labelledby="errors-title"><span class="kicker">02 · 沿着报文检查五个关口</span>
+<h2 id="errors-title">Bit / Stuff / CRC / Form / ACK 分别检查哪里？</h2>
+<div class="table-scroll"><table><thead><tr><th>类型</th><th>检测依据</th><th>不能忽略的例外或边界</th></tr></thead><tbody>
+<tr><td><strong>Bit Error</strong></td><td>发送方实际采样位与自己发送位不符</td><td>仲裁时隐性输给显性、ACK 槽被正确应答、被动错误标志受到显性覆盖，不按普通位错误判定</td></tr>
+<tr><td><strong>Stuff Error</strong></td><td>动态填充区出现违反五连位填充规则的序列</td><td>经典 CAN 的动态填充作用于 SOF 到 CRC 序列；CRC 界定符、ACK、EOF 不是此区域</td></tr>
+<tr><td><strong>CRC Error</strong></td><td>计算得到的 CRC 序列与接收到的序列不匹配</td><td>经典 CAN 使用 CRC-15；不能只对应用 payload 字节计算就称为帧 CRC</td></tr>
+<tr><td><strong>Form Error</strong></td><td>固定格式位置出现不符合预期的位</td><td>包括 CRC 界定符、ACK 界定符、EOF 等；部分帧末与错误界定场景有特殊规则</td></tr>
+<tr><td><strong>ACK Error</strong></td><td>发送者在 ACK 槽没有采样到显性确认</td><td>可能没有其他正常应答节点，也可能节点在只听模式、配置或物理链路有问题；不等于应用层已处理</td></tr>
+</tbody></table></div>
+<p>这五类检查覆盖了不同的协议条件。一个干扰事件可以连带触发不同控制器的不同观察结果：例如某节点最早报告 CRC 错误，别的节点之后看到了它的错误标志，便可能报告填充或位错误。因此抓到的“错误类别”并不总是故障根因。<a href="https://onlinedocs.microchip.com/oxy/GUID-0C0B825F-9C9F-446F-AFDD-2324B355B920-en-US-12/GUID-EF89A342-C3A3-4AFD-82E5-DF9BC1C77759.html">Microchip · Error Handling</a></p>
+<div class="inspector" id="error-inspector">
+<h3>按错误类型定位排查点</h3>
+<p>点击一个类型，查看一条典型观测与下一步要核对的证据。这里给的是<strong>诊断方向</strong>，不把任一症状直接当成确定根因。</p>
+<div class="error-choices" role="group" aria-label="选择要检查的 CAN 错误类型">
+<button type="button" data-error="ack" aria-pressed="true">ACK</button>
+<button type="button" data-error="bit" aria-pressed="false">Bit</button>
+<button type="button" data-error="stuff" aria-pressed="false">Stuff</button>
+<button type="button" data-error="crc" aria-pressed="false">CRC</button>
+<button type="button" data-error="form" aria-pressed="false">Form</button>
 </div>
-
-<h4>4.2.2 填充错误（Stuff Error）</h4>
-
-<p>CAN总线用了NRZ编码。如果连续出现5个相同电平，接收节点可能会失去同步。所以协议规定：连续发送5个相同位后，必须插入一个相反电平的位。</p>
-
-<p>如果接收节点发现连续6个相同位，就报填充错误。嗯，这里要注意：CRC界定符、ACK界定符这些固定格式的字段，是不做填充的。</p>
-
-<div class="tip">
-  <p><strong>我的经验：</strong>我曾经遇到一个案例，某款MCU的CAN控制器在接收时，偶尔会报填充错误。后来发现是晶振精度不够，导致采样点偏移。换了个高精度晶振，问题就解决了。</p>
+<div class="inspector-result" id="error-result" aria-live="polite"><strong>ACK Error · 无人确认</strong>先核对是否只有一个正常发送节点，以及其他节点是否处于 listen-only / silent 模式，再检查速率、收发器、布线与终端匹配。</div>
 </div>
+<div class="fact-note"><strong>不要只靠“连续 6 个相同位”判断 Stuff Error。</strong>这条规则只针对应执行动态位填充的区域。错误标志和某些固定格式场本来就允许连续相同的位。<a href="https://www.analog.com/en/resources/app-notes/an-1123.html">Analog Devices · CAN Implementation Guide</a></div>
+</section>
+<section id="error-flags" aria-labelledby="flags-title"><span class="kicker">03 · 错误如何被其他节点注意到</span>
+<h2 id="flags-title">主动错误标志和被动错误标志，为何相差一个电平？</h2>
+<p><strong>错误主动（Error Active）</strong>节点检测到错误时，会发送由六个显性位组成的主动错误标志。它违反正常帧的填充或固定格式规则，因此可使其他节点注意到当前报文异常。<strong>错误被动（Error Passive）</strong>节点只能发送六个隐性位组成的被动错误标志，其本身通常不会强制覆盖正在发送的帧。</p>
+<figure><img src="assets/chapter04-error-flags.svg" width="940" height="360" loading="lazy" alt="比较六个显性0的主动错误标志与六个隐性1的被动错误标志，并画出后续八位隐性错误界定符。"><figcaption>图 2 · 图中显示<strong>单个节点的名义错误标志</strong>：主动 6×0、被动 6×1，之后是错误界定符 8×1。真实总线上多个节点的错误标志可能叠加，实际可见的显性区间不一定只有 6 bit。</figcaption></figure>
+<p>被动错误状态并不是“节点不再发现错误”，也不是“无法收发”。它仍可参与正常通信，只是对其他节点的干扰能力受到限制；在需要它重新发起发送时，还受额外的 <strong>Suspend Transmission</strong> 等间隔规则约束。<a href="https://www.port.de/cgi-bin/CAN/CanFaqErrors">CAN FAQ · Error Confinement</a></p>
+<p>发送的错误标志加上 <strong>8 个隐性的错误界定符</strong>只是名义结构；错误标志在总线上相互叠加、等待总线重新回到隐性以及帧间间歇都会影响实际时间。不能把每次错误都精确简化为固定 14 bit 的总线开销。</p>
+</section>
+<section id="crc" aria-labelledby="crc-title"><span class="kicker">04 · 用一个计算器理解 CRC</span>
+<h2 id="crc-title">CRC-15 不是把 8 个 payload 字节做一次校验</h2>
+<p>经典 CAN 使用 15 位的 CRC 序列。生成多项式为 <code>x^15 + x^14 + x^10 + x^8 + x^7 + x^4 + x^3 + 1</code>，实现中常用低 15 位常数 <code>0x4599</code> 表示其除去最高项后的系数。CRC 涵盖的是<strong>从 SOF 至数据场末尾的去填充逻辑位</strong>，不包括 CRC 序列自身，也不是只对数据场的字节计算。<a href="https://www.can-cia.org/can-knowledge/cyclic-redundancy-check-crc-in-can-frames">CiA · CRC in CAN frames</a></p>
+<p>下列示例输入是一个已经选好的二进制逻辑位串，用于展示多项式移位余数；它<strong>不是自动生成的完整 CAN 帧</strong>。真正复现总线上某条报文的 CRC，需要准确构造 SOF、标识符、控制场与数据场等位字段，并按规定处理填充。</p>
+<pre><code>def crc15_can(bits):
+    if any(bit not in "01" for bit in bits):
+        raise ValueError("Only binary bits are accepted")
+    crc = 0
+    for char in bits:
+        feedback = ((crc &gt;&gt; 14) &amp; 1) ^ int(char)
+        crc = (crc &lt;&lt; 1) &amp; 0x7FFF
+        if feedback:
+            crc ^= 0x4599
+    return crc
 
-<h4>4.2.3 CRC错误（CRC Error）</h4>
-
-<p>CRC（循环冗余校验）是检查数据完整性的。发送节点计算CRC值，放在CRC字段里。接收节点重新计算一遍，如果对不上，就报CRC错误。</p>
-
-<p>CAN的CRC算法是15位的，生成多项式是x¹⁵ + x¹⁴ + x¹⁰ + x⁸ + x⁷ + x⁴ + x³ + 1。你不需要记住这个，但要知道它的检错能力很强。</p>
-
-<pre><code>// 经典 CAN CRC-15：输入为从 SOF 到数据场末尾、已去填充的线上位流
-// CRC计算不能只读取数据场的data[]字节，也不包含CRC字段自身
-#include &lt;stdint.h&gt;
-#include &lt;stddef.h&gt;
-uint16_t can_crc15_bits(const uint8_t *bits, size_t count) {
-    uint16_t crc = 0;
-    for (size_t i = 0; i &lt; count; ++i) {
-        uint16_t feedback = ((crc &gt;&gt; 14) &amp; 1u) ^ (bits[i] &amp; 1u);
-        crc = (uint16_t)((crc &lt;&lt; 1) &amp; 0x7FFFu);
-        if (feedback) crc ^= 0x4599u;
-    }
-    return crc;
-}</code></pre>
-
-<h4>4.2.4 格式错误（Form Error）</h4>
-
-<p>CAN帧中有一些固定格式的位段。比如CRC界定符必须是隐性位，ACK界定符也必须是隐性位。如果检测到这些位置的电平不对，就报格式错误。</p>
-
-<p>这个错误类型我遇到的比较少。但有一次，某个节点在发送EOF（帧结束）时，把最后一个隐性位拉成了显性。结果整个网络都在报格式错误。查到最后，是那个节点的CAN控制器驱动代码有bug。</p>
-
-<h4>4.2.5 应答错误（ACK Error）</h4>
-
-<p>发送节点在ACK时隙会释放总线（输出隐性位）。如果至少有一个接收节点正确收到了报文，它会把ACK时隙拉成显性。如果发送节点读到的ACK时隙是隐性，就说明没有节点正确接收，报应答错误。</p>
-
-<div class="warning">
-  <p><strong>注意：</strong>应答错误不代表总线坏了。可能是总线上只有发送节点自己，没有其他节点在监听。我在做单节点测试时就经常遇到这个情况，属于正常现象。</p>
+assert crc15_can("000000") == 0
+assert crc15_can("1") == 0x4599</code></pre>
+<p>源码及独立多项式长除法校验位于本项目的 <a href="https://github.com/1998x-stack/CAN-bus-tutorial/blob/main/examples/can_chapter04_checks.py">CRC-15 教学计算器</a>，并有边界输入与位翻转回归测试。</p>
+</section>
+<section id="states" aria-labelledby="states-title"><span class="kicker">05 · 错误不能无限传染</span>
+<h2 id="states-title">TEC、REC 到了多少，才会进入错误被动或 Bus-Off？</h2>
+<p>每个 CAN 控制器都维护发送错误计数（TEC）和接收错误计数（REC）。这两个值共同决定错误主动 / 错误被动状态，但<strong>Bus-Off 只由 TEC 的门槛触发</strong>。有关门槛可参见 <a href="https://onlinedocs.microchip.com/oxy/GUID-0C0B825F-9C9F-446F-AFDD-2324B355B920-en-US-12/GUID-EF89A342-C3A3-4AFD-82E5-DF9BC1C77759.html">Microchip 控制器说明</a>。</p>
+<figure><img src="assets/chapter04-state-machine.svg" width="940" height="400" loading="lazy" alt="CAN错误主动状态满足TEC和REC小于128；错误被动状态满足TEC或REC至少128且TEC不超过255；TEC达到256进入Bus-Off。恢复需观察128组11个连续隐性位并满足控制器恢复流程。"><figcaption>图 3 · <strong>Error Active</strong>：TEC、REC 均不超过 127；<strong>Error Passive</strong>：TEC 或 REC 至少 128 且 TEC 尚未达到 256；<strong>Bus-Off</strong>：TEC 至少 256。图中的箭头示意门槛变化，不代表所有错误事件都有相同的计数增量。</figcaption></figure>
+<div class="table-scroll"><table><thead><tr><th>状态</th><th>计数条件</th><th>节点能力</th></tr></thead><tbody>
+<tr><td>Error Active</td><td><code>TEC &lt; 128</code> 且 <code>REC &lt; 128</code></td><td>正常参与总线；检测到错误可发送主动错误标志</td></tr>
+<tr><td>Error Passive</td><td><code>TEC &lt; 256</code> 且（<code>TEC ≥ 128</code> 或 <code>REC ≥ 128</code>）</td><td>仍可收发，但只能发被动错误标志，发送启动受额外等待规则约束</td></tr>
+<tr><td>Bus-Off</td><td><code>TEC ≥ 256</code></td><td>协议层暂时退出通信；需完成恢复机制后再参与总线</td></tr>
+</tbody></table></div>
+<div class="state-lab" id="state-lab">
+<h3>交互状态探针：只改变计数值，不猜测错误原因</h3>
+<p>试着把 TEC 设为 <code>127</code>、<code>128</code>、<code>256</code>，或把 REC 设为 <code>255</code>。这只是状态<strong>判定</strong>工具，不是计算器自动模拟故障累计：每种事件的 TEC/REC 变化要按协议具体规则处理。</p>
+<div class="state-controls">
+<label for="tec-input">TEC · 发送错误计数<input type="number" id="tec-input" min="0" max="256" step="1" value="0" inputmode="numeric"/></label>
+<label for="rec-input">REC · 接收错误计数<input type="number" id="rec-input" min="0" max="255" step="1" value="0" inputmode="numeric"/></label>
 </div>
-
-<h3>4.3 错误状态机</h3>
-
-<p>每个CAN节点都有两个计数器：发送错误计数器（TEC）和接收错误计数器（REC）。根据这两个计数器的值，节点会处于三种状态之一。</p>
-
-<table>
-  <tr>
-    <th>状态</th>
-    <th>条件</th>
-    <th>行为</th>
-  </tr>
-  <tr>
-    <td>主动错误</td>
-    <td>TEC &lt; 128 且 REC &lt; 128</td>
-    <td>正常通信，检测到错误时发送主动错误帧（6个显性位）</td>
-  </tr>
-  <tr>
-    <td>被动错误</td>
-    <td>TEC ≥ 128 或 REC ≥ 128</td>
-    <td>可以收发，但检测到错误时只能发送被动错误帧（6个隐性位）</td>
-  </tr>
-  <tr>
-    <td>总线关闭</td>
-    <td>TEC &gt; 255</td>
-    <td>完全断开与总线的连接，不参与任何通信</td>
-  </tr>
-</table>
-
-<h4>4.3.1 主动错误状态</h4>
-
-<p>这是正常状态。节点可以自由收发报文。如果检测到错误，它会发送一个主动错误帧——6个连续的显性位。这个帧会破坏当前报文，让所有节点都知道出错了。</p>
-
-<p>主动错误帧的优先级很高。因为它全是显性位，会覆盖总线上其他节点的隐性位。说白了，就是“我发现了错误，大家都停下来重传”。</p>
-
-<h4>4.3.2 被动错误状态</h4>
-
-<p>当TEC或REC超过127时，节点进入被动错误状态。这时候它还能收发报文，但发送错误帧时只能发6个隐性位。</p>
-
-<p>隐性位会被显性位覆盖。所以如果总线上有其他主动错误节点，被动错误节点的错误帧根本起不了作用。只有等所有节点都变成被动错误，被动错误帧才能生效。</p>
-
-<div class="highlight">
-  <p><strong>避坑指南：</strong>我曾经遇到一个项目，某个节点频繁进入被动错误状态。它发送的报文经常被其他节点覆盖，导致通信不稳定。后来发现是它的CAN收发器驱动能力不足，换了个收发器就好了。</p>
+<div class="preset-buttons" role="group" aria-label="CAN错误状态样例">
+<button type="button" data-preset="normal" aria-pressed="true">0 / 0</button>
+<button type="button" data-preset="warning" aria-pressed="false">96 / 0</button>
+<button type="button" data-preset="boundary" aria-pressed="false">127 / 0</button>
+<button type="button" data-preset="passive" aria-pressed="false">0 / 128</button>
+<button type="button" data-preset="rx-high" aria-pressed="false">0 / 255</button>
+<button type="button" data-preset="off" aria-pressed="false">256 / 0</button>
 </div>
-
-<h4>4.3.3 总线关闭状态</h4>
-
-<p>如果TEC超过255，节点就彻底关闭了。它不再参与总线通信，直到用户手动恢复，或者硬件自动恢复（取决于配置）。</p>
-
-<p>这个状态很危险。一个节点总线关闭，意味着它完全失联了。在汽车上，这可能导致某个功能彻底失效。</p>
-
-<div class="warning">
-  <p><strong>Bus Off恢复：</strong>规范要求检测到128次、每次连续11个隐性位的序列。具体由控制器自动恢复还是软件请求恢复，取决于配置；务必记录恢复事件，避免未消除故障就持续重启节点。</p>
+<div class="state-result" data-state="active" id="state-result" aria-live="polite"><strong id="state-status">Error Active · 错误主动</strong><p id="state-reason">TEC=0，REC=0：均低于 128，正常参与总线并可发主动错误标志。</p></div>
+<p class="small">输入值限定为 TEC 0～256、REC 0～255，用于教学展示临界状态；部分硬件寄存器的可见范围和恢复模式可能不同。</p>
 </div>
-
-<h3>4.4 错误计数规则</h3>
-
-<p>错误计数器的增减规则，我简单总结一下：</p>
-
-<ul>
-  <li><strong>发送成功：</strong>TEC减1（前提是TEC &gt; 0）</li>
-  <li><strong>接收成功：</strong>REC减1（前提是REC &gt; 0）</li>
-  <li><strong>发送错误：</strong>多数典型发送错误TEC增加8（有例外）</li>
-  <li><strong>接收错误：</strong>多数典型接收错误REC增加1（有例外）</li>
-  <li><strong>主动错误帧：</strong>计数变化应按具体错误触发规则判断</li>
-  <li><strong>被动错误帧：</strong>并非无条件使TEC增加8</li>
-</ul>
-
-<p>TEC/REC变化由CAN规范的完整计数规则决定，存在仲裁、ACK、错误被动等例外。常见发送错误可能使TEC增加8，接收错误通常使REC增加1，但不能将这些概括为无条件规则；输掉仲裁不会增加错误计数。</p>
-
-<h3>4.5 实际项目中的经验</h3>
-
-<p>最后分享几个我在项目中踩过的坑：</p>
-
-<ol>
-  <li><strong>不要忽视REC的增长。</strong>如果某个节点的REC持续增长，说明它接收到了很多错误帧。这可能是总线干扰，也可能是其他节点在疯狂发错误帧。</li>
-  <li><strong>总线关闭后不要立即恢复。</strong>我见过有人写代码，检测到总线关闭就立刻复位CAN控制器。结果节点反复关闭、恢复，把整个总线都搞乱了。</li>
-  <li><strong>错误状态要上报。</strong>在汽车电子项目中，ECU的错误状态应该通过诊断报文上报。这样工程师在售后阶段才能分析问题。</li>
-</ol>
-
-<div class="tip">
-  <p><strong>我的习惯：</strong>在开发阶段，我会把TEC和REC的值通过串口打印出来。这样能直观地看到节点的健康状态。量产时再把这个功能关掉，避免影响总线负载。</p>
+<h3>“发送错误 +8，接收错误 +1”为什么不能做成无条件公式？</h3>
+<p>这是理解计数趋势的常见近似，而不是所有情况均可套用的状态更新公式。例如<strong>仲裁失败不算错误</strong>；错误被动节点遇到无人 ACK 时，是否继续增加 TEC 有专门的例外；正常接收后若 REC 曾超过 127，也不能机械地认定永远只减 1。完整更新规则要依据控制器实现和适用的 CAN 协议版本，不能凭一个 error flag 就直接推算 TEC/REC 的精确值。<a href="https://www.port.de/cgi-bin/CAN/CanFaqErrors">CAN FAQ · counter rules</a></p>
+<div class="fact-note"><strong>预警线不是新的状态。</strong>不少控制器在 TEC 或 REC 达到 96 左右时提供 Error Warning 标志，便于提前诊断；但“三种协议错误状态”仍是 Error Active、Error Passive 与 Bus-Off。<a href="https://onlinedocs.microchip.com/oxy/GUID-0C0B825F-9C9F-446F-AFDD-2324B355B920-en-US-12/GUID-EF89A342-C3A3-4AFD-82E5-DF9BC1C77759.html">Microchip 文档</a></div>
+</section>
+<section id="recover" aria-labelledby="recover-title"><span class="kicker">06 · “恢复通信”也有条件</span>
+<h2 id="recover-title">Bus-Off 不是立刻复位，也不是等固定毫秒数</h2>
+<p>当 TEC 达到 256 时，控制器进入 Bus-Off，在协议层停止参与总线。经典 CAN 的恢复需要观察<strong>128 次、每次 11 个连续隐性位</strong>的序列；满足协议检测条件后，才允许重新进入错误主动状态，相关错误计数复位。控制器是自动执行恢复、等待软件请求，还是受硬件配置限制，需要结合所用芯片的数据手册确认。<a href="https://www.port.de/cgi-bin/CAN/CanFaqErrors">CAN FAQ · Bus-Off recovery</a></p>
+<p>这<strong>不是</strong>简单把 128×11 除以位速率就能保证的精确恢复耗时，更不是软件任意把 TEC 归零就替代了协议恢复。若出现持续干扰、总线无法空闲、线路故障或诊断策略要求，实际恢复时间可能更长。</p>
+<p>工程上建议把 Bus-Off 作为独立故障事件记录：记下时间、控制器配置、TEC/REC 与最后错误类型，验证收发器供电和总线电气，排查故障原因，再按照芯片手册与系统安全需求决定重启和重入策略。持续自动复位反而可能掩盖根因。</p>
+</section>
+<section id="debug" aria-labelledby="debug-title"><span class="kicker">07 · 从症状推导检查动作</span>
+<h2 id="debug-title">三种常见现场现象，该先查什么？</h2>
+<div class="error-grid">
+<div><strong>只有一块板，重复 ACK Error</strong><p>先加上一台可以正常应答的节点，或确认测试工具是否只听；再校验 nominal bitrate、收发器、总线端接与控制器发送模式。不要把“无 ACK”直接当成硬件损坏。</p></div>
+<div><strong>CRC / Stuff / Form 同时出现</strong><p>检查真实的差分波形、线束长度和支线、端接电阻、接地与共模干扰，再核对时钟误差、采样点和实际总线负载；这些错误可能彼此因果关联。</p></div>
+<div><strong>TEC 快速增长并进入 Bus-Off</strong><p>先保存寄存器与错误中断日志；检查是否持续无人应答、显性受干扰或收发器异常，随后确认重入配置与业务侧容错要求。</p></div>
+<div><strong>REC 明显高于 TEC</strong><p>可能更多地观察到了总线上的接收异常，不足以单凭 REC 将故障定位到某一条线或某个 ECU；需结合分析仪、节点隔离测试和错误发生时刻。</p></div>
 </div>
+<p>错误帧通常使当前被破坏的传输需要重新尝试，但“自动重试”等于“肯定送达”是危险推断。单次发送模式、应用超时、Bus-Off、发送队列设置和持续错误都能影响交付。与前三章一致，应该区分链路层事件和业务确认。</p>
+</section>
+<section id="exercise" aria-labelledby="exercise-title"><span class="kicker">08 · 让规则可以复算</span>
+<h2 id="exercise-title">写一个只管状态门槛的纯函数</h2>
+<p>下面的 Python 3 标准库示例不会假定“每次错误都固定加分”，它只输入观测到的计数值，然后输出状态；CRC-15 检查作为独立函数实现。</p>
+<pre><code>def classify_error_state(tec, rec):
+    if any(type(x) is not int for x in (tec, rec)):
+        raise ValueError("TEC and REC must be integers")
+    if not (0 &lt;= tec &lt;= 256 and 0 &lt;= rec &lt;= 255):
+        raise ValueError("Counter outside teaching range")
+    if tec &gt;= 256:
+        return "bus-off"
+    if tec &gt;= 128 or rec &gt;= 128:
+        return "error-passive"
+    return "error-active"
 
-<p>好了，这一章的内容就到这里。错误处理是CAN总线的核心机制之一。理解了它，你才能真正理解为什么CAN总线能在恶劣的汽车环境中稳定工作。下一章我们聊聊CAN的位时序和同步，这是理解波特率设置的关键。</p>
-        <div class="footer-nav">
-            <a href="03.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="05.html">下一章 →</a>
-        </div>
-        
-    </div>
-</div>
-</div>
-</body>
-</html>
+assert classify_error_state(0, 0) == "error-active"
+assert classify_error_state(127, 0) == "error-active"
+assert classify_error_state(0, 128) == "error-passive"
+assert classify_error_state(256, 0) == "bus-off"</code></pre>
+<p>完整的可运行示例、CRC 独立多项式长除法核对与状态临界值测试，收录于 <a href="https://github.com/1998x-stack/CAN-bus-tutorial/blob/main/examples/can_chapter04_checks.py">chapter04_checks.py</a>。这是教学用函数，不能替代芯片手册中的状态寄存器、故障计数细则与重入控制。</p>
+<details class="question"><summary>一个没有接收者的单节点 CAN 网为什么可能一直报 ACK Error？</summary><p>因为发送者在 ACK 槽需要由其他正确接收的节点驱动显性位。没有参与 ACK 的节点就可能出现 ACK 错误，和线路是否损坏是两件事。</p></details>
+<details class="question"><summary>如果 REC=200、TEC=0，会进入 Bus-Off 吗？</summary><p>不会，仅按这些门槛属于 Error Passive。Bus-Off 条件检查 TEC 是否至少 256，而不只看 REC。</p></details>
+<details class="question"><summary>六个连续显性位，一定是 Stuff Error 吗？</summary><p>不一定。动态位填充区出现六连位才违反填充规则；错误主动标志本身就包含六个显性位，其他固定格式区域还需按专门的规则检查。</p></details>
+</section>
+<section id="references" aria-labelledby="refs-title"><span class="kicker">核对资料</span><h2 id="refs-title">参考与技术边界</h2>
+<ol class="refs">
+<li><a href="https://kvaser.com/lesson/can-error-handling/">Kvaser · CAN Error Handling</a>：五种错误与故障限制概念。</li>
+<li><a href="https://onlinedocs.microchip.com/oxy/GUID-0C0B825F-9C9F-446F-AFDD-2324B355B920-en-US-12/GUID-EF89A342-C3A3-4AFD-82E5-DF9BC1C77759.html">Microchip · 38.12 Error Handling</a>：TEC/REC 状态与 96 预警点。</li>
+<li><a href="https://www.port.de/cgi-bin/CAN/CanFaqErrors">CAN FAQ · Error Confinement Rules</a>：计数器例外、错误被动后的暂停发送及 Bus-Off 恢复。</li>
+<li><a href="https://www.analog.com/en/resources/app-notes/an-1123.html">Analog Devices · CAN Implementation Guide</a>：错误标志、信号边界与 CRC。</li>
+<li><a href="https://www.can-cia.org/can-knowledge/cyclic-redundancy-check-crc-in-can-frames">CAN in Automation · CRC in CAN frames</a>：经典 CAN 的 CRC-15 与其他代际区别。</li>
+</ol><p>下一章将回到物理比特的时间结构：<a href="05.html">CAN 位时序与同步</a>。</p></section>
+<nav class="next" aria-label="章节导航"><a href="03.html">← 第三章 · 仲裁</a><a href="index.html">返回目录</a><a href="05.html">第五章 · 位时序 →</a></nav></article></main></div><script>
+(function(){
+"use strict";
+const errors={
+ack:["ACK Error · 无人确认","先核对是否只有一个正常发送节点，以及其他节点是否处于 listen-only / silent 模式，再检查速率、收发器、布线与终端匹配。"],
+bit:["Bit Error · 发送与采样不符","检查实际 CAN_H / CAN_L 差分波形和收发器状态；先排除仲裁、ACK 槽与被动错误标志的正常显性覆盖。"],
+stuff:["Stuff Error · 动态位填充违规","先确认出现六连位的位置确实在 SOF 到 CRC 序列的动态填充区，再核对位时序、干扰、接收端同步与线路质量。"],
+crc:["CRC Error · 重算结果不一致","核对误码是否集中在相同 ID 或相同时刻，检查信号质量；计算 CRC 时必须使用正确的去填充字段位，不是只用 payload。"],
+form:["Form Error · 固定格式位违规","关注 CRC delimiter、ACK delimiter、EOF 等字段的信号，结合实际异常发生位置检查波形、采样点与错误标志叠加。"]
+};
+const eBtns=[...document.querySelectorAll("[data-error]")],eOut=document.getElementById("error-result");
+function showError(key){
+const info=errors[key];if(!info)return;
+eOut.replaceChildren();
+const h=document.createElement("strong");h.textContent=info[0];
+eOut.append(h,document.createTextNode(info[1]));
+eBtns.forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.error===key)));
+}
+eBtns.forEach(b=>b.addEventListener("click",()=>showError(b.dataset.error)));
+const tec=document.getElementById("tec-input"),rec=document.getElementById("rec-input");
+const container=document.getElementById("state-result");
+const title=document.getElementById("state-status"),reason=document.getElementById("state-reason");
+const presets={normal:[0,0],warning:[96,0],boundary:[127,0],passive:[0,128],"rx-high":[0,255],off:[256,0]};
+const buttons=[...document.querySelectorAll("[data-preset]")];
+function update(){
+const t=Number(tec.value),r=Number(rec.value);
+const valid=tec.value.trim()!==""&&rec.value.trim()!==""&&Number.isInteger(t)&&Number.isInteger(r)&&t>=0&&t<=256&&r>=0&&r<=255;
+if(!valid){
+ container.dataset.state="invalid";title.textContent="请输入有效的整数";
+ reason.textContent="本示例只接收 TEC 0～256、REC 0～255 的整数。";
+}else if(t>=256){
+ container.dataset.state="off";title.textContent="Bus-Off · 总线关闭";
+ reason.textContent="TEC="+t+"，REC="+r+"：TEC 达到 256，节点退出协议通信；需完成规定的恢复流程。";
+}else if(t>=128||r>=128){
+ container.dataset.state="passive";title.textContent="Error Passive · 错误被动";
+ reason.textContent="TEC="+t+"，REC="+r+"：至少一个计数达到 128，尚未触发 TEC=256 的 Bus-Off 门槛。";
+}else{
+ container.dataset.state="active";title.textContent="Error Active · 错误主动";
+ reason.textContent="TEC="+t+"，REC="+r+"：两个计数都低于 128；"+(t>=96||r>=96?"某些控制器会给出 Error Warning 预警。":"可正常通信并使用主动错误标志。");
+}
+buttons.forEach(b=>{
+ const pair=presets[b.dataset.preset],isSelected=valid&&pair[0]===t&&pair[1]===r;
+ b.setAttribute("aria-pressed",String(isSelected));
+});
+}
+buttons.forEach(b=>b.addEventListener("click",()=>{
+ const values=presets[b.dataset.preset];tec.value=String(values[0]);rec.value=String(values[1]);update();
+}));
+tec.addEventListener("input",update);rec.addEventListener("input",update);
+update();
+})();
+</script></body></html>
