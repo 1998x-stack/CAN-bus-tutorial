@@ -1,0 +1,49 @@
+{
+  "chapter": 10,
+  "platform": "STM32F103xB / bxCAN Classic CAN / STM32F10x SPL",
+  "scope_note": "Register/event semantics are tied to bxCAN. Code examples require board, startup-vector and interrupt integration review.",
+  "claims": [
+    {
+      "id": "ch10-1",
+      "claim": "bxCAN three Tx mailboxes",
+      "locator": "RM0008 bxCAN, Transmission handling",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "ch10-2",
+      "claim": "TXFP=0 schedules local pending mailboxes by identifier; TXFP=1 by request order",
+      "locator": "RM0008 bxCAN, Transmit priority / CAN_MCR.TXFP",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "ch10-3",
+      "claim": "CAN_TSR.RQCP indicates request completion; CAN_TSR.TXOK indicates success",
+      "locator": "RM0008 bxCAN, Transmit mailbox states / CAN_TSR",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "ch10-4",
+      "claim": "SPL CAN_Transmit returns mailbox index or NoMailBox, not proof of successful bus transmission",
+      "locator": "STM32F10x SPL CAN exported functions",
+      "source_url": "https://ese.han.nl/STM32/stm32f10stdlibrary/html/group___c_a_n___exported___functions.html",
+      "status": "verified"
+    },
+    {
+      "id": "ch10-5",
+      "claim": "USB_HP_CAN1_TX_IRQHandler vector for common STM32F103xB",
+      "locator": "STM32F103xB startup vector table",
+      "source_url": "https://github.com/STMicroelectronics/cmsis-device-f1/blob/master/Source/Templates/gcc/startup_stm32f103xb.s",
+      "status": "verified"
+    },
+    {
+      "id": "ch10-6",
+      "claim": "A receiving peer ACK is required for ordinary successful Classic CAN transmission",
+      "locator": "RM0008 bxCAN, Protocol features / errors",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    }
+  ]
+}
