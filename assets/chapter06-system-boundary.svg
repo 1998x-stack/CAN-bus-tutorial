@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 445" role="img" aria-labelledby="title desc">
+<title id="title">两种独立 CAN 控制器的完整信号链</title>
+<desc id="desc">上路是 MCU 经地址和数据总线连接 SJA1000，SJA1000 经 TX0、RX0 等接口连接 CAN 收发器，再接 CAN_H 与 CAN_L。下路是 MCU 通过 SPI 连接 MCP2515，MCP2515 经 TXCAN 和 RXCAN 连接独立收发器，再接双线总线。两条路径都区分控制器和收发器。</desc>
+<rect width="1100" height="445" rx="18" fill="#fffdf9"/>
+<g font-family="system-ui,Microsoft YaHei,sans-serif" fill="#203035">
+<text x="32" y="41" font-size="25" font-weight="750">谁负责“组织报文”？谁负责“驱动电线”？</text>
+<text x="32" y="70" font-size="16" fill="#53676d">CAN 控制器处理位时序、仲裁、帧、CRC、过滤与错误；收发器负责物理差分电平。</text>
+<rect x="32" y="98" width="1036" height="143" rx="13" fill="#f0f8f7" stroke="#cee6df"/>
+<rect x="32" y="259" width="1036" height="143" rx="13" fill="#f7f4fc" stroke="#e3d8ed"/>
+<g font-size="18" font-weight="650" text-anchor="middle">
+<rect x="56" y="129" width="170" height="82" rx="11" fill="#fff" stroke="#6aa99f" stroke-width="2"/><text x="141" y="165">MCU / CPU</text><text x="141" y="190" font-size="14" fill="#53676d">主机软件</text>
+<rect x="328" y="129" width="206" height="82" rx="11" fill="#d9efea" stroke="#368b7b" stroke-width="2"/><text x="431" y="164">SJA1000</text><text x="431" y="190" font-size="14">独立 CAN 控制器</text>
+<rect x="639" y="129" width="190" height="82" rx="11" fill="#fbe7d8" stroke="#d18b5e" stroke-width="2"/><text x="734" y="164">CAN 收发器</text><text x="734" y="190" font-size="14">独立物理层器件</text>
+<rect x="909" y="129" width="136" height="82" rx="11" fill="#fff" stroke="#7197c3" stroke-width="2"/><text x="977" y="160" font-size="16">CAN_H</text><text x="977" y="188" font-size="16">CAN_L</text>
+<rect x="56" y="292" width="170" height="82" rx="11" fill="#fff" stroke="#8a76bc" stroke-width="2"/><text x="141" y="329">MCU / CPU</text><text x="141" y="354" font-size="14" fill="#53676d">主机软件</text>
+<rect x="328" y="292" width="206" height="82" rx="11" fill="#e7ddf6" stroke="#9274c1" stroke-width="2"/><text x="431" y="328">MCP2515</text><text x="431" y="354" font-size="14">独立 CAN 控制器</text>
+<rect x="639" y="292" width="190" height="82" rx="11" fill="#fbe7d8" stroke="#d18b5e" stroke-width="2"/><text x="734" y="328">CAN 收发器</text><text x="734" y="354" font-size="14">独立物理层器件</text>
+<rect x="909" y="292" width="136" height="82" rx="11" fill="#fff" stroke="#7197c3" stroke-width="2"/><text x="977" y="323" font-size="16">CAN_H</text><text x="977" y="351" font-size="16">CAN_L</text>
+</g>
+<g stroke="#5c767a" stroke-width="3" fill="none" stroke-linecap="round">
+<path d="M226 169 H317 l-11 -7 m11 7 l-11 7"/><path d="M534 169 H629 l-11 -7 m11 7 l-11 7"/><path d="M829 169 H899 l-11 -7 m11 7 l-11 7"/>
+<path d="M226 332 H317 l-11 -7 m11 7 l-11 7"/><path d="M534 332 H629 l-11 -7 m11 7 l-11 7"/><path d="M829 332 H899 l-11 -7 m11 7 l-11 7"/>
+</g>
+<g font-size="14" text-anchor="middle" fill="#36545a">
+<text x="277" y="154">并行总线</text><text x="582" y="154">TX / RX</text><text x="866" y="154">双线</text>
+<text x="277" y="316">SPI</text><text x="582" y="316">TXCAN / RXCAN</text><text x="866" y="316">双线</text>
+</g>
+<text x="34" y="429" font-size="13" fill="#53676d">两个路径均为“独立控制器 + 独立收发器”；一体化 CAN PHY 器件不能替代协议控制器。</text>
+</g></svg>
