@@ -25,6 +25,9 @@ def run():
             assert page.locator("figure").count() == 3
             assert page.locator("figure figcaption").count() == 3
             assert page.locator("svg#signal-svg title").count() == 1
+            for img in page.locator("figure img").all():
+                img.scroll_into_view_if_needed()
+                img.evaluate("(img) => img.decode()")
             assert page.locator("figure img").evaluate_all(
                 "(images) => images.every(img => img.complete && img.naturalWidth > 0)"
             ), "Diagram asset failed to load"
