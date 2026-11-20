@@ -144,7 +144,7 @@ class TestLoadAndRegressions(unittest.TestCase):
         self.assertNotIn("CAN_TIxR_IDE;  // 标准帧", pages["10"])
         self.assertNotIn("0x4F表示读响应失败", pages["20"])
         self.assertIn("0x606C0020", pages["21"])
-        self.assertIn("Protocol_GetVehicleSpeed", pages["27"])
+        self.assertIn("protocol_decode_speed", pages["27"])
         self.assertNotIn("HAL_CAN_Reset(&amp;hcan)", pages["30"])
         self.assertIn("CAN_BS1_14TQ", pages["30"])
         self.assertIn("36MHz/[4*(1+14+3)] = 500kbps", pages["30"])
