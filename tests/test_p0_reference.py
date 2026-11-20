@@ -144,7 +144,16 @@ class TestLoadAndRegressions(unittest.TestCase):
         self.assertNotIn("CAN_TIxR_IDE;  // 标准帧", pages["10"])
         self.assertNotIn("0x4F表示读响应失败", pages["20"])
         self.assertIn("0x606C0020", pages["21"])
-        self.assertIn("Protocol_GetVehicleSpeed", pages["27"])
+        # Chapter 27 may expose the newer result-status API rather than
+        # returning a -1 sentinel. Both must validate the frame before decode.
+        self.assertTrue(
+            "Protocol_GetVehicleSpeed" in pages["27"] or (
+                "protocol_decode_speed" in pages["27"] and
+                "dlc &lt; 3u" in pages["27"] and
+                "extended" in pages["27"]
+            ),
+            "Chapter 27 must guard DLC and standard-vs-extended frame decoding",
+        )
         self.assertNotIn("HAL_CAN_Reset(&amp;hcan)", pages["30"])
         # Chapter 30 now explains the same correct bxCAN timing numerically,
         # instead of spelling out a legacy CAN_BS1_14TQ macro. Accept both
