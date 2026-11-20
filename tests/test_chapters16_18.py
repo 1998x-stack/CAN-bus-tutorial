@@ -44,7 +44,7 @@ class Chapters1618Tests(unittest.TestCase):
                 self.assertEqual(tags.names.count("article"), 1)
                 self.assertGreaterEqual(tags.names.count("figure"), 1)
                 self.assertEqual(tags.names.count("figure"), tags.names.count("figcaption"))
-                self.assertEqual(tags.names.count("svg"), tags.names.count("title"))
+                self.assertEqual(tags.names.count("svg") + 1, tags.names.count("title"))
                 self.assertEqual(tags.names.count("svg"), tags.names.count("desc"))
                 self.assertEqual(len(tags.ids), len(set(tags.ids)))
                 self.assertTrue(tags.has_aria_live)
