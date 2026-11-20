@@ -1,0 +1,52 @@
+{
+  "chapter": 22,
+  "method": "Public documentation cross-check. Educational derived examples are not SAE conformance certificates.",
+  "scope": "Classic CAN / J1939-21 unless otherwise stated.",
+  "claims": [
+    {
+      "id": "id_layout",
+      "claim": "29-bit CAN ID contains Priority, R/EDP, DP, PF, PS, SA",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://www.kernel.org/doc/html/latest/networking/j1939.html",
+      "locator": "The J1939 protocol / PGN mapping",
+      "notes": "J1939 routing information."
+    },
+    {
+      "id": "pdu_mask",
+      "claim": "PDU1 PF<240 omits PS from PGN; PDU2 includes PS",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://www.kernel.org/doc/html/latest/networking/j1939.html",
+      "locator": "PGN mapping / PDU1 and PDU2",
+      "notes": "Illustrated with 0x0CF00401."
+    },
+    {
+      "id": "name_layout",
+      "claim": "NAME identity/manufacturer/instance bits agree with Linux UAPI",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://github.com/torvalds/linux/blob/master/include/uapi/linux/can/j1939.h",
+      "locator": "J1939 NAME bit field comments",
+      "notes": "64-bit field ranges, not original article ranges."
+    },
+    {
+      "id": "spn190",
+      "claim": "EEC1 PGN 61444 uses SPN190 bytes 4-5 at 0.125 rpm/bit",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://canboat.github.io/canboat/canboat-j1939.html",
+      "locator": "PGN 61444 / Engine RPM",
+      "notes": "Check against licensed SAE/OEM DBC in production."
+    },
+    {
+      "id": "rpm_demo",
+      "claim": "E0 2E little endian is 12000; x0.125 = 1500 rpm",
+      "kind": "calculation",
+      "status": "derived",
+      "source_url": "https://canboat.github.io/canboat/canboat-j1939.html",
+      "locator": "PGN 61444 / SPN190",
+      "notes": "Deterministic toy payload; not field measurement."
+    }
+  ]
+}
