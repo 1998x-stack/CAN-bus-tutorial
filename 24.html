@@ -136,7 +136,7 @@
 .skip-link{position:absolute;top:-60px;left:12px;z-index:50;background:white;padding:10px}.skip-link:focus{top:6px}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #147f80;outline-offset:3px}
 @media(max-width:900px){body{padding:8px}.container{grid-template-columns:minmax(0,1fr)}.sidebar{border-right:0;border-bottom:1px solid #e8d6af;padding:12px 16px;max-height:185px;overflow:auto}.sidebar h3{font-size:1rem;margin:0 0 .5rem}.chapter-list{display:flex;flex-wrap:wrap;gap:3px}.chapter-list li{margin:0}.chapter-list a{font-size:.78rem;padding:5px 8px}.double-border{border-radius:12px}.footer-nav{gap:8px;flex-wrap:wrap}.footer-nav a{padding:7px 12px}}
-@media(max-width:480px){.main-content{padding:18px 14px}.main-content article{font-size:16px}.main-content article h2{font-size:1.3rem}.main-content article figure{padding:7px}.main-content article figure svg text{font-size:12px}.main-content article .lab{padding:.8rem}}
+@media(max-width:480px){.main-content{padding:18px 14px}.main-content article{font-size:16px}.main-content article h2{font-size:1.3rem}.main-content article figure{padding:7px}.main-content article figure{overflow-x:auto}.main-content article figure svg{min-width:720px}.main-content article .lab{padding:.8rem}}
 @media(prefers-reduced-motion:reduce){.chapter-list a,.footer-nav a{transition:none!important;transform:none!important}}
 @media print{body{padding:0;background:white}.double-border{border:0;box-shadow:none}.container{display:block}.sidebar,.footer-nav,.lab{display:none!important}.main-content{padding:0}.main-content article{max-width:none}figure{break-inside:avoid}}
 
@@ -146,7 +146,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 <a class="skip-link" href="#chapter-24">跳转至正文</a>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>📚 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
@@ -180,8 +180,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 <li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
-    </div>
-    <div class="main-content">
+    </nav>
+    <main class="main-content" id="content">
 
 <article id="chapter-24">
 <header><h1>第24章 CAN 测试工具：为什么抓到报文还不够？</h1>
@@ -319,7 +319,7 @@ candump -L can0,18F00400:1FFFFF00
             <a href="25.html">下一章 →</a>
         </div>
         
-    </div>
+    </main>
 </div>
 </div>
 </body>
