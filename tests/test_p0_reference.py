@@ -132,7 +132,14 @@ class TestLoadAndRegressions(unittest.TestCase):
                            "10", "20", "21", "27", "30")}
         self.assertNotIn("每次仲裁都输，输多了计数器就超限", pages["03"])
         self.assertNotIn("至少需要20个Tq以上", pages["05"])
-        self.assertIn("CAN_BS1_14tq", pages["08"])
+        # Accept both the legacy SPL enumerator and the newer calculation-first
+        # Chapter 08, while still guarding the exact 500-kbit/s configuration.
+        self.assertTrue(
+            "CAN_BS1_14tq" in pages["08"] or (
+                "BS1 = 14" in pages["08"] and "500 kbit/s" in pages["08"]
+            ),
+            "Chapter 08 should teach the correct 14-tq BS1 configuration",
+        )
         self.assertIn("GPIO_PinRemapConfig(GPIO_Remap1_CAN1", pages["09"])
         self.assertNotIn("CAN_TIxR_IDE;  // 标准帧", pages["10"])
         self.assertNotIn("0x4F表示读响应失败", pages["20"])
