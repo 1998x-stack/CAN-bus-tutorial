@@ -60,6 +60,24 @@ python3 -m unittest discover -s tests -v
 
 具体修复清单、计算基准与实机验证边界见 [docs/P0_VERIFICATION.md](docs/P0_VERIFICATION.md)。Python单元测试通过不代表某块STM32开发板已经完成交叉编译或硬件总线验证。
 
+
+## 📘 第 19–21 章：CANopen 图解与可复算实验
+
+- [第 19 章：NMT 与心跳](19.html)：Boot-up、NMT 状态、Heartbeat/Node Guarding、消费者超时编码。
+- [第 20 章：SDO 通信](20.html)：逐字节读取响应、分段 toggle、块确认与 Abort。
+- [第 21 章：PDO 通信](21.html)：对象映射、SYNC 时序、传输类型与带宽下界。
+
+三个章节各有 2 幅可独立查看的 SVG 图、浏览器内交互实验和来源清单（`docs/chapter19-evidence.json` 至 `docs/chapter21-evidence.json`）。底层计算参考模型见 `reference/canopen_ch19_21.py`。
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 -m reference.canopen_ch19_21
+# 可选浏览器 QA：安装 playwright 与 Chromium / Chrome 后
+python3 tests/browser_chapters19_21.py
+```
+
+> 示例仅用于离线字段验证，不是 CANopen 一致性测试或实机安全认证。PDO 对象可映射性、设备单位和配置时机以各设备 EDS/文档为准。
+
 ## 📂 项目结构
 
 ```text
