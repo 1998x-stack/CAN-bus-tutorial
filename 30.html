@@ -1,489 +1,110 @@
-
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>第30章 CAN总线项目实战</title>
-    <link rel="stylesheet" href="theme.css">
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            padding: 20px;
-        }
-        /* 双边框设计：外边框 + 内阴影 */
-        .double-border {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #ffffff;
-            border: 2px solid #f1c40f;
-            border-radius: 24px;
-            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
-            overflow: hidden;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 0;
-        }
-        .sidebar {
-            background: #fefcf5;
-            border-right: 2px solid #fdebb3;
-            padding: 24px 16px;
-        }
-        .sidebar h3 {
-            font-size: 1.4rem;
-            color: #b45f06;
-            border-left: 5px solid #f39c12;
-            padding-left: 15px;
-            margin-bottom: 25px;
-        }
-        .chapter-list {
-            list-style: none;
-        }
-        .chapter-list li {
-            margin-bottom: 6px;
-        }
-        .chapter-list a {
-            display: block;
-            padding: 8px 12px;
-            text-decoration: none;
-            color: #2c3e50;
-            border-radius: 12px;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .chapter-list a:hover {
-            background: #fdebd0;
-            transform: translateX(3px);
-        }
-        .chapter-list .active {
-            background: #3b82f6;
-            color: white;
-            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
-        }
-        .main-content {
-            padding: 30px 35px;
-            background: white;
-        }
-        .footer-nav {
-            margin-top: 45px;
-            padding-top: 20px;
-            border-top: 2px solid #f0e6d2;
-            display: flex;
-            justify-content: space-between;
-        }
-        .footer-nav a {
-            padding: 8px 24px;
-            background: #f1f5f9;
-            text-decoration: none;
-            color: #1e40af;
-            border-radius: 40px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .footer-nav a:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            color: #64748b;
-            border-top: 1px dashed #e2e8f0;
-            font-size: 0.9rem;
-        }
-        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
-        h3 { color: #2c3e50; margin: 20px 0 10px; }
-        pre {
-            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
-            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
-        }
-        table {
-            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
-        }
-        th, td {
-            border: 1px solid #fcd34d; padding: 10px; text-align: left;
-        }
-        th { background: #fffbeb; }
-        .tip, .warning, .highlight {
-            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
-        }
-        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
-        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
-        .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📚 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
-<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
-<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
-<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
-<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
-<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
-<li><a href="07.html" class="">第7章 CAN收发器</a></li>
-<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
-<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
-<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
-<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
-<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
-<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
-<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
-<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
-<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
-<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
-<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
-<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
-<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
-<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
-<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
-<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
-<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
-<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
-<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
-<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
-<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
-<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
-<li><a href="30.html" class="active">第30章 CAN总线项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-        <h2>第30章：CAN总线项目实战：基于STM32的CAN总线数据采集系统、上位机显示、故障诊断</h2>
-
-<p>终于到了最后一章。</p>
-<p>说实话，前面29章讲了很多理论、协议、硬件、软件。但真正让CAN总线发挥价值的，是把它做成一个完整的系统。今天我们就来做一个实战项目：基于STM32的CAN数据采集系统，配上位机显示，再加故障诊断功能。</p>
-<p>这个项目我做过不下5个版本。最早是在一个工程机械项目上，客户要求实时监控发动机参数。那时候我熬夜调代码，踩了不少坑。今天我把经验都倒出来，你直接拿去用。</p>
-
-<h3>30.1 系统整体架构</h3>
-
-<p>先看整体框架。这个系统分三层：</p>
-
-<ul>
-  <li><strong>底层</strong>：STM32 + CAN收发器，负责采集传感器数据，通过CAN总线发送</li>
-  <li><strong>中间层</strong>：USB-CAN适配器，把CAN数据转成PC能识别的格式</li>
-  <li><strong>上层</strong>：上位机软件，显示数据、存储、故障诊断</li>
-</ul>
-
-<p>说白了，就是传感器→STM32→CAN总线→USB-CAN→PC上位机。这个链路我建议你用现成的USB-CAN工具，比如周立功的或者PCAN。自己写USB驱动？嗯，除非你想多花两周时间。</p>
-
-<div class="highlight">
-  <p><strong>硬件清单</strong>：</p>
-  <ul>
-    <li>STM32F103C8T6 开发板（便宜够用）</li>
-    <li>TJA1050 CAN收发器（或者SN65HVD230）</li>
-    <li>USB-CAN适配器（推荐PCAN-USB）</li>
-    <li>传感器：温度、压力、转速模拟信号</li>
-    <li>12V电源（工业现场常用）</li>
-  </ul>
-</div>
-
-<h3>30.2 STM32端程序设计</h3>
-
-<p>STM32这边要做三件事：采集数据、打包成CAN帧、发送出去。我习惯用HAL库，因为移植方便。</p>
-
-<p>先看CAN初始化。这里有个坑：波特率配置。我记得有一次项目，CAN通信死活不通，查了半天发现是时钟树配错了。在本STM32F1示例中CAN控制器使用PCLK1=36MHz，具体芯片的时钟上限以手册为准。你算波特率的时候一定要确认这个时钟。</p>
-
-<pre><code>// STM32F1 HAL / bxCAN：示例假定PCLK1 = 36 MHz。
-// hcan定义在文件作用域，供后续发送/诊断函数共享。
-// GPIO、复用与NVIC请在HAL_CAN_MspInit()或CubeMX生成代码中配置。
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="CAN总线第30章：STM32到PC采集的字节协议、Python SocketCAN接收和故障诊断"><title>第30章 CAN 总线数据采集系统 · CAN总线从入门到精通</title><link rel="stylesheet" href="assets/chapters28-30.css"></head><body><a href="#content" class="skip">跳转正文</a><div class="layout"><nav class="sidebar" aria-label="课程目录"><strong>CAN 总线 · 30 章</strong><details><summary>展开完整课程目录</summary><ol><li><a href="01.html" >01 · CAN总线概述</a></li><li><a href="02.html" >02 · CAN协议基础</a></li><li><a href="03.html" >03 · CAN总线仲裁机制</a></li><li><a href="04.html" >04 · CAN总线错误处理</a></li><li><a href="05.html" >05 · CAN总线位时序与同步</a></li><li><a href="06.html" >06 · CAN控制器硬件</a></li><li><a href="07.html" >07 · CAN收发器</a></li><li><a href="08.html" >08 · STM32 CAN外设</a></li><li><a href="09.html" >09 · STM32 CAN初始化</a></li><li><a href="10.html" >10 · CAN报文发送</a></li><li><a href="11.html" >11 · CAN报文接收</a></li><li><a href="12.html" >12 · CAN中断编程</a></li><li><a href="13.html" >13 · CAN过滤器深入</a></li><li><a href="14.html" >14 · CAN总线网络拓扑</a></li><li><a href="15.html" >15 · CAN总线终端电阻</a></li><li><a href="16.html" >16 · CAN总线电平与差分信号</a></li><li><a href="17.html" >17 · CAN总线通信速率</a></li><li><a href="18.html" >18 · CANopen协议入门</a></li><li><a href="19.html" >19 · CANopen NMT与心跳</a></li><li><a href="20.html" >20 · CANopen SDO通信</a></li><li><a href="21.html" >21 · CANopen PDO通信</a></li><li><a href="22.html" >22 · J1939协议入门</a></li><li><a href="23.html" >23 · J1939多包传输</a></li><li><a href="24.html" >24 · CAN总线测试工具</a></li><li><a href="25.html" >25 · CAN总线调试技巧</a></li><li><a href="26.html" >26 · CAN总线硬件设计</a></li><li><a href="27.html" >27 · CAN总线软件架构</a></li><li><a href="28.html" >28 · CAN总线多节点通信实战</a></li><li><a href="29.html" >29 · CAN总线低功耗设计</a></li><li><a href="30.html" aria-current="page">30 · CAN总线项目实战</a></li></ol></details></nav><main class="reader" id="content"><article>
+<header><p class="eyebrow">第 30 章 · 系统集成与验收</p><h1>从 STM32 的 ADC 数字到上位机告警，中间究竟发生了什么？</h1><p class="lead">最终项目不应停在“CAN 发送成功”的串口日志上。我们定义一份字节级协议，把传感器→STM32→CAN→USB-CAN→PC 贯通，并用序号、超时和错误计数定位故障，给出可以复算的测试向量。</p></header>
+<nav class="mini-toc" aria-label="本章目录"><a href="#architecture">端到端架构</a><a href="#contract">字节契约</a><a href="#firmware">STM32</a><a href="#host">上位机</a><a href="#diagnostics">诊断验收</a><a href="#references">依据</a></nav>
+<section id="architecture"><h2>30.1 先明确“完成”的定义</h2>
+<p>项目选用经典 CAN、11 位标准标识符、500 kbit/s、8 个采集节点和一个只读上位机。每节点每 20 ms 发送一帧 8 字节数据；USB-CAN 适配器只负责接入总线，不自动保证时钟同步、数据格式或应用层可靠交付。</p>
+<figure class="figure"><svg role="img" aria-labelledby="c30-t1 c30-d1" viewBox="0 0 760 250"><title id="c30-t1">STM32采集到上位机的数据链</title><desc id="c30-d1">从传感器与ADC，经过STM32帧编码，收发器接入共享CAN总线，再经过USB-CAN适配器到PC接收解码与诊断。</desc><rect width="760" height="250" rx="14" fill="#f6f8f4"/><text x="22" y="33" class="diagram-title">把每个接口都变成可验证的契约</text>
+<g><rect x="15" y="87" width="122" height="91" rx="11" fill="#e6eee8" stroke="#8ca79f" stroke-width="2"/><rect x="165" y="87" width="130" height="91" rx="11" fill="#e4f4f1" stroke="#087f82" stroke-width="2"/><rect x="324" y="87" width="115" height="91" rx="11" fill="#fceee4" stroke="#c76843" stroke-width="2"/><rect x="470" y="87" width="118" height="91" rx="11" fill="#eae4f7" stroke="#7560ae" stroke-width="2"/><rect x="617" y="87" width="128" height="91" rx="11" fill="#e4f4f1" stroke="#087f82" stroke-width="2"/></g>
+<g text-anchor="middle" class="diagram-label"><text x="76" y="121">传感器</text><text x="76" y="145">ADC</text><text x="230" y="121">STM32</text><text x="230" y="145">帧编码</text><text x="381" y="121">CAN</text><text x="381" y="145">总线</text><text x="529" y="121">USB-CAN</text><text x="529" y="145">适配器</text><text x="681" y="121">PC</text><text x="681" y="145">解析/告警</text></g>
+<g stroke="#506b70" stroke-width="2.5" fill="none"><path d="M137 133h28 M295 133h29 M439 133h31 M588 133h29"/></g><g fill="#506b70"><path d="M158 128l7 5-7 5 M317 128l7 5-7 5 M463 128l7 5-7 5 M610 128l7 5-7 5"/></g>
+<g text-anchor="middle" class="diagram-note"><text x="80" y="207">量程/校准</text><text x="231" y="207">单位与序</text><text x="381" y="207">ID/位时序</text><text x="529" y="207">驱动/时间戳</text><text x="680" y="207">新鲜度/存储</text></g></svg><figcaption>图 30-1：每一次跨层转换都会引入一种失败模式。总线 ACK 只表明至少一个具备应答资格的接收节点正确接收到帧，不等同于指定 PC 程序已解码、持久化或显示。</figcaption></figure>
+<p>可交付的验收标准应写成可测量条件：例如同一台架连续运行 30 分钟、8 个节点均可解码、无未解释 ID、单节点断线在约定超时内标记 <code>stale</code>、发送队列满时有计数器，且故障恢复不造成不安全的执行器输出。具体延迟门限和丢帧容忍度要由应用风险确定，这里不虚构产品级合格阈值。</p></section>
+<section id="contract"><h2>30.2 8 字节必须能被两端独立解释</h2>
+<p>先定应用层映射，再开始编程。这里使用 <strong>ID = 0x300 + node（1–8）</strong>，每帧固定 8 字节，所有多字节量均为 little-endian。负温度用 int16 二进制补码表示；不得直接把带有对齐/填充的 C 结构体原样 <code>memcpy</code> 到总线。</p>
+<table><thead><tr><th>字节</th><th>字段</th><th>类型</th><th>换算/单位</th></tr></thead><tbody>
+<tr><td>0–1</td><td>温度</td><td>int16</td><td>原始值 × 0.01 °C</td></tr><tr><td>2–3</td><td>压力</td><td>uint16</td><td>原始值 × 0.1 kPa</td></tr><tr><td>4–5</td><td>转速</td><td>uint16</td><td>原始值 × 1 rpm</td></tr><tr><td>6</td><td>采样计数器</td><td>uint8</td><td>每发送一帧加 1，模 256</td></tr><tr><td>7</td><td>状态标志</td><td>uint8</td><td>bit 0=传感器故障，其余保留为 0</td></tr></tbody></table>
+<p>约定一个有符号向量：温度 −12.34°C、压力 250.0kPa、转速 1450rpm、计数器 7、状态位 1。计算后 8 字节为：</p>
+<pre><code>ID: 0x301  DLC: 8
+Data: 2E FB C4 09 AA 05 07 01
+       |----| |----| |----|  |  |
+       -1234   2500   1450  7  1</code></pre>
+<figure class="figure"><svg viewBox="0 0 760 173" role="img" aria-labelledby="c30-t2 c30-d2"><title id="c30-t2">采集帧的字节布局</title><desc id="c30-d2">低位字节先传输，温度2字节、压力2字节、转速2字节、计数器1字节、状态1字节。</desc><rect width="760" height="173" rx="14" fill="#f6f8f4"/><text x="20" y="31" class="diagram-title">一帧 · 八个字节 · 明确的字节序</text>
+<g stroke="#fffdf8" stroke-width="3"><rect x="16" y="64" width="90" height="66" fill="#087f82"/><rect x="107" y="64" width="90" height="66" fill="#087f82"/><rect x="198" y="64" width="90" height="66" fill="#c76843"/><rect x="289" y="64" width="90" height="66" fill="#c76843"/><rect x="380" y="64" width="90" height="66" fill="#7560ae"/><rect x="471" y="64" width="90" height="66" fill="#7560ae"/><rect x="562" y="64" width="90" height="66" fill="#a87524"/><rect x="653" y="64" width="90" height="66" fill="#42676a"/></g>
+<g fill="#fff" text-anchor="middle" font-size="21" font-family="ui-monospace,monospace" font-weight="750"><text x="61" y="105">2E</text><text x="152" y="105">FB</text><text x="243" y="105">C4</text><text x="334" y="105">09</text><text x="425" y="105">AA</text><text x="516" y="105">05</text><text x="607" y="105">07</text><text x="698" y="105">01</text></g><g class="diagram-note" text-anchor="middle"><text x="106" y="153">温度</text><text x="288" y="153">压力</text><text x="470" y="153">转速</text><text x="607" y="153">序号</text><text x="698" y="153">状态</text></g></svg><figcaption>图 30-2：每个颜色块是一字节，数值顺序为 <em>least-significant byte first</em>。注意：CAN 的物理总线串行发送顺序和应用 payload 的多字节编码约定是两件事。</figcaption></figure>
+<div class="tool"><h3>按协议打包一帧</h3><div class="field-grid"><label for="temp">温度（°C）<input id="temp" type="number" min="-327.68" max="327.67" step="0.01" value="-12.34"></label><label for="pressure">压力（kPa）<input id="pressure" type="number" min="0" max="6553.5" step="0.1" value="250.0"></label><label for="rpm">转速（rpm）<input id="rpm" type="number" min="0" max="65535" step="1" value="1450"></label><label for="seq">序号（0–255）<input id="seq" type="number" min="0" max="255" step="1" value="7"></label></div><p class="result" id="packet-result" role="status" aria-live="polite">0x301 · DLC=8 · <strong>2E FB C4 09 AA 05 07 01</strong></p><p class="small">教学固定状态字节为 0x01。这个工具仅验证打包/字节序，不模拟 CAN 控制器、误码率或实时性。</p></div></section>
+<section id="firmware"><h2>30.3 STM32 端：发送邮箱成功不等于链路全程成功</h2>
+<p>STM32F103 的 bxCAN 标称位时序必须根据真实 APB1 时钟计算。教学条件为 <strong>PCLK1 = 36 MHz、BRP = 4、BS1 = 14 TQ、BS2 = 3 TQ、SJW = 1 TQ</strong>，因此速率为 36 MHz / [4 × (1+14+3)] = 500 kbit/s，采样点 = (1+14)/18 ≈ 83.33%。GPIO、CAN1 外设时钟、终端电阻、过滤器、NVIC 与收发器的配置仍需在板级初始化中实现。</p>
+<pre><code>// STM32F1 HAL / bxCAN：假设 hcan 已配置、过滤器就绪且 HAL_CAN_Start() 成功
 #include "stm32f1xx_hal.h"
-static CAN_HandleTypeDef hcan;
-
-void MX_CAN1_Init(void)
-{
-    CAN_FilterTypeDef filter = {0};
-    hcan.Instance = CAN1;
-    hcan.Init.TimeTriggeredMode = DISABLE;
-    hcan.Init.AutoBusOff = ENABLE;
-    hcan.Init.AutoWakeUp = DISABLE;
-    hcan.Init.AutoRetransmission = ENABLE;
-    hcan.Init.ReceiveFifoLocked = DISABLE;
-    hcan.Init.TransmitFifoPriority = DISABLE;
-    hcan.Init.Mode = CAN_MODE_NORMAL;
-    hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-    hcan.Init.TimeSeg1 = CAN_BS1_14TQ;
-    hcan.Init.TimeSeg2 = CAN_BS2_3TQ;
-    hcan.Init.Prescaler = 4; // 36MHz/[4*(1+14+3)] = 500kbps
-
-    if (HAL_CAN_Init(&amp;hcan) != HAL_OK) Error_Handler();
-
-    filter.FilterBank = 0;
-    filter.FilterMode = CAN_FILTERMODE_IDMASK;
-    filter.FilterScale = CAN_FILTERSCALE_32BIT;
-    filter.FilterIdHigh = 0;
-    filter.FilterIdLow = 0;
-    filter.FilterMaskIdHigh = 0;
-    filter.FilterMaskIdLow = 0;
-    filter.FilterFIFOAssignment = CAN_RX_FIFO0;
-    filter.FilterActivation = ENABLE;
-    filter.SlaveStartFilterBank = 14; // 双bxCAN变体需按设备手册分配
-    if (HAL_CAN_ConfigFilter(&amp;hcan, &amp;filter) != HAL_OK) Error_Handler();
-    if (HAL_CAN_Start(&amp;hcan) != HAL_OK) Error_Handler();
-    if (HAL_CAN_ActivateNotification(&amp;hcan,
-            CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) Error_Handler();
-}</code></pre>
-
-<div class="tip">
-  <p><strong>个人经验</strong>：我习惯把CAN过滤器设置成接收所有ID，然后在应用层做过滤。这样调试方便，后期改ID也不用动底层。当然，量产产品建议用硬件过滤，省CPU资源。</p>
-</div>
-
-<p>数据采集部分，我用ADC采集模拟量。比如温度传感器，0-5V对应0-100度。采集后打包成CAN帧发送。</p>
-
-<pre><code>// 示例温度0..100°C，编码为0.01°C/bit的大端16位整数。
-// 实际项目必须按传感器和DBC约定处理范围、无效值及时间戳。
-void DataAcquisitionTask(void)
-{
+#include &lt;stdbool.h&gt;
+#include &lt;stdint.h&gt;
+extern CAN_HandleTypeDef hcan;
+bool send_sample(uint8_t node, int16_t temp_centi,
+                 uint16_t pressure_decikpa, uint16_t rpm,
+                 uint8_t seq, uint8_t status) {
+    if (node &lt; 1U || node &gt; 8U) return false;
+    if (HAL_CAN_GetTxMailboxesFreeLevel(&amp;hcan) == 0U) return false;
+    uint16_t t = (uint16_t)temp_centi;
+    uint8_t data[8] = {
+        (uint8_t)t, (uint8_t)(t &gt;&gt; 8),
+        (uint8_t)pressure_decikpa, (uint8_t)(pressure_decikpa &gt;&gt; 8),
+        (uint8_t)rpm, (uint8_t)(rpm &gt;&gt; 8),
+        seq, (uint8_t)(status &amp; 0x01U)
+    };
     CAN_TxHeaderTypeDef tx = {0};
-    uint8_t payload[8] = {0};
-    uint32_t mailbox;
-    uint16_t adc = HAL_ADC_GetValue(&amp;hadc1); // 假定hadc1由板级代码初始化
-    uint16_t centi_deg = (uint16_t)((adc * 10000UL) / 4095UL);
-    tx.StdId = 0x100;      // 仅教学示例，需按项目分配ID
-    tx.IDE = CAN_ID_STD;
-    tx.RTR = CAN_RTR_DATA;
-    tx.DLC = 2;
+    tx.StdId = 0x300U + node; tx.IDE = CAN_ID_STD;
+    tx.RTR = CAN_RTR_DATA; tx.DLC = 8U;
     tx.TransmitGlobalTime = DISABLE;
-    payload[0] = (uint8_t)(centi_deg &gt;&gt; 8);
-    payload[1] = (uint8_t)centi_deg;
-    if (HAL_CAN_GetTxMailboxesFreeLevel(&amp;hcan) == 0U) return;
-    if (HAL_CAN_AddTxMessage(&amp;hcan, &amp;tx, payload, &amp;mailbox) != HAL_OK) {
-        // 记录发送失败；不可视为已成功上总线
-    }
-}</code></pre>
-
-<p>这里要注意：CAN帧一次只能发8字节。如果你的数据多，就分多帧发。我一般一个传感器一帧，ID不同。比如0x100是温度，0x101是压力，0x102是转速。这样上位机解析也方便。</p>
-
-<h3>30.3 上位机显示设计</h3>
-
-<p>上位机我用C#写，因为开发快。核心功能就三个：接收CAN数据、解析显示、存储日志。</p>
-
-<p>接收部分，我用PCANBasic库。这个库是PEAK公司提供的，免费。你装好PCAN-USB驱动后，直接调用API就行。</p>
-
-<pre><code>// C# 接收CAN数据
-public void ReceiveCANData()
-{
-    TPCANMsg msg;
-    TPCANStatus status;
-    
-    while (true)
-    {
-        status = PCANBasic.Read(PCANBasic.PCAN_USBBUS1, out msg, out _);
-        
-        if (status == PCANBasic.PCAN_ERROR_OK)
-        {
-            // 根据ID解析数据
-            switch (msg.ID)
-            {
-                case 0x100:  // 温度
-                    float temp = (msg.DATA[0] << 8 | msg.DATA[1]) / 100.0f;
-                    UpdateTemperatureDisplay(temp);
-                    break;
-                    
-                case 0x101:  // 压力
-                    float pressure = (msg.DATA[0] << 8 | msg.DATA[1]) / 10.0f;
-                    UpdatePressureDisplay(pressure);
-                    break;
-                    
-                case 0x102:  // 转速
-                    uint16_t rpm = (uint16_t)(msg.DATA[0] << 8 | msg.DATA[1]);
-                    UpdateRPMDisplay(rpm);
-                    break;
-            }
-            
-            // 记录日志
-            LogCANMessage(msg);
-        }
-        
-        Thread.Sleep(10);  // 10ms轮询一次
-    }
-}
-</code></pre>
-
-<div class="highlight">
-  <p><strong>显示界面建议</strong>：</p>
-  <ul>
-    <li>仪表盘显示实时数据（温度表、压力表、转速表）</li>
-    <li>波形图显示趋势（最近100个点）</li>
-    <li>数据表格显示原始CAN帧（方便调试）</li>
-    <li>状态栏显示总线负载率、错误帧计数</li>
-  </ul>
-</div>
-
-<h3>30.4 故障诊断功能</h3>
-
-<p>故障诊断是项目的灵魂。没有诊断，出了问题你只能干瞪眼。</p>
-
-<p>我设计了三层诊断：</p>
-
-<ol>
-  <li><strong>物理层诊断</strong>：检查CAN_H和CAN_L电压、终端电阻</li>
-  <li><strong>数据链路层诊断</strong>：检查错误帧、总线负载率</li>
-  <li><strong>应用层诊断</strong>：检查数据合理性、超时判断</li>
-</ol>
-
-<p>物理层诊断，我建议你在上位机加一个“总线健康检查”按钮。点击后，STM32会返回当前总线的状态。</p>
-
-<pre><code>// 自定义台架诊断响应，仅在隔离实验网络使用。
-// 不使用保留给OBD功能请求的0x7DF，不把“重置HAL错误码”当成Bus Off恢复。
-void DemoDiagnosticReply(uint8_t cmd)
-{
-    CAN_TxHeaderTypeDef tx = {0};
-    uint8_t payload[8] = {0};
     uint32_t mailbox;
-    tx.StdId = 0x621; // 示例自定义ID，部署前必须检查ID冲突
-    tx.IDE = CAN_ID_STD;
-    tx.RTR = CAN_RTR_DATA;
-    tx.DLC = 4;
-    tx.TransmitGlobalTime = DISABLE;
-    if (cmd == 0x01) {
-        uint32_t err = HAL_CAN_GetError(&amp;hcan);
-        payload[0] = cmd;
-        payload[1] = (uint8_t)HAL_CAN_GetState(&amp;hcan);
-        payload[2] = (uint8_t)err;
-        payload[3] = (uint8_t)(err &gt;&gt; 8);
-    } else if (cmd == 0x02) {
-        uint32_t esr = hcan.Instance-&gt;ESR;
-        payload[0] = cmd;
-        payload[1] = (uint8_t)(esr &gt;&gt; 16); // TEC
-        payload[2] = (uint8_t)(esr &gt;&gt; 24); // REC
-        payload[3] = (uint8_t)(esr &amp; 0x07u); // LEC
-    } else {
-        payload[0] = 0x7Fu; // 不支持此命令，尤其不允许远程直接复位
-        payload[1] = cmd;
-    }
-    if (HAL_CAN_GetTxMailboxesFreeLevel(&amp;hcan) == 0U) return;
-    if (HAL_CAN_AddTxMessage(&amp;hcan, &amp;tx, payload, &amp;mailbox) != HAL_OK) {
-        // 记录失败，由上层处理
-    }
+    return HAL_CAN_AddTxMessage(&amp;hcan, &amp;tx, data, &amp;mailbox) == HAL_OK;
 }</code></pre>
+<p class="small">将 ADC 原始量转换成工程量需要传感器的真实标定曲线、基准电压与上下限处理。此函数接收<strong>已经标定并量化</strong>的数据；应用必须检测溢出、无效样本和采样同步条件，再决定状态字节。</p>
+<div class="caution">不建议用“温度传感器 0–5 V”直接接到 STM32F103 的 ADC 引脚：模拟输入允许范围受芯片供电和规格限制，需按实际电路分压、隔离或调理，不能假定 5 V 可直连。</div></section>
+<section id="host"><h2>30.4 PC 端：先解析，再判断新鲜度，再显示</h2><p>对 Linux + 支持 SocketCAN 的 CAN 适配器，可使用 <code>python-can</code>。先在实验台架上配置接口位速率；下面的代码刻意把<strong>解码</strong>与<strong>硬件接收</strong>分开。若使用 PEAK/厂商 API，请适配接入层，但不要改变字节协议。</p>
+<pre><code># Linux SocketCAN 示例（需先安装 python-can 并配置 can0 为 500 kbit/s）
+# sudo ip link set can0 up type can bitrate 500000
+import struct
+import time
+import can
 
-<div class="warning">
-  <p><strong>曾经踩过的坑</strong>：有一次现场总线频繁报错，我查了三天。最后发现是一个节点的CAN收发器坏了，导致总线电压异常。从那以后，我每个项目都加物理层诊断。你想想看，如果连总线电压都监测不到，你怎么定位问题？</p>
-</div>
+last_seen = {}
+last_seq = {}
+def decode_frame(msg):
+    if msg.is_extended_id or msg.is_remote_frame or msg.is_error_frame:
+        return None
+    if not (0x301 &lt;= msg.arbitration_id &lt;= 0x308):
+        return None
+    if msg.dlc != 8 or len(msg.data) != 8:
+        return None
+    temp, pressure, rpm, seq, flags = struct.unpack("&lt;hHHBB", msg.data)
+    node = msg.arbitration_id - 0x300
+    previous = last_seq.get(node)
+    gap = previous is not None and seq != (previous + 1) % 256
+    last_seq[node] = seq
+    last_seen[node] = time.monotonic()
+    return node, temp / 100, pressure / 10, rpm, seq, flags, gap
 
-<p>上位机的诊断界面，我习惯用颜色标识：绿色表示正常，黄色表示警告，红色表示故障。这样现场工程师一眼就能看出问题。</p>
-
-<table>
-  <tr>
-    <th>诊断项目</th>
-    <th>正常范围</th>
-    <th>警告范围</th>
-    <th>故障范围</th>
-  </tr>
-  <tr>
-    <td>CAN_H电压</td>
-    <td>2.5V ± 0.5V</td>
-    <td>2.0V-2.0V 或 3.0V-3.5V</td>
-    <td>&lt;2.0V 或 &gt;3.5V</td>
-  </tr>
-  <tr>
-    <td>CAN_L电压</td>
-    <td>2.5V ± 0.5V</td>
-    <td>2.0V-2.0V 或 3.0V-3.5V</td>
-    <td>&lt;2.0V 或 &gt;3.5V</td>
-  </tr>
-  <tr>
-    <td>终端电阻</td>
-    <td>60Ω ± 10%</td>
-    <td>50-54Ω 或 66-70Ω</td>
-    <td>&lt;50Ω 或 &gt;70Ω</td>
-  </tr>
-  <tr>
-    <td>总线负载率</td>
-    <td>&lt;30%</td>
-    <td>30%-60%</td>
-    <td>&gt;60%</td>
-  </tr>
-  <tr>
-    <td>错误帧率</td>
-    <td>0</td>
-    <td>1-5帧/分钟</td>
-    <td>&gt;5帧/分钟</td>
-  </tr>
-</table>
-
-<h3>30.5 数据存储与回放</h3>
-
-<p>数据存下来才有价值。我一般存两种格式：</p>
-
-<ul>
-  <li><strong>CSV格式</strong>：方便Excel打开，做数据分析</li>
-  <li><strong>二进制格式</strong>：方便回放，模拟现场工况</li>
-</ul>
-
-<p>回放功能特别有用。比如客户说“昨天下午3点设备出问题了”，你直接把那个时间段的CAN数据回放一遍，就能复现问题。我靠这个功能解决过好几个疑难杂症。</p>
-
-<pre><code>// 数据回放功能
-public void ReplayData(string filename)
-{
-    byte[] rawData = File.ReadAllBytes(filename);
-    int offset = 0;
-    
-    while (offset &lt; rawData.Length)
-    {
-        // 解析时间戳
-        uint timestamp = BitConverter.ToUInt32(rawData, offset);
-        offset += 4;
-        
-        // 解析CAN帧
-        TPCANMsg msg;
-        msg.ID = BitConverter.ToUInt32(rawData, offset);
-        offset += 4;
-        msg.LEN = rawData[offset++];
-        msg.MSGTYPE = rawData[offset++];
-        
-        for (int i = 0; i &lt; msg.LEN; i++)
-        {
-            msg.DATA[i] = rawData[offset++];
-        }
-        
-        // 模拟发送
-        PCANBasic.Write(PCANBasic.PCAN_USBBUS1, ref msg);
-        
-        // 按原始时间间隔发送
-        Thread.Sleep((int)(timestamp - lastTimestamp));
-        lastTimestamp = timestamp;
-    }
-}
-</code></pre>
-
-<h3>30.6 项目调试心得</h3>
-
-<p>最后分享几个实战经验：</p>
-
-<ol>
-  <li><strong>先跑通通信，再做功能</strong>。我见过太多人一上来就写应用层代码，结果CAN都没通。先用CAN分析仪发个标准帧，确认STM32能收到，再往下做。</li>
-  <li><strong>日志要详细</strong>。每个CAN帧的收发都要打日志，包括时间戳。出了问题，日志就是你的救命稻草。</li>
-  <li><strong>加看门狗</strong>。工业现场环境恶劣，STM32可能死机。加个独立看门狗，保证系统能自动恢复。</li>
-  <li><strong>预留升级接口</strong>。我习惯在CAN协议里留一个“固件升级”命令。这样现场设备不用拆下来，通过CAN就能升级程序。</li>
-</ol>
-
-<div class="tip">
-  <p><strong>我的习惯</strong>：每个项目做完，我都会写一份“调试记录”。把踩过的坑、解决的方法都记下来。下次遇到类似问题，直接翻记录。这个习惯帮我省了无数时间。</p>
-</div>
-
-<p>好了，30章的内容到这里就结束了。从CAN总线的基础知识，到协议细节，再到硬件设计、软件编程，最后到实战项目。这一路走来，我相信你已经具备了独立开发CAN总线系统的能力。</p>
-
-<p>记住，CAN总线不难，难的是细心和耐心。每个字节、每个位、每个时序，都可能影响整个系统的稳定性。多动手、多测试、多总结，你也能成为CAN总线专家。</p>
-
-<p>如果在实际项目中遇到问题，欢迎交流。毕竟，技术这东西，一个人闷头搞不如大家一起讨论进步快。</p>
-
-<p>祝你在CAN总线的路上越走越远！</p>
-        <div class="footer-nav">
-            <a href="29.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="javascript:void(0)">下一章 →</a>
-        </div>
-        
-    </div>
-</div>
-</div>
-</body>
-</html>
+with can.Bus(channel="can0", interface="socketcan") as bus:
+    while True:
+        msg = bus.recv(timeout=0.05)
+        if msg is not None:
+            sample = decode_frame(msg)
+            if sample:
+                print("node/temp/pressure/rpm/seq/flags/gap:", sample)
+        now = time.monotonic()
+        stale = [node for node in range(1, 9)
+                 if now - last_seen.get(node, -1e9) &gt; 0.10]
+        # 把 stale 和错误计数传给 UI/日志；不要把旧值冒充实时值。</code></pre>
+<p>这里的 100 ms 是<strong>教学演示的应用超时策略</strong>，不是 CAN 标准规定的时限。500 kbit/s 是通道配置；程序读取到帧还需要用 ID、DLC、版本与字段范围约束，避免错误显示。</p></section>
+<section id="diagnostics"><h2>30.5 从“没数据”逐层缩小故障范围</h2>
+<table><thead><tr><th>观察</th><th>首查项目</th><th>不能直接推断</th></tr></thead><tbody><tr><td>完全收不到帧</td><td>供电、收发器、线缆、终端、位速率、过滤器</td><td>不能直接证明 MCU 死机</td></tr><tr><td>有报文但字段异常</td><td>字节序、量程、标定、DLC、版本</td><td>不能立即归咎物理层噪声</td></tr><tr><td>序号跳变/采样过期</td><td>发送周期、邮箱拥塞、过滤器、PC 处理延迟</td><td>序号缺口不能定位唯一丢包位置</td></tr><tr><td>错误计数上升</td><td>TEC/REC、LEC、总线波形、ACK 及错误状态</td><td>不能将总线关闭等同于“节点永久坏了”</td></tr><tr><td>PC 看不到 CAN_H/L 电压</td><td>外接示波器/电压检测通道</td><td>软件读 ESR 不能代替物理电压测量</td></tr></tbody></table>
+<p>在 STM32 bxCAN 的 ESR 中，TEC/REC 分别位于高字节区域，错误状态应结合时序快照记录。建议以<strong>上电时刻、同步时刻、采样时刻、传输/接收时刻</strong>串起日志；不同来源的时钟不能不校正就直接相减求延迟。</p>
+<pre><code>// bxCAN F1 寄存器观测示例（在适当的同步/互斥上下文调用）
+uint32_t esr = hcan.Instance-&gt;ESR;
+uint8_t tec = (uint8_t)((esr &gt;&gt; 16) &amp; 0xFFU);
+uint8_t rec = (uint8_t)((esr &gt;&gt; 24) &amp; 0xFFU);
+uint8_t lec = (uint8_t)((esr &gt;&gt; 4) &amp; 0x07U);
+// 还应读取 BOFF/EPVF/EWGF 等状态位；错误码含义见器件参考手册。</code></pre>
+<p>注意上述 LEC 位域的具体定义应以所用 STM32F1 参考手册为准；<strong>原始 ESR 快照与 HAL 错误码应同时留存</strong>，用于复盘。</p>
+<ol class="steps"><li><strong>离线黄金向量：</strong>不接 CAN，总是得到 <code>2E FB C4 09 AA 05 07 01</code>；解码值分别为 −12.34、250.0、1450、7、1。</li><li><strong>单节点台架：</strong>发送固定频率帧，检查发送完成、PC 接收、时间戳及过滤器，不要把添加到邮箱当作接收成功。</li><li><strong>八节点集成：</strong>按预期 400 帧/s（不含其他业务）计算理论负载，并与抓包工具测量对照。</li><li><strong>故障注入：</strong>停止节点 3，PC 标记 stale；恢复后允许计数器重新同步，并记录异常原因而不静默覆盖历史。</li></ol>
+<div class="insight"><strong>项目闭环：</strong>一条报文最终能被验证的，不是“发送函数返回 OK”，而是每层的数据定义、时序约束、异常行为与日志能够独立对上。</div></section>
+<section id="references"><h2>30.6 参考接口与工程边界</h2><ol class="refs"><li><a href="https://github.com/STMicroelectronics/stm32f1xx-hal-driver/blob/master/Inc/stm32f1xx_hal_can.h">ST 官方 STM32F1 HAL CAN 头文件</a>：初始化、发送、接收、睡眠及错误接口。</li><li><a href="https://python-can.readthedocs.io/en/stable/interfaces/socketcan.html">python-can 官方 SocketCAN 文档</a>：总线创建与收发入口。</li><li><a href="https://python-can.readthedocs.io/en/stable/message.html">python-can Message 字段</a>：DLC、标准/扩展帧与数据。</li><li><a href="https://www.analog.com/en/resources/app-notes/an-1123.html">Analog Devices AN-1123</a>：CAN 帧、终端与仲裁背景。</li></ol>
+<p class="small">本章代码是 STM32F1 bxCAN 的教学骨架与 Linux SocketCAN 的用户态接收例子，不是已完成硬件认证的整机固件；量产必须补全时钟/外设初始化、电源与 ESD 设计、状态机、异常恢复及系统安全评审。</p></section><footer class="chapter-footer"><a href="29.html">← 第29章</a><a href="index.html">返回总目录</a><span>本课程已完结</span></footer></article></main></div><script>
+(function(){"use strict";
+const keys=["temp","pressure","rpm","seq"],out=document.getElementById("packet-result");
+function run(){const v=keys.map(k=>Number(document.getElementById(k).value));if(v.some(n=>!Number.isFinite(n))||v[0]<-327.68||v[0]>327.67||v[1]<0||v[1]>6553.5||v[2]<0||v[2]>65535||v[3]<0||v[3]>255||!Number.isInteger(v[2])||!Number.isInteger(v[3])){out.textContent="输入超出字段范围或序号/转速非整数。";return;}
+const b=new ArrayBuffer(8),d=new DataView(b);d.setInt16(0,Math.round(v[0]*100),true);d.setUint16(2,Math.round(v[1]*10),true);d.setUint16(4,v[2],true);d.setUint8(6,v[3]);d.setUint8(7,1);
+const bytes=Array.from(new Uint8Array(b),n=>n.toString(16).toUpperCase().padStart(2,"0")).join(" ");
+out.innerHTML="0x301 · DLC=8 · <strong>"+bytes+"</strong>";}
+keys.forEach(k=>document.getElementById(k).addEventListener("input",run));run();
+})();</script></body></html>
