@@ -28,7 +28,7 @@ h3{font-size:21px;color:#254e4b;margin:27px 0 9px}strong{color:#1a4240}
 section{margin-top:70px}ol,ul{margin:16px 0 16px 25px;padding:0}li{margin:8px 0}
 .jump{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px}.jump a{border:1px solid #cce2db;padding:5px 12px;border-radius:18px;background:#f6fbf8;text-decoration:none;font-size:14px}
 figure{padding:16px;margin:30px 0;border:1px solid var(--line);border-radius:13px;background:#fff;min-width:0}
-figure img{display:block;width:100%;height:auto;max-width:100%}
+figure img{display:block;width:100%;height:auto;max-width:100%}.figure-scroll{max-width:100%;overflow-x:auto}
 figcaption{font-size:14px;line-height:1.7;color:var(--subtle);margin-top:12px}
 .stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:26px 0}
 .stat{background:#eef8f4;border-left:3px solid #2b897e;padding:14px;border-radius:7px}
@@ -56,7 +56,7 @@ pre code{background:transparent;color:inherit;padding:0}code{font-family:ui-mono
 .next{display:flex;justify-content:space-between;gap:13px;flex-wrap:wrap;border-top:1px solid #d1dfd9;margin-top:57px;padding-top:22px;font-size:15px}
 .next a{text-decoration:none;font-weight:750}
 @media(max-width:960px){.layout{display:block;margin:0;padding:0}.course-nav{position:static;max-height:none;border-radius:0;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px}.course-nav .brand{margin:0}.course-nav ol{max-height:230px;overflow-y:auto}.paper{border:0;border-radius:0;padding:32px clamp(18px,4vw,45px) 45px}}
-@media(max-width:550px){.course-nav{flex-wrap:wrap}.course-nav .brand{font-size:15px}.paper{padding:25px 17px 38px}.stat-grid,.steps{grid-template-columns:1fr}.lab{padding:15px}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}section{margin-top:54px}figure{padding:8px}.dek{font-size:18px}}
+@media(max-width:550px){.course-nav{flex-wrap:wrap}.course-nav .brand{font-size:15px}.paper{padding:25px 17px 38px}.stat-grid,.steps{grid-template-columns:1fr}.lab{padding:15px}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}section{margin-top:54px}figure{padding:8px}.figure-scroll img{width:720px;min-width:720px;max-width:none}.dek{font-size:18px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
 @media print{body{background:white;color:black}.layout{display:block;max-width:none;margin:0;padding:0}.skip-link,.course-nav,.jump,.next,.lab button{display:none!important}.paper{padding:0;border:0;box-shadow:none}.paper article{max-width:none}section{margin-top:34px}figure,.lab,.stat{break-inside:avoid}pre{white-space:pre-wrap;overflow:visible;color:#111;background:#eee}a{color:black}}
 </style>
@@ -111,7 +111,7 @@ pre code{background:transparent;color:inherit;padding:0}code{font-family:ui-mono
 <span class="kicker">01 · 先看完整的一位</span>
 <h2 id="segments-h">一个 CAN 位，不是一个瞬间，而是一小段时间</h2>
 <p>把每个标称位拆成若干个 <strong>时间量子 TQ（Time Quantum）</strong>。Bosch CAN 2.0 的概念模型有四段：同步段、传播段、相位缓冲段 1、相位缓冲段 2。四段合起来是一位；其中同步段固定为 1 TQ。<a href="https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-8FAD80F3-8BD3-4A27-A2EB-736FC7248AD4.html">Microchip 位时序说明</a></p>
-<figure><img src="assets/chapter05-bit-timing.svg" width="1020" height="310" loading="lazy" alt="16 TQ 位时间示意：同步段1 TQ、传播段5 TQ、相位段1为8 TQ、相位段2为2 TQ；第14 TQ 后的采样点为87.5%。"><figcaption>图 1 · 一个示例拆分：SYNC = 1，PROP = 5，PHASE1 = 8，PHASE2 = 2（总计 16 TQ）。图中 5+8 的划分是解释四段原理所用；在 bxCAN 寄存器中，它们合起来作为 BS1 = 13 配置。</figcaption></figure>
+<figure><div class="figure-scroll" tabindex="0" aria-label="可横向滚动的技术示意图"><img src="assets/chapter05-bit-timing.svg" width="1020" height="310" loading="lazy" alt="16 TQ 位时间示意：同步段1 TQ、传播段5 TQ、相位段1为8 TQ、相位段2为2 TQ；第14 TQ 后的采样点为87.5%。"></div><figcaption>图 1 · 一个示例拆分：SYNC = 1，PROP = 5，PHASE1 = 8，PHASE2 = 2（总计 16 TQ）。图中 5+8 的划分是解释四段原理所用；在 bxCAN 寄存器中，它们合起来作为 BS1 = 13 配置。</figcaption></figure>
 <div class="table-scroll"><table><thead><tr><th>段</th><th>关键职责</th><th>设置注意</th></tr></thead><tbody>
 <tr><td>SYNC_SEG</td><td>期望在此遇到用于同步的边沿</td><td>固定 1 TQ；不是“上升沿或下降沿任意重置”</td></tr>
 <tr><td>PROP_SEG</td><td>为仲裁与物理链路往返延迟留预算</td><td>取值受具体控制器限制，不能脱离线缆和收发器选</td></tr>
@@ -127,7 +127,7 @@ pre code{background:transparent;color:inherit;padding:0}code{font-family:ui-mono
 <p>在 <strong>采样点</strong>，接收逻辑判断当前位是显性（0）还是隐性（1）。单点采样可写为：从一位起点到采样点，经过 <code>SYNC_SEG + PROP_SEG + PHASE_SEG1</code>。采样点位置是该累计长度占整个位时间的比例。</p>
 <div class="equation">采样点 = (1 + BS1) / (1 + BS1 + BS2)<br>在 1 + 13 + 2 = 16 TQ 时：14 / 16 = <strong>87.5%</strong></div>
 <p>CAN 的无损仲裁要求节点能够在自己的仲裁位采样时刻看见别的节点拉出的显性电平。若只把“20 米线缆的一次单程传播时间”填入传播补偿，就漏掉了回程影响，以及 TX/RX 电子器件和可能的隔离延迟。</p>
-<figure><img src="assets/chapter05-propagation.svg" width="980" height="314" loading="lazy" alt="CAN 仲裁传播预算：从A到B再返回A，包含双向线缆、发送器和接收器延迟。"><figcaption>图 2 · 用往返路径建立传播延迟的直觉。对于近似对称节点可用 <code>2 × (线缆单程延迟 + 驱动器延迟 + 接收器延迟)</code> 估算；非对称节点必须逐方向计算最坏值。参见 <a href="https://www.analog.com/en/resources/analog-dialogue/articles/configure-can-bit-timing.html">Analog Devices 位时序分析</a>。</figcaption></figure>
+<figure><div class="figure-scroll" tabindex="0" aria-label="可横向滚动的技术示意图"><img src="assets/chapter05-propagation.svg" width="980" height="314" loading="lazy" alt="CAN 仲裁传播预算：从A到B再返回A，包含双向线缆、发送器和接收器延迟。"></div><figcaption>图 2 · 用往返路径建立传播延迟的直觉。对于近似对称节点可用 <code>2 × (线缆单程延迟 + 驱动器延迟 + 接收器延迟)</code> 估算；非对称节点必须逐方向计算最坏值。参见 <a href="https://www.analog.com/en/resources/analog-dialogue/articles/configure-can-bit-timing.html">Analog Devices 位时序分析</a>。</figcaption></figure>
 <p>“采样点越晚越好”也不准确：采样点后面还需要足够的相位段 2、SJW 和处理时间余量。工程上常见的 <strong>75%～87.5%</strong> 只是可考虑的范围，不是标准对所有拓扑规定的万能答案。必须同时满足速率、传播延迟、振荡器容差、控制器寄存器范围和整网一致性。</p>
 <div class="stat-grid"><div class="stat"><b>2 μs</b><span>500 kbit/s 的标称位时长</span></div><div class="stat"><b>125 ns</b><span>16 TQ / 位时，每个 TQ 的时长</span></div><div class="stat"><b>250 ns</b><span>BS2 = 2 TQ 的标称时长</span></div></div>
 </section>
@@ -136,7 +136,7 @@ pre code{background:transparent;color:inherit;padding:0}code{font-family:ui-mono
 <span class="kicker">03 · 时间基准如何被修正</span>
 <h2 id="sync-h">先在 SOF 对齐，再利用帧内跳变微调</h2>
 <p><strong>硬同步</strong>发生在帧开始时符合条件的隐性 → 显性 SOF 边沿；控制器据此重新开始位时间。<strong>重同步</strong>用于帧内满足协议条件的隐性 → 显性边沿，并非“每个跳变都能调整”，也不是每个 TQ 都发生。发送端和接收端对重同步还有具体规则，需遵守控制器实现。</p>
-<figure><img src="assets/chapter05-resynchronization.svg" width="980" height="432" loading="lazy" alt="硬同步对齐SOF；相位误差为正时延长相位段1，为负时缩短相位段2。"><figcaption>图 3 · 按 Microchip 的相位误差定义：<code>e &gt; 0</code> 表示合格边沿偏晚，延长 PHASE_SEG1；<code>e &lt; 0</code> 表示边沿偏早，缩短 PHASE_SEG2。这里画的是方向与效果，不是逐 TQ 的真实波形。<a href="https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-792F8F02-385C-4AF9-8A7B-A48A66D4D717.html">Microchip 同步规则</a></figcaption></figure>
+<figure><div class="figure-scroll" tabindex="0" aria-label="可横向滚动的技术示意图"><img src="assets/chapter05-resynchronization.svg" width="980" height="432" loading="lazy" alt="硬同步对齐SOF；相位误差为正时延长相位段1，为负时缩短相位段2。"></div><figcaption>图 3 · 按 Microchip 的相位误差定义：<code>e &gt; 0</code> 表示合格边沿偏晚，延长 PHASE_SEG1；<code>e &lt; 0</code> 表示边沿偏早，缩短 PHASE_SEG2。这里画的是方向与效果，不是逐 TQ 的真实波形。<a href="https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-792F8F02-385C-4AF9-8A7B-A48A66D4D717.html">Microchip 同步规则</a></figcaption></figure>
 <div class="steps">
 <div class="step"><b>① 建立共同起点</b><p>总线空闲后，节点观察 SOF 的显性边沿，进行硬同步；不是所有数据位都执行硬同步。</p></div>
 <div class="step"><b>② 判断偏差方向</b><p>合格边沿落在期望同步段之后为正误差；落在前面为负误差。<strong>不要倒置符号与补偿方向。</strong></p></div>
