@@ -1,0 +1,49 @@
+/* Reading system for the CAN bxCAN chapters: calm hierarchy, diagram-first explanations. */
+:root{--paper:#fffdf9;--ink:#203035;--muted:#52666d;--teal:#147f80;--amber:#a46425;--violet:#7461ba}
+html{scroll-behavior:smooth}
+body{background:#edf2ed;overflow-wrap:anywhere}
+.double-border{border:1px solid #d7e1d7;border-radius:16px;box-shadow:0 18px 54px #20303514}
+.container{grid-template-columns:250px minmax(0,1fr)}
+.sidebar{background:#f8f8f3;border-right:1px solid #dce3db}
+.sidebar .chapter-list a.active{background:#d7eee6;color:#145a50;box-shadow:none}
+.main-content{min-width:0;background:var(--paper);padding:clamp(20px,3.6vw,60px)}
+.article{max-width:860px;margin:0 auto;color:var(--ink);font-size:17px;line-height:1.85}
+.article header{padding-bottom:26px;border-bottom:1px solid #d7e1db}
+.article .eyebrow{font-size:12px;letter-spacing:.17em;text-transform:uppercase;color:var(--teal);font-weight:800;margin:0 0 10px}
+.article h1{font-size:clamp(29px,3.2vw,45px);line-height:1.25;letter-spacing:-.02em;margin:0 0 16px;color:#163c40}
+.article .dek{color:#51676b;font-size:clamp(17px,1.8vw,20px);line-height:1.7}
+.article h2{font-size:clamp(23px,2.1vw,30px);color:#163c40;border:0;padding:0;margin:0 0 18px;line-height:1.3}
+.article h3{font-size:19px;color:#235358;margin:28px 0 10px}
+.article section{margin:55px 0 0}
+.article p{line-height:1.85;color:#273c42}
+.article a{color:#116a75;text-underline-offset:3px}
+.article .lead{font-size:19px;color:#263e42}
+.article .kicker{font-size:12px;letter-spacing:.12em;color:#8b632f;font-weight:800;margin-bottom:8px}
+.article .callout{border-left:4px solid #147f80;background:#eff8f5;border-radius:0 12px 12px 0;padding:14px 20px;margin:24px 0}
+.article .callout.warn{border-color:#ba7541;background:#fff5e9}
+.article .callout p{margin:4px 0}
+.article .diagram{background:#fff;border:1px solid #dbe5e0;border-radius:16px;padding:18px;margin:28px 0 18px}
+.article .diagram-scroll{overflow-x:auto;max-width:100%}
+.article svg{display:block;width:100%;height:auto;min-width:570px}
+.article figcaption{font-size:14px;color:#50676a;line-height:1.65;margin-top:11px}
+.article svg text{font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.article table{background:white;display:block;overflow-x:auto;border-collapse:collapse;border:0}
+.article th,.article td{border:1px solid #dce5df;min-width:110px;vertical-align:top;padding:10px 14px}
+.article th{background:#eef6f1;color:#2d5e5d}
+.article pre{background:#14282c;color:#ecf4ef;border-radius:12px;font-size:14px;line-height:1.65;padding:20px;max-width:100%;overflow-x:auto}
+.article pre code{white-space:pre;background:transparent;font-size:inherit;color:inherit;padding:0}
+.article code{background:#eff2ee;color:#154d57}
+.article details{border:1px solid #d6e1dd;border-radius:12px;margin:14px 0;padding:13px 18px;background:#fafcf9}
+.article summary{cursor:pointer;font-weight:700;color:#215958}
+.article summary::marker{color:var(--teal)}
+.article .subtle{font-size:14px;color:#586e72}
+.article .source-note{border-top:1px solid #d9e4dd;padding-top:16px;font-size:14px;color:#52666d}
+.article .steps{padding-left:23px}
+.article .steps li{margin:12px 0}
+.article :focus-visible,.chapter-list a:focus-visible,.footer-nav a:focus-visible{outline:3px solid #147f80;outline-offset:4px}
+.skip-link{position:absolute;top:-100px;left:14px;background:#fff;padding:12px;z-index:100;color:#123}
+.skip-link:focus{top:10px}
+@media(max-width:900px){.container{grid-template-columns:1fr}.sidebar{border-right:0;border-bottom:1px solid #d6e3d6;max-height:190px;overflow-y:auto}.main-content{padding:23px}}
+@media(max-width:480px){body{padding:8px}.double-border{border-radius:10px}.article{font-size:16px}.article h1{font-size:29px}.article section{margin-top:40px}.article .diagram{padding:10px}.article svg{min-width:560px}.article th,.article td{min-width:125px}.footer-nav{gap:8px;flex-wrap:wrap}.footer-nav a{padding:8px 12px;font-size:13px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+@media print{body{background:#fff;padding:0}.double-border{border:0;box-shadow:none}.container{display:block}.sidebar,.skip-link,.footer-nav{display:none!important}.main-content{padding:0}.article{max-width:none}.article section{break-inside:avoid}.article .diagram-scroll{overflow:visible}.article svg{min-width:0}.article details{break-inside:avoid}}
