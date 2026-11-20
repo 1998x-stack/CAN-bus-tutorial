@@ -1,294 +1,272 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>第5章 CAN总线位时序与同步</title>
-    <link rel="stylesheet" href="theme.css">
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            padding: 20px;
-        }
-        /* 双边框设计：外边框 + 内阴影 */
-        .double-border {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #ffffff;
-            border: 2px solid #f1c40f;
-            border-radius: 24px;
-            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
-            overflow: hidden;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 0;
-        }
-        .sidebar {
-            background: #fefcf5;
-            border-right: 2px solid #fdebb3;
-            padding: 24px 16px;
-        }
-        .sidebar h3 {
-            font-size: 1.4rem;
-            color: #b45f06;
-            border-left: 5px solid #f39c12;
-            padding-left: 15px;
-            margin-bottom: 25px;
-        }
-        .chapter-list {
-            list-style: none;
-        }
-        .chapter-list li {
-            margin-bottom: 6px;
-        }
-        .chapter-list a {
-            display: block;
-            padding: 8px 12px;
-            text-decoration: none;
-            color: #2c3e50;
-            border-radius: 12px;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .chapter-list a:hover {
-            background: #fdebd0;
-            transform: translateX(3px);
-        }
-        .chapter-list .active {
-            background: #3b82f6;
-            color: white;
-            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
-        }
-        .main-content {
-            padding: 30px 35px;
-            background: white;
-        }
-        .footer-nav {
-            margin-top: 45px;
-            padding-top: 20px;
-            border-top: 2px solid #f0e6d2;
-            display: flex;
-            justify-content: space-between;
-        }
-        .footer-nav a {
-            padding: 8px 24px;
-            background: #f1f5f9;
-            text-decoration: none;
-            color: #1e40af;
-            border-radius: 40px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .footer-nav a:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            color: #64748b;
-            border-top: 1px dashed #e2e8f0;
-            font-size: 0.9rem;
-        }
-        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
-        h3 { color: #2c3e50; margin: 20px 0 10px; }
-        pre {
-            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
-            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
-        }
-        table {
-            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
-        }
-        th, td {
-            border: 1px solid #fcd34d; padding: 10px; text-align: left;
-        }
-        th { background: #fffbeb; }
-        .tip, .warning, .highlight {
-            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
-        }
-        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
-        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
-        .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="理解经典 CAN 的位时间、采样点、SJW 和硬同步/重同步，并用 STM32 bxCAN 的可复算配置练习验证。">
+<title>第 5 章 · CAN 位时序与同步：在正确的时刻读到同一位</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+:root{--paper:#fffdf9;--ink:#203035;--subtle:#53676d;--teal:#147f80;--blue:#5f83b2;--warm:#c76a47;--line:#d9e6e3}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:#edf5f3;color:var(--ink);margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.82}
+a{color:#116f73;text-underline-offset:3px}a:hover{color:#905627}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+.skip-link{position:absolute;top:-80px;left:15px;background:white;padding:9px 15px;z-index:5}.skip-link:focus{top:8px}
+.layout{max-width:1330px;margin:24px auto;display:grid;grid-template-columns:246px minmax(0,1fr);gap:28px;padding:0 18px;align-items:start}
+.course-nav{position:sticky;top:18px;border:1px solid var(--line);background:#fff;border-radius:15px;padding:18px;max-height:calc(100vh - 36px);overflow-y:auto;font-size:14px;line-height:1.5}
+.course-nav .brand{display:block;font-size:18px;font-weight:750;text-decoration:none;color:#214d4a;margin-bottom:12px}
+.course-nav summary{font-weight:700;cursor:pointer}.course-nav ol{list-style:none;margin:14px 0 0;padding:0}
+.course-nav li{margin:0}.course-nav li a{display:block;padding:5px 7px;border-radius:7px;color:#4c6268;text-decoration:none;font-size:13px}
+.course-nav li a:hover{background:#f3f8f6}.course-nav li a[aria-current]{background:#dff1ed;font-weight:750;color:#09695e}
+.paper{background:var(--paper);border:1px solid #e4e9e6;border-radius:16px;padding:48px clamp(22px,5vw,72px) 60px;min-width:0;box-shadow:0 9px 35px #163f3810}
+article{max-width:820px;margin:0 auto}header{margin:0 0 15px}.eyebrow,.kicker{font-size:13px;letter-spacing:.1em;font-weight:800;color:#a26735}
+.eyebrow{color:var(--teal)}h1{font-size:clamp(33px,4vw,47px);line-height:1.23;letter-spacing:-.025em;color:#193b3b;margin:12px 0 18px}
+.dek{font-size:20px;color:#466166;line-height:1.75;margin:0 0 24px}p{margin:15px 0;line-height:1.85}
+h2{font-size:clamp(24px,2.8vw,31px);line-height:1.35;color:#19433f;border:0;padding:0;margin:8px 0 20px}
+h3{font-size:21px;color:#254e4b;margin:27px 0 9px}strong{color:#1a4240}
+section{margin-top:70px}ol,ul{margin:16px 0 16px 25px;padding:0}li{margin:8px 0}
+.jump{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px}.jump a{border:1px solid #cce2db;padding:5px 12px;border-radius:18px;background:#f6fbf8;text-decoration:none;font-size:14px}
+figure{padding:16px;margin:30px 0;border:1px solid var(--line);border-radius:13px;background:#fff;min-width:0}
+figure img{display:block;width:100%;height:auto;max-width:100%}.figure-scroll{max-width:100%;overflow-x:auto}
+figcaption{font-size:14px;line-height:1.7;color:var(--subtle);margin-top:12px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:26px 0}
+.stat{background:#eef8f4;border-left:3px solid #2b897e;padding:14px;border-radius:7px}
+.stat b{display:block;font-size:20px;line-height:1.3;color:#17645d}.stat span{font-size:13px;line-height:1.6;color:#50656a}
+.callout{border-left:4px solid #d49a4e;background:#fff7e9;padding:13px 19px;margin:25px 0;border-radius:0 9px 9px 0}
+.equation{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#eef7f4;border:1px solid #cee5df;padding:16px 18px;border-radius:9px;margin:20px 0;font-size:16px;line-height:1.8;overflow-wrap:anywhere}
+.table-scroll{max-width:100%;overflow-x:auto;margin:23px 0}
+table{border-collapse:collapse;width:100%;min-width:540px;font-size:15px;background:#fff}
+th,td{padding:12px 13px;text-align:left;vertical-align:top;border:0;border-bottom:1px solid #dce8e3}th{background:#eff7f4;color:#27574f;font-weight:750}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:23px 0}
+.step{background:#fff;border:1px solid var(--line);border-radius:10px;padding:15px}
+.step b{display:block;color:#1c6d65;font-size:16px}.step p{font-size:14px;line-height:1.7;margin:7px 0 0}
+.code-panel{margin:20px 0}pre{margin:0;background:#183438;color:#f1f9f6;padding:20px;border-radius:11px;overflow-x:auto;font-size:14px;line-height:1.68}
+pre code{background:transparent;color:inherit;padding:0}code{font-family:ui-monospace,Consolas,monospace;overflow-wrap:anywhere}
+.lab{background:#fafffd;border:1px solid #c7e2d9;border-radius:15px;padding:22px;margin:30px 0}
+.lab h3{margin:0 0 10px}.lab-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:16px 0}
+.lab label{font-size:13px;line-height:1.5;color:#365d5a;font-weight:700;display:flex;flex-direction:column;gap:5px}
+.lab input,.lab select{font:inherit;font-size:15px;background:#fff;color:#173e3b;border:1px solid #9abdb7;border-radius:8px;padding:7px 8px;min-width:0;width:100%}
+.lab button{font:inherit;color:#fff;background:#166e69;border:1px solid #166e69;border-radius:999px;padding:6px 18px;cursor:pointer}
+.lab button:hover{background:#11564f}
+.lab-result{background:#ebf7f2;padding:12px 15px;border-radius:10px;color:#215b54;line-height:1.7}
+.lab-result b{font-size:19px}.lab .small,.small{font-size:14px;color:#5a706c}
+.question{padding:13px 0;border-bottom:1px solid #dae7e3}.question summary{cursor:pointer;font-weight:700}
+.refs{font-size:15px;overflow-wrap:anywhere}.refs li{padding:3px 0}
+.next{display:flex;justify-content:space-between;gap:13px;flex-wrap:wrap;border-top:1px solid #d1dfd9;margin-top:57px;padding-top:22px;font-size:15px}
+.next a{text-decoration:none;font-weight:750}
+@media(max-width:960px){.layout{display:block;margin:0;padding:0}.course-nav{position:static;max-height:none;border-radius:0;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px}.course-nav .brand{margin:0}.course-nav ol{max-height:230px;overflow-y:auto}.paper{border:0;border-radius:0;padding:32px clamp(18px,4vw,45px) 45px}}
+@media(max-width:550px){.course-nav{flex-wrap:wrap}.course-nav .brand{font-size:15px}.paper{padding:25px 17px 38px}.stat-grid,.steps{grid-template-columns:1fr}.lab{padding:15px}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}section{margin-top:54px}figure{padding:8px}.figure-scroll img{width:720px;min-width:720px;max-width:none}.dek{font-size:18px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+@media print{body{background:white;color:black}.layout{display:block;max-width:none;margin:0;padding:0}.skip-link,.course-nav,.jump,.next,.lab button{display:none!important}.paper{padding:0;border:0;box-shadow:none}.paper article{max-width:none}section{margin-top:34px}figure,.lab,.stat{break-inside:avoid}pre{white-space:pre-wrap;overflow:visible;color:#111;background:#eee}a{color:black}}
+</style>
 </head>
 <body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📚 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
-<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
-<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
-<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
-<li><a href="05.html" class="active">第5章 CAN总线位时序与同步</a></li>
-<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
-<li><a href="07.html" class="">第7章 CAN收发器</a></li>
-<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
-<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
-<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
-<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
-<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
-<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
-<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
-<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
-<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
-<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
-<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
-<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
-<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
-<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
-<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
-<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
-<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
-<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
-<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
-<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
-<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
-<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
-<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-        <h2>第5章：CAN总线位时序与同步</h2>
+<a class="skip-link" href="#content">跳转至正文</a>
+<div class="layout">
+<nav class="course-nav" aria-label="课程导航">
+<a class="brand" href="index.html">CAN 总线 · 30 章</a>
+<details><summary>切换章节</summary><ol><li><a href="01.html">第1章 CAN总线概述</a></li>
+<li><a href="02.html">第2章 CAN协议基础</a></li>
+<li><a href="03.html">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html" aria-current="page">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html">第7章 CAN收发器</a></li>
+<li><a href="08.html">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html">第10章 CAN报文发送</a></li>
+<li><a href="11.html">第11章 CAN报文接收</a></li>
+<li><a href="12.html">第12章 CAN中断编程</a></li>
+<li><a href="13.html">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html">第18章 CANopen协议入门</a></li>
+<li><a href="19.html">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html">第22章 J1939协议入门</a></li>
+<li><a href="23.html">第23章 J1939多包传输</a></li>
+<li><a href="24.html">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html">第30章 CAN总线项目实战</a></li></ol></details>
+</nav>
+<main class="paper" id="content"><article>
+<header>
+<div class="eyebrow">CAN 基础知识 · 第五章</div>
+<h1>同样是 500 kbit/s，为什么有的节点听得清，有的会报错？</h1>
+<p class="dek">波特率只规定一位有多长；采样点决定何时认定这位的电平；同步机制负责把各节点的时间基准拉回到合理范围。</p>
+<p>设想两个控制器都被配置为 <strong>500 kbit/s</strong>。一个在位时间的 60% 处采样，另一个在 87.5% 处采样。即使速率计算完全正确，线缆、收发器和振荡器引入的延迟也会让它们面对不同的时序余量。CAN 不传输独立时钟，它依赖总线上的合格跳变沿来维持一致的位边界。</p>
+<p>本章先解释<strong>经典 CAN 的标称位时间</strong>，再推导 STM32 bxCAN 配置。CAN FD 的数据段位时序和次级采样点不在本章范围内。</p>
+<nav class="jump" aria-label="本章目录"><a href="#segments">位时间四段</a><a href="#delay">传播与采样</a><a href="#sync">硬同步 / 重同步</a><a href="#formula">公式计算</a><a href="#lab">交互实验</a><a href="#debug">排错清单</a></nav>
+</header>
 
-<p>各位同学，今天我们来聊聊CAN总线里一个特别关键，但也容易让人犯迷糊的话题——位时序与同步。说实话，我刚开始接触CAN的时候，觉得这部分就是一堆寄存器的配置，没什么大不了的。直到有一次，我在一个车载项目中，总线莫名其妙地丢帧，查了整整两天，最后发现就是同步段配置差了一个Tq。嗯，从那以后，我再也不敢小看这个章节了。</p>
+<section id="segments" aria-labelledby="segments-h">
+<span class="kicker">01 · 先看完整的一位</span>
+<h2 id="segments-h">一个 CAN 位，不是一个瞬间，而是一小段时间</h2>
+<p>把每个标称位拆成若干个 <strong>时间量子 TQ（Time Quantum）</strong>。Bosch CAN 2.0 的概念模型有四段：同步段、传播段、相位缓冲段 1、相位缓冲段 2。四段合起来是一位；其中同步段固定为 1 TQ。<a href="https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-8FAD80F3-8BD3-4A27-A2EB-736FC7248AD4.html">Microchip 位时序说明</a></p>
+<figure><div class="figure-scroll" tabindex="0" aria-label="可横向滚动的技术示意图"><img src="assets/chapter05-bit-timing.svg" width="1020" height="310" loading="lazy" alt="16 TQ 位时间示意：同步段1 TQ、传播段5 TQ、相位段1为8 TQ、相位段2为2 TQ；第14 TQ 后的采样点为87.5%。"></div><figcaption>图 1 · 一个示例拆分：SYNC = 1，PROP = 5，PHASE1 = 8，PHASE2 = 2（总计 16 TQ）。图中 5+8 的划分是解释四段原理所用；在 bxCAN 寄存器中，它们合起来作为 BS1 = 13 配置。</figcaption></figure>
+<div class="table-scroll"><table><thead><tr><th>段</th><th>关键职责</th><th>设置注意</th></tr></thead><tbody>
+<tr><td>SYNC_SEG</td><td>期望在此遇到用于同步的边沿</td><td>固定 1 TQ；不是“上升沿或下降沿任意重置”</td></tr>
+<tr><td>PROP_SEG</td><td>为仲裁与物理链路往返延迟留预算</td><td>取值受具体控制器限制，不能脱离线缆和收发器选</td></tr>
+<tr><td>PHASE_SEG1</td><td>需要时被延长，以吸收<strong>正相位误差</strong></td><td>位采样点位于本段末尾</td></tr>
+<tr><td>PHASE_SEG2</td><td>需要时被缩短，以吸收<strong>负相位误差</strong></td><td>还要满足信息处理时间与控制器要求</td></tr>
+</tbody></table></div>
+<div class="callout"><strong>别把抽象四段直接写进 bxCAN 寄存器。</strong>STM32 bxCAN 只显式配置 <code>BS1</code> 与 <code>BS2</code>：<code>BS1 = PROP_SEG + PHASE_SEG1</code>，<code>BS2 = PHASE_SEG2</code>。实际内部如何分配同步余量，应按控制器技术文档理解；不要因为 BS1 = 13 就声称“传播段天然有 13 TQ”。参见 <a href="https://community.st.com/stm32-mcus-60/can-bxcan-bit-time-configuration-on-stm32-mcus-135466">ST 的 bxCAN 位时序教程</a>。</div>
+</section>
 
-<h3>5.1 位时间结构</h3>
+<section id="delay" aria-labelledby="delay-h">
+<span class="kicker">02 · 再问采样为何不能太早</span>
+<h2 id="delay-h">采样点必须等到远端的电平“来得及被看见”</h2>
+<p>在 <strong>采样点</strong>，接收逻辑判断当前位是显性（0）还是隐性（1）。单点采样可写为：从一位起点到采样点，经过 <code>SYNC_SEG + PROP_SEG + PHASE_SEG1</code>。采样点位置是该累计长度占整个位时间的比例。</p>
+<div class="equation">采样点 = (1 + BS1) / (1 + BS1 + BS2)<br>在 1 + 13 + 2 = 16 TQ 时：14 / 16 = <strong>87.5%</strong></div>
+<p>CAN 的无损仲裁要求节点能够在自己的仲裁位采样时刻看见别的节点拉出的显性电平。若只把“20 米线缆的一次单程传播时间”填入传播补偿，就漏掉了回程影响，以及 TX/RX 电子器件和可能的隔离延迟。</p>
+<figure><div class="figure-scroll" tabindex="0" aria-label="可横向滚动的技术示意图"><img src="assets/chapter05-propagation.svg" width="980" height="314" loading="lazy" alt="CAN 仲裁传播预算：从A到B再返回A，包含双向线缆、发送器和接收器延迟。"></div><figcaption>图 2 · 用往返路径建立传播延迟的直觉。对于近似对称节点可用 <code>2 × (线缆单程延迟 + 驱动器延迟 + 接收器延迟)</code> 估算；非对称节点必须逐方向计算最坏值。参见 <a href="https://www.analog.com/en/resources/analog-dialogue/articles/configure-can-bit-timing.html">Analog Devices 位时序分析</a>。</figcaption></figure>
+<p>“采样点越晚越好”也不准确：采样点后面还需要足够的相位段 2、SJW 和处理时间余量。工程上常见的 <strong>75%～87.5%</strong> 只是可考虑的范围，不是标准对所有拓扑规定的万能答案。必须同时满足速率、传播延迟、振荡器容差、控制器寄存器范围和整网一致性。</p>
+<div class="stat-grid"><div class="stat"><b>2 μs</b><span>500 kbit/s 的标称位时长</span></div><div class="stat"><b>125 ns</b><span>16 TQ / 位时，每个 TQ 的时长</span></div><div class="stat"><b>250 ns</b><span>BS2 = 2 TQ 的标称时长</span></div></div>
+</section>
 
-<p>先说说位时间。一个CAN数据位，在总线上是有固定时间长度的。这个时间被分成了四个小段，就像切蛋糕一样。我个人习惯把这四个段记成：同步段、传播段、相位缓冲段1、相位缓冲段2。</p>
-
-<p>每个段的长度，是用Tq（Time Quantum，时间量子）来衡量的。Tq是CAN控制器的最小时间单位，由系统时钟分频得到。你想想看，一个位时间由多少个Tq组成？这个是可以配置的，通常范围在8到25个Tq之间。</p>
-
-<table>
-  <tr>
-    <th>段名称</th>
-    <th>长度（Tq）</th>
-    <th>作用</th>
-  </tr>
-  <tr>
-    <td>同步段（Sync_Seg）</td>
-    <td>1 Tq</td>
-    <td>用于检测总线上的跳变沿</td>
-  </tr>
-  <tr>
-    <td>传播段（Prop_Seg）</td>
-    <td>1~8 Tq</td>
-    <td>补偿物理延迟</td>
-  </tr>
-  <tr>
-    <td>相位缓冲段1（Phase_Seg1）</td>
-    <td>1~8 Tq</td>
-    <td>用于重同步，可延长</td>
-  </tr>
-  <tr>
-    <td>相位缓冲段2（Phase_Seg2）</td>
-    <td>1~8 Tq</td>
-    <td>用于重同步，可缩短</td>
-  </tr>
-</table>
-
-<p>这里有个关键点：采样点。采样点位于相位缓冲段1和相位缓冲段2之间。说白了，CAN控制器就在这个时刻读取总线电平，判断是显性还是隐性。采样点的位置直接影响通信的可靠性。</p>
-
-<div class="highlight">
-  <p><strong>采样点并不存在适用于所有总线的固定最佳比例。</strong>常见工程配置约75%～87.5%；需要结合线束传播延迟、晶振容差、SJW和控制器寄存器范围验证。</p>
+<section id="sync" aria-labelledby="sync-h">
+<span class="kicker">03 · 时间基准如何被修正</span>
+<h2 id="sync-h">先在 SOF 对齐，再利用帧内跳变微调</h2>
+<p><strong>硬同步</strong>发生在帧开始时符合条件的隐性 → 显性 SOF 边沿；控制器据此重新开始位时间。<strong>重同步</strong>用于帧内满足协议条件的隐性 → 显性边沿，并非“每个跳变都能调整”，也不是每个 TQ 都发生。发送端和接收端对重同步还有具体规则，需遵守控制器实现。</p>
+<figure><div class="figure-scroll" tabindex="0" aria-label="可横向滚动的技术示意图"><img src="assets/chapter05-resynchronization.svg" width="980" height="432" loading="lazy" alt="硬同步对齐SOF；相位误差为正时延长相位段1，为负时缩短相位段2。"></div><figcaption>图 3 · 按 Microchip 的相位误差定义：<code>e &gt; 0</code> 表示合格边沿偏晚，延长 PHASE_SEG1；<code>e &lt; 0</code> 表示边沿偏早，缩短 PHASE_SEG2。这里画的是方向与效果，不是逐 TQ 的真实波形。<a href="https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-792F8F02-385C-4AF9-8A7B-A48A66D4D717.html">Microchip 同步规则</a></figcaption></figure>
+<div class="steps">
+<div class="step"><b>① 建立共同起点</b><p>总线空闲后，节点观察 SOF 的显性边沿，进行硬同步；不是所有数据位都执行硬同步。</p></div>
+<div class="step"><b>② 判断偏差方向</b><p>合格边沿落在期望同步段之后为正误差；落在前面为负误差。<strong>不要倒置符号与补偿方向。</strong></p></div>
+<div class="step"><b>③ 限幅修正</b><p>调整量的绝对值由相位误差与同步跳转宽度 SJW 共同限制，不能无限延长或缩短。</p></div>
 </div>
+<div class="equation">|实际重同步调整| ≤ min(|相位误差|, SJW)</div>
+<p>例如允许 <code>SJW = 2 TQ</code> 时，若合格边沿产生 <code>e = +1 TQ</code>，可延长相位段 1 共 1 TQ；若 <code>e = +3 TQ</code>，单次调整最多 2 TQ。<strong>这只是位时间跟踪，不是修改所有节点的永久晶振频率。</strong></p>
+<p>在 Microchip 对经典 CAN 的说明中，一位时间内最多进行一次重同步，使用隐性 → 显性跳变，并对发送节点的正相位误差重同步有额外例外。具体细节见 <a href="https://www.microchip.com/content/dam/mchp/documents/OTH/ApplicationNotes/ApplicationNotes/00754.pdf">AN754 · Understanding Microchip's CAN Module Bit Timing</a>。</p>
+</section>
 
-<h3>5.2 同步段</h3>
+<section id="formula" aria-labelledby="formula-h">
+<span class="kicker">04 · 从概念转成寄存器数字</span>
+<h2 id="formula-h">算出同一个 500 kbit/s，并不只剩一个答案</h2>
+<p>下列公式使用 <strong>STM32 bxCAN 的语义</strong>：<code>fCAN</code> 必须是实际提供给该 CAN 外设的时钟，不是随意拿 MCU CPU 主频代入。这里的 <code>BRP</code> 表示物理分频系数；寄存器编码值通常比它小 1。<code>BS1</code>、<code>BS2</code> 均表示实际 TQ 数，不是原始寄存器位模式。</p>
+<div class="equation">TQ = BRP / fCAN<br>位时间 = (1 + BS1 + BS2) × TQ<br>bitrate = fCAN / [BRP × (1 + BS1 + BS2)]<br>sample point = (1 + BS1) / (1 + BS1 + BS2)</div>
+<div class="table-scroll"><table><thead><tr><th>可复算示例</th><th>fCAN / BRP</th><th>BS1 / BS2 / SJW</th><th>结果</th></tr></thead><tbody>
+<tr><td>A · 16 MHz</td><td>16 MHz / 2</td><td>13 / 2 / 2</td><td>16 TQ；500 kbit/s；87.5%</td></tr>
+<tr><td>B · 36 MHz</td><td>36 MHz / 4</td><td>14 / 3 / 2</td><td>18 TQ；500 kbit/s；83.33%</td></tr>
+</tbody></table></div>
+<p>两个例子都能得到 500 kbit/s，却把采样点放在不同位置。不能只靠“有相同波特率”判断互操作余量，更不能在只知道 <code>BS1</code> 的情况下直接宣称具备某个特定传播段长度。</p>
+<div class="code-panel"><pre><code># bxCAN 示例 A（数值表示 TQ / 实际分频系数）
+fCAN = 16_000_000  # Hz，实际 CAN 外设时钟
+BRP, BS1, BS2, SJW = 2, 13, 2, 2
 
-<p>同步段固定为1个Tq。它的作用很简单——等待总线上的跳变沿。每个CAN节点都在同步段的上升沿或下降沿处，重新对齐自己的时钟。</p>
+n_tq = 1 + BS1 + BS2           # 16
+tq_ns = 1e9 * BRP / fCAN       # 125 ns
+bitrate = fCAN / (BRP * n_tq)  # 500000 bps
+sample = (1 + BS1) / n_tq      # 0.875
 
-<p>为什么会这样？因为CAN总线没有独立的时钟线。所有节点都靠总线上的电平变化来同步。你想想看，如果每个节点的晶振都有微小偏差，时间长了就会累积误差。同步段就是用来消除这个误差的。</p>
+# HAL 中应对应 Prescaler=2、BS1=13TQ、BS2=2TQ、SJW=2TQ；
+# 需要按实际 STM32 系列的 HAL 头文件选取宏，并核对 CAN 时钟。</code></pre></div>
+<div class="callout"><strong>硬件限制要具体到外设。</strong>对经典 STM32 bxCAN，常见约束为 <code>BRP ∈ [1,1024]</code>、<code>BS1 ∈ [1,16]</code>、<code>BS2 ∈ [1,8]</code>、<code>SJW ∈ [1,4]</code>，且 <code>SJW ≤ BS2</code>。某些其它控制器的 PROP、PHASE、信息处理时间及字段编码规则与 bxCAN 不同；把这组范围当成所有 CAN 控制器的规则会算错。</div>
+</section>
 
-<h3>5.3 传播段</h3>
-
-<p>传播段用来补偿信号在总线上的传输延迟。这个延迟包括：驱动器的延迟、接收器的延迟、以及总线电缆的延迟。</p>
-
-<p>传播补偿必须考虑往返传播路径、收发器延迟和物理线缆延迟。不能简单将“20米单程约100ns”等同于完整的传播段预算；应依据控制器和收发器手册计算最坏情况。</p>
-
-<div class="tip">
-  <p><strong>实战技巧：</strong>我建议传播段至少设为2~3个Tq。别抠门，留点余量。我曾经在一个项目中，为了追求高速，把传播段设成了1个Tq，结果总线长度稍微一长就出问题。后来老老实实改回3个Tq，问题就解决了。</p>
+<section id="lab" aria-labelledby="lab-h">
+<span class="kicker">05 · 改数字，观察结果</span>
+<h2 id="lab-h">交互实验：同一速率可以有不同采样位置吗？</h2>
+<p>先选 16 MHz / 2 / 13 / 2，观察 500 kbit/s 与 87.5%；再切换到 36 MHz / 4 / 14 / 3，比较采样点。下面只验证 <strong>bxCAN 数值约束与算术</strong>，并不能模拟线缆、电磁兼容性或真实的振荡器漂移。</p>
+<div class="lab" id="timing-lab">
+<h3>bxCAN 标称位时序计算器</h3>
+<div class="lab-grid">
+<label for="clock">CAN 时钟<select id="clock"><option value="16000000">16 MHz</option><option value="36000000">36 MHz</option></select></label>
+<label for="brp">分频 BRP<input id="brp" type="number" min="1" max="1024" step="1" value="2" inputmode="numeric"></label>
+<label for="bs1">BS1（TQ）<input id="bs1" type="number" min="1" max="16" step="1" value="13" inputmode="numeric"></label>
+<label for="bs2">BS2（TQ）<input id="bs2" type="number" min="1" max="8" step="1" value="2" inputmode="numeric"></label>
+<label for="sjw">SJW（TQ）<input id="sjw" type="number" min="1" max="4" step="1" value="2" inputmode="numeric"></label>
 </div>
-
-<h3>5.4 相位缓冲段</h3>
-
-<p>相位缓冲段有两个：Phase_Seg1和Phase_Seg2。它们的作用是配合同步机制，动态调整采样点的位置。</p>
-
-<p>Phase_Seg1可以延长，Phase_Seg2可以缩短。延长或缩短的步长，由同步跳转宽度（SJW，Synchronization Jump Width）决定。SJW一般设为1~4个Tq。</p>
-
-<p>这里有个容易踩的坑：SJW不能大于Phase_Seg1和Phase_Seg2的最小值。否则，重同步的时候可能会把采样点调整到错误的位置。嗯，这个细节很多初学者会忽略。</p>
-
-<h3>5.5 同步机制</h3>
-
-<p>同步机制分为两种：硬同步和重同步。说白了，硬同步是「大调整」，重同步是「微调」。</p>
-
-<h4>5.5.1 硬同步</h4>
-
-<p>硬同步发生在总线从空闲状态（隐性）变为开始帧（显性）的时刻。也就是SOF（Start of Frame）位。所有节点检测到这个下降沿后，都会把自己的同步段对齐到这个边沿。</p>
-
-<p>硬同步的特点是：一次性调整到位。调整后，所有节点的位时间起点就一致了。</p>
-
-<div class="warning">
-  <p><strong>注意：</strong>硬同步只在SOF位发生一次。如果在数据帧中间出现硬同步，那说明总线出大问题了。我曾经在调试一个电机控制器时，发现总线上频繁出现硬同步，最后查出是电源干扰导致节点误触发。换了滤波电容后，问题消失。</p>
+<p><button id="preset-b" type="button">切换到 36 MHz 示例</button></p>
+<p class="lab-result" id="calc-result" role="status" aria-live="polite"><b>500.000 kbit/s · 87.50%</b>，共 16 TQ，单 TQ 125.0 ns。</p>
+<p class="small">输入非整数、超出 bxCAN 范围或 SJW 超过 BS2 时，计算器会给出提醒；数值“合法”不代表整网已通过时序预算验证。</p>
 </div>
+<details class="question"><summary>思考：把 BRP=2 改为 4，采样点会改变吗？</summary><p>若 BS1 与 BS2 不变，则<strong>比例不会改变</strong>，仍是 87.5%；但每个 TQ 加倍、位时间加倍，速率会变成 250 kbit/s。采样点位置与实际位速率是不同问题。</p></details>
+<p>想把数值检查落到本地终端，可以运行仓库中的 <a href="examples/can_chapter05_checks.py">参考计算脚本</a>，并通过 <code>python -m unittest discover -s tests -v</code> 运行对应回归测试。它没有声称替代示波器或实机 CAN 控制器。</p>
+</section>
 
-<h4>5.5.2 重同步</h4>
+<section id="debug" aria-labelledby="debug-h">
+<span class="kicker">06 · 回到工程现场</span>
+<h2 id="debug-h">出现 ACK、位错误或偶发掉帧时，先查什么？</h2>
+<ol>
+<li><strong>核对真实 CAN 外设时钟。</strong>时钟树、APB 分频、外设时钟源与代码中的假设是否一致？不要用“CPU 72 MHz”直接代替 CAN 时钟。</li>
+<li><strong>读回 BRP、BS1、BS2、SJW。</strong>确认驱动 API 用的是实际 TQ 还是寄存器减一编码。再由公式算出位速率与采样点。</li>
+<li><strong>比较全网节点的标称位速率。</strong>除速率外，也记录采样点与 SJW；不同器件的容差预算未必相同。</li>
+<li><strong>建立最坏传播预算。</strong>包括最长物理路径、收发器 TX/RX 延迟、隔离器、线缆速度和终端/支线影响。不要只用“每米 5 ns”代替整个环路。</li>
+<li><strong>核对振荡器与物理层。</strong>晶振误差是否处于控制器/协议要求范围？终端电阻、共模干扰、反射、电源完整性是否正常？“超过 1% 一定失败”与“0.5% 一定成功”都不是通用判据。</li>
+<li><strong>做真实测量。</strong>用 CAN 分析仪读取错误状态与重发趋势，用示波器观察波形，必要时更改采样点或降低速率后复测，而不是仅因为软件自检通过就判定硬件稳定。</li>
+</ol>
+<p>一个实用判断方法：先计算出<strong>可实现的参数组合</strong>，再通过最坏路径延迟/时钟误差预算筛选，最后才进入实机压力测试。任何一个环节都不能被“推荐采样点 87.5%”替代。</p>
+</section>
 
-<p>重同步发生在数据帧传输过程中。每个节点在同步段检测到跳变沿后，如果发现这个边沿没有落在自己的同步段内，就会进行微调。</p>
-
-<p>调整规则是这样的：</p>
-<ul>
-  <li>如果边沿落在同步段之前（即相位误差为负），说明本地时钟偏慢，需要延长Phase_Seg1</li>
-  <li>如果边沿落在同步段之后（即相位误差为正），说明本地时钟偏快，需要缩短Phase_Seg2</li>
-</ul>
-
-<p>调整的幅度不能超过SJW。也就是说，每次最多调整SJW个Tq。</p>
-
-<p>你想想看，如果每个节点都这样微调，整个网络的时钟就能保持同步。这就是CAN总线能在没有独立时钟线的情况下，实现可靠通信的秘密。</p>
-
-<h3>5.6 实战配置示例</h3>
-
-<p>假设我们要配置一个500kbps的CAN网络，系统时钟为16MHz，我们来看看怎么算。</p>
-
-<pre><code>// CAN控制器时钟为16 MHz，目标500 kbps
-// Prescaler=2 -&gt; 1 TQ=125ns
-// Sync=1 TQ，BS1=13 TQ，BS2=2 TQ -&gt; 总共16 TQ
-// Bitrate=16MHz/[2*(1+13+2)]=500kbps
-// SamplePoint=(1+13)/(1+13+2)=87.5%
-//
-// 另一例：CAN时钟36MHz，Prescaler=4，BS1=14，BS2=3
-// Bitrate=36MHz/[4*(1+14+3)]=500kbps
-// SamplePoint=15/18≈83.33%</code></pre>
-
-<div class="highlight">
-  <p><strong>正确结论：</strong>16 TQ就可以实现87.5%的采样点（1+13+2），而不是必须至少20或24 TQ。有效位时序组合要满足目标速率、寄存器约束及物理传播延迟。</p>
-</div>
-
-<h3>5.7 避坑指南</h3>
-
-<p>最后，我总结几个实战中容易踩的坑：</p>
-
-<ul>
-  <li><strong>采样点太靠前：</strong>我曾经在一个项目中，采样点设在60%的位置，结果总线长度超过10米就丢帧。后来改到87.5%，问题解决。</li>
-  <li><strong>SJW设得太大：</strong>SJW不是越大越好。设得太大，重同步时调整幅度过大，反而容易引入抖动。我一般设2个Tq。</li>
-  <li><strong>忽略晶振误差：</strong>不同节点的晶振精度不同。如果晶振误差超过1%，即使配置再完美，也会出问题。我建议使用精度在0.5%以内的晶振。</li>
-  <li><strong>传播段设得太小：</strong>特别是长距离总线，传播段一定要留够余量。我一般按每米5ns计算，再加2个Tq的余量。</li>
-</ul>
-
-<p>好了，关于位时序与同步，今天就讲到这里。下一章我们聊聊CAN总线的错误处理机制，那也是个很有意思的话题。</p>
-        <div class="footer-nav">
-            <a href="04.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="06.html">下一章 →</a>
-        </div>
-        
-    </div>
-</div>
-</div>
+<section id="summary" aria-labelledby="summary-h">
+<span class="kicker">07 · 把图像变成判断</span>
+<h2 id="summary-h">记住三个互相独立的问题</h2>
+<p><strong>多久传完一位？</strong>看 <code>fCAN、BRP、TQ/位</code>。<strong>在何时读一位？</strong>看 <code>BS1/BS2</code> 和物理传播延迟。<strong>边沿偏离时如何追上？</strong>看同步规则、PHASE1/PHASE2 与 SJW。理解了三者的分工，才不会把“同样的波特率”误认为“同样的通信余量”。</p>
+<h3>资料与适用边界</h3>
+<ol class="refs">
+<li><a href="https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-8FAD80F3-8BD3-4A27-A2EB-736FC7248AD4.html">Microchip · CAN Bit Timing Configuration</a>：四段定义、传播补偿、TQ 与采样点。</li>
+<li><a href="https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-792F8F02-385C-4AF9-8A7B-A48A66D4D717.html">Microchip · CAN Bus Synchronization</a>：硬同步与相位误差方向。</li>
+<li><a href="https://community.st.com/stm32-mcus-60/can-bxcan-bit-time-configuration-on-stm32-mcus-135466">ST · CAN (bxCAN) bit time configuration</a>：bxCAN 的 BS1、BS2、位速率和采样点的器件表述。</li>
+<li><a href="https://www.analog.com/en/resources/analog-dialogue/articles/configure-can-bit-timing.html">Analog Devices · Configure CAN Bit Timing</a>：物理路径、隔离与传播延迟预算。</li>
+<li><a href="https://www.microchip.com/content/dam/mchp/documents/OTH/ApplicationNotes/ApplicationNotes/00754.pdf">Microchip AN754</a>：同步边沿约束与可复核的说明图。</li>
+</ol>
+<p class="small">内容面向经典 CAN / STM32 bxCAN 标称位时序。不同 CAN 控制器、CAN FD 和具体芯片参考手册的寄存器范围与采样机制可能不同。</p>
+</section>
+<nav class="next" aria-label="章节导航"><a href="04.html">← 第 4 章 · 错误处理</a><a href="index.html">返回总目录</a><a href="06.html">第 6 章 · CAN 控制器 →</a></nav>
+</article></main></div>
+<script>
+(function () {
+  'use strict';
+  var ids = ['brp', 'bs1', 'bs2', 'sjw'];
+  var clock = document.getElementById('clock');
+  var output = document.getElementById('calc-result');
+  var preset = document.getElementById('preset-b');
+  var fields = ids.map(function (id) { return document.getElementById(id); });
+  function render() {
+    var f = Number(clock.value);
+    var values = fields.map(function (el) { return Number(el.value); });
+    var valid = fields.every(function (el, i) {
+      var v = values[i];
+      return el.value.trim() !== '' && Number.isInteger(v) &&
+        v >= Number(el.min) && v <= Number(el.max);
+    });
+    if (!valid) {
+      output.textContent = '请输入合法的整数：BRP 1–1024，BS1 1–16，BS2 1–8，SJW 1–4。';
+      return;
+    }
+    var brp = values[0], bs1 = values[1], bs2 = values[2], sjw = values[3];
+    if (sjw > bs2) {
+      output.textContent = '不符合 bxCAN 示例约束：SJW 不能大于 BS2。';
+      return;
+    }
+    var total = 1 + bs1 + bs2;
+    var kbps = f / (brp * total * 1000);
+    var sample = 100 * (1 + bs1) / total;
+    var tqNs = 1e9 * brp / f;
+    output.textContent = kbps.toFixed(3) + ' kbit/s · 采样点 ' +
+      sample.toFixed(2) + '% · 总计 ' + total + ' TQ · ' +
+      tqNs.toFixed(1) + ' ns/TQ。仅通过数值检查，仍需验证物理延迟与时钟容差。';
+  }
+  fields.forEach(function (el) { el.addEventListener('input', render); });
+  clock.addEventListener('change', render);
+  preset.addEventListener('click', function () {
+    var toB = clock.value !== '36000000';
+    clock.value = toB ? '36000000' : '16000000';
+    var next = toB ? [4, 14, 3, 2] : [2, 13, 2, 2];
+    fields.forEach(function (el, i) { el.value = String(next[i]); });
+    preset.textContent = toB ? '切换回 16 MHz 示例' : '切换到 36 MHz 示例';
+    render();
+  });
+  render();
+}());
+</script>
 </body>
 </html>

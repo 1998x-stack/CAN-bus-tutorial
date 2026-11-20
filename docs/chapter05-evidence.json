@@ -1,0 +1,111 @@
+{
+  "chapter": "05",
+  "scope": "Classical CAN nominal timing; STM32 bxCAN example; excludes CAN FD data phase",
+  "sources": {
+    "microchip_timing": "https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-8FAD80F3-8BD3-4A27-A2EB-736FC7248AD4.html",
+    "microchip_sync": "https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-792F8F02-385C-4AF9-8A7B-A48A66D4D717.html",
+    "microchip_an754": "https://www.microchip.com/content/dam/mchp/documents/OTH/ApplicationNotes/ApplicationNotes/00754.pdf",
+    "st_bxcan": "https://community.st.com/stm32-mcus-60/can-bxcan-bit-time-configuration-on-stm32-mcus-135466",
+    "adi": "https://www.analog.com/en/resources/analog-dialogue/articles/configure-can-bit-timing.html"
+  },
+  "claims": [
+    {
+      "id": "four-segments",
+      "claim": "经典CAN标称位分为同步、传播、相位1、相位2",
+      "status": "verified",
+      "locator": "§50.7.4.1 / Partition of the CAN Bit Time",
+      "source_url": "https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-8FAD80F3-8BD3-4A27-A2EB-736FC7248AD4.html"
+    },
+    {
+      "id": "sync-one-tq",
+      "claim": "SYNC_SEG 固定1 TQ",
+      "status": "verified",
+      "locator": "§50.7.4.1 / SYNC SEG",
+      "source_url": "https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-8FAD80F3-8BD3-4A27-A2EB-736FC7248AD4.html"
+    },
+    {
+      "id": "sample-boundary",
+      "claim": "采样点位于第一相位段末尾",
+      "status": "verified",
+      "locator": "§50.7.4.1 / Sample Point",
+      "source_url": "https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-8FAD80F3-8BD3-4A27-A2EB-736FC7248AD4.html"
+    },
+    {
+      "id": "round-trip",
+      "claim": "传播预算需考虑总线往返及收发器/隔离延迟",
+      "status": "verified",
+      "locator": "Propagation Time / Physical Delay",
+      "source_url": "https://www.analog.com/en/resources/analog-dialogue/articles/configure-can-bit-timing.html"
+    },
+    {
+      "id": "bxcan-map",
+      "claim": "bxCAN BS1 合并 PROP_SEG 与 PHASE_SEG1；BS2对应PHASE_SEG2",
+      "status": "verified",
+      "locator": "bxCAN bit time / Nominal bit time figure",
+      "source_url": "https://community.st.com/stm32-mcus-60/can-bxcan-bit-time-configuration-on-stm32-mcus-135466"
+    },
+    {
+      "id": "synchronization",
+      "claim": "硬同步在帧起始 SOF；帧内为重同步",
+      "status": "verified",
+      "locator": "§50.7.4.1.1",
+      "source_url": "https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-792F8F02-385C-4AF9-8A7B-A48A66D4D717.html"
+    },
+    {
+      "id": "positive-error",
+      "claim": "e>0：PhaseSeg1 延长",
+      "status": "verified",
+      "locator": "§50.7.4.1.1 / Positive phase error",
+      "source_url": "https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-792F8F02-385C-4AF9-8A7B-A48A66D4D717.html"
+    },
+    {
+      "id": "negative-error",
+      "claim": "e<0：PhaseSeg2 缩短",
+      "status": "verified",
+      "locator": "§50.7.4.1.1 / Negative phase error",
+      "source_url": "https://onlinedocs.microchip.com/oxy/GUID-4D282FC5-82FC-4934-8BAD-D4A5D8422E6C-en-US-7/GUID-792F8F02-385C-4AF9-8A7B-A48A66D4D717.html"
+    },
+    {
+      "id": "eligible-edges",
+      "claim": "帧内同步不是每个跳变都能使用",
+      "status": "verified",
+      "locator": "AN754 / Resynchronization rules",
+      "source_url": "https://www.microchip.com/content/dam/mchp/documents/OTH/ApplicationNotes/ApplicationNotes/00754.pdf"
+    },
+    {
+      "id": "brp-sample-formula",
+      "claim": "bxCAN bitrate=fCAN/[BRP*(1+BS1+BS2)]，采样点=(1+BS1)/总TQ",
+      "status": "derived",
+      "locator": "§bxCAN / CAN bit timing equations",
+      "source_url": "https://community.st.com/stm32-mcus-60/can-bxcan-bit-time-configuration-on-stm32-mcus-135466"
+    },
+    {
+      "id": "16mhz-example",
+      "claim": "16MHz/2/(1+13+2)=500kbps，14/16=87.5%",
+      "status": "derived",
+      "locator": "章节5.4算例A / examples/can_chapter05_checks.py",
+      "source_url": "https://community.st.com/stm32-mcus-60/can-bxcan-bit-time-configuration-on-stm32-mcus-135466"
+    },
+    {
+      "id": "36mhz-example",
+      "claim": "36MHz/4/(1+14+3)=500kbps，15/18≈83.33%",
+      "status": "derived",
+      "locator": "章节5.4算例B / examples/can_chapter05_checks.py",
+      "source_url": "https://community.st.com/stm32-mcus-60/can-bxcan-bit-time-configuration-on-stm32-mcus-135466"
+    },
+    {
+      "id": "no-universal-sample",
+      "claim": "采样点需按传播延迟、分频器与限制综合优化",
+      "status": "verified",
+      "locator": "Setting the sample point later / restrictions",
+      "source_url": "https://www.analog.com/en/resources/analog-dialogue/articles/configure-can-bit-timing.html"
+    },
+    {
+      "id": "didactic-split",
+      "claim": "PROP=5、PHASE1=8的分配只是16TQ示意，不是bxCAN显式寄存器",
+      "status": "illustrative",
+      "locator": "图1注释 / BS1=13",
+      "source_url": "https://community.st.com/stm32-mcus-60/can-bxcan-bit-time-configuration-on-stm32-mcus-135466"
+    }
+  ]
+}
