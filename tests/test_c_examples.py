@@ -86,28 +86,12 @@ int main(void) {
         self.compile_and_run(source.replace("CAN_SendStd(", function_name + "("))
 
     def test_chapter_27_signal_decode(self):
-        source = r"""
-#include <stdint.h>
-#include <stddef.h>
-#include <assert.h>
-""" + snippet("27", 0) + "\n" + snippet("27", 1) + r"""
-int main(void) {
-    CanFrame_t frame = {0};
-    frame.id = 0x100;
-    frame.dlc = 3;
-    frame.data[1] = 0xB8;
-    frame.data[2] = 0x0B;
-    float v = Protocol_GetVehicleSpeed(&frame);
-    assert(v > 29.99f && v < 30.01f);
-    frame.dlc = 2;
-    assert(Protocol_GetVehicleSpeed(&frame) == -1.0f);
-    frame.dlc = 3;
-    frame.is_ext = 1;
-    assert(Protocol_GetVehicleSpeed(&frame) == -1.0f);
-    return 0;
-}
-"""
+        """Run the new portable chapter 27 pipeline example, including negative cases."""
+        source = (ROOT / "examples" / "can_ch27_pipeline.c").read_text(
+            encoding="utf-8"
+        )
         self.compile_and_run(source)
+
 
 
 if __name__ == "__main__":
