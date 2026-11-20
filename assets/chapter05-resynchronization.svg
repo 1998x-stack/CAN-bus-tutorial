@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 432" role="img" aria-labelledby="title desc">
+<title id="title">CAN 硬同步、正相位误差及负相位误差的处理</title>
+<desc id="desc">SOF 隐性到显性跳变触发硬同步。帧内合格的隐性到显性边沿晚于期望的同步段，为正相位误差，延长第一相位段。边沿早于期望的同步段，为负相位误差，缩短第二相位段。每次调整最多 SJW。</desc>
+<rect width="980" height="432" rx="18" fill="#fffdf9"/>
+<g font-family="system-ui,'Microsoft YaHei',sans-serif" fill="#203035">
+<text x="36" y="37" font-size="23" font-weight="750">两种同步：建立起点，再追踪边沿</text>
+<rect x="35" y="56" width="910" height="94" rx="12" fill="#e8f4f1"/>
+<text x="56" y="83" font-size="19" font-weight="700">① 硬同步 · SOF</text>
+<text x="56" y="110" font-size="15">总线空闲后，SOF 的隐性 → 显性跳变将本地位时间重新对齐</text>
+<path d="M690 88 H740 V121 H850" fill="none" stroke="#147f80" stroke-width="4"/>
+<line x1="740" y1="72" x2="740" y2="133" stroke="#c15f45" stroke-width="2" stroke-dasharray="4 5"/>
+<text x="865" y="117" font-size="14" fill="#147f80">显性 0</text>
+<rect x="35" y="163" width="442" height="204" rx="12" fill="#f2f8fb" stroke="#c6dce6"/>
+<text x="56" y="192" font-size="19" font-weight="700">② 边沿偏晚（e &gt; 0）</text>
+<text x="56" y="220" font-size="15">实际边沿在预期同步段之后</text>
+<line x1="96" y1="255" x2="415" y2="255" stroke="#829b9d" stroke-width="3"/>
+<line x1="175" y1="235" x2="175" y2="276" stroke="#9f9a8e" stroke-dasharray="5 5" stroke-width="3"/>
+<line x1="235" y1="235" x2="235" y2="276" stroke="#147f80" stroke-width="3"/>
+<text x="163" y="287" font-size="13" fill="#56686d">预期</text><text x="222" y="287" font-size="13" fill="#147f80">实际</text>
+<path d="M180 249 H229 l-8 -6 m8 6 l-8 6" stroke="#147f80" stroke-width="2" fill="none"/>
+<text x="56" y="320" font-size="16" font-weight="700" fill="#175a65">延长 PHASE_SEG1</text>
+<text x="56" y="345" font-size="14" fill="#56686d">本位采样点向后微调；幅度 ≤ SJW</text>
+<rect x="503" y="163" width="442" height="204" rx="12" fill="#fcf4e8" stroke="#e2d3b9"/>
+<text x="525" y="192" font-size="19" font-weight="700">③ 边沿偏早（e &lt; 0）</text>
+<text x="525" y="220" font-size="15">实际边沿在预期同步段之前</text>
+<line x1="565" y1="255" x2="885" y2="255" stroke="#829b9d" stroke-width="3"/>
+<line x1="719" y1="235" x2="719" y2="276" stroke="#9f9a8e" stroke-dasharray="5 5" stroke-width="3"/>
+<line x1="658" y1="235" x2="658" y2="276" stroke="#b67635" stroke-width="3"/>
+<text x="709" y="287" font-size="13" fill="#56686d">预期</text><text x="643" y="287" font-size="13" fill="#9a6631">实际</text>
+<path d="M709 249 H666 l8 -6 m-8 6 l8 6" stroke="#b67635" stroke-width="2" fill="none"/>
+<text x="525" y="320" font-size="16" font-weight="700" fill="#8b5b28">缩短 PHASE_SEG2</text>
+<text x="525" y="345" font-size="14" fill="#56686d">当前位提前结束；幅度 ≤ SJW</text>
+<text x="35" y="403" font-size="14" fill="#52666b">示意图：边沿位移被放大，仅用于表示相位误差方向，不按实际 TQ 比例绘制。</text>
+</g></svg>
