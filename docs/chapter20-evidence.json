@@ -1,0 +1,69 @@
+{
+  "chapter": 20,
+  "scope": "Classic CANopen CiA 301 / examples; source anchors and assumptions",
+  "claims": [
+    {
+      "id": "sdo-roles",
+      "claim": "Upload reads from server and download writes to server, using client-server roles.",
+      "kind": "protocol",
+      "source_url": "https://www.can-cia.org/can-knowledge/sdo-protocol",
+      "locator": "SDO protocol overview",
+      "status": "verified",
+      "notes": "Classic CANopen context"
+    },
+    {
+      "id": "expedited",
+      "claim": "4F/4B/47/43 represent successful 1/2/3/4-byte expedited upload responses.",
+      "kind": "protocol",
+      "source_url": "https://canopennode.github.io/CANopenNode/group__CO__SDOserver.html",
+      "locator": "CO_SDO_ST_UPLOAD_INITIATE_RSP, command bit pattern 0100nnes",
+      "status": "verified",
+      "notes": "Byte 4 starts payload"
+    },
+    {
+      "id": "abort",
+      "claim": "0x80 identifies SDO Abort and bytes 4–7 carry the little-endian abort code.",
+      "kind": "protocol",
+      "source_url": "https://canopennode.github.io/CANopenNode/group__CO__SDOserver.html",
+      "locator": "CO_SDO_ST_ABORT",
+      "status": "verified",
+      "notes": "0x06020000 means object not found"
+    },
+    {
+      "id": "segment-toggle",
+      "claim": "Segment upload uses 011t0000 requests and 000tnnnc replies, up to seven bytes per segment.",
+      "kind": "protocol",
+      "source_url": "https://canopennode.github.io/CANopenNode/group__CO__SDOserver.html",
+      "locator": "CO_SDO_ST_UPLOAD_SEGMENT_REQ/RSP",
+      "status": "verified",
+      "notes": "Toggle starts at zero; n is unused bytes"
+    },
+    {
+      "id": "segment-example",
+      "claim": "A 10-byte response can comprise a 7-byte segment followed by a 3-byte segment with command 0x19.",
+      "kind": "calculation",
+      "source_url": "https://canopennode.github.io/CANopenNode/group__CO__SDOserver.html",
+      "locator": "Segment response command bit layout, and reference/canopen_ch19_21.py",
+      "status": "derived",
+      "notes": "1<<4 + (7-3)<<1 + 1 = 0x19"
+    },
+    {
+      "id": "block-ack",
+      "claim": "Block acknowledgement 0xA2 contains ackseq and following block size rather than bitmap.",
+      "kind": "protocol",
+      "source_url": "https://canopennode.github.io/CANopenNode/group__CO__SDOserver.html",
+      "locator": "CO_SDO_ST_DOWNLOAD_BLK_SUBBLOCK_RSP / UPLOAD_BLK_SUBBLOCK_CRSP",
+      "status": "verified",
+      "notes": "Do not confuse with segment toggle"
+    },
+    {
+      "id": "example-values",
+      "claim": "Object 0x2000:01 and returned 0x1234 are teaching-only data.",
+      "kind": "protocol",
+      "source_url": "https://canopennode.github.io/CANopenNode/group__CO__SDOserver.html",
+      "locator": "Example in #expedited",
+      "status": "illustrative",
+      "notes": "Not a claim about an actual vendor object dictionary"
+    }
+  ]
+}
