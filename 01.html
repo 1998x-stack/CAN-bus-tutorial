@@ -1,315 +1,222 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>第1章 CAN总线概述</title>
-    <link rel="stylesheet" href="theme.css">
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            padding: 20px;
-        }
-        /* 双边框设计：外边框 + 内阴影 */
-        .double-border {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #ffffff;
-            border: 2px solid #f1c40f;
-            border-radius: 24px;
-            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
-            overflow: hidden;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 0;
-        }
-        .sidebar {
-            background: #fefcf5;
-            border-right: 2px solid #fdebb3;
-            padding: 24px 16px;
-        }
-        .sidebar h3 {
-            font-size: 1.4rem;
-            color: #b45f06;
-            border-left: 5px solid #f39c12;
-            padding-left: 15px;
-            margin-bottom: 25px;
-        }
-        .chapter-list {
-            list-style: none;
-        }
-        .chapter-list li {
-            margin-bottom: 6px;
-        }
-        .chapter-list a {
-            display: block;
-            padding: 8px 12px;
-            text-decoration: none;
-            color: #2c3e50;
-            border-radius: 12px;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .chapter-list a:hover {
-            background: #fdebd0;
-            transform: translateX(3px);
-        }
-        .chapter-list .active {
-            background: #3b82f6;
-            color: white;
-            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
-        }
-        .main-content {
-            padding: 30px 35px;
-            background: white;
-        }
-        .footer-nav {
-            margin-top: 45px;
-            padding-top: 20px;
-            border-top: 2px solid #f0e6d2;
-            display: flex;
-            justify-content: space-between;
-        }
-        .footer-nav a {
-            padding: 8px 24px;
-            background: #f1f5f9;
-            text-decoration: none;
-            color: #1e40af;
-            border-radius: 40px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .footer-nav a:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            color: #64748b;
-            border-top: 1px dashed #e2e8f0;
-            font-size: 0.9rem;
-        }
-        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
-        h3 { color: #2c3e50; margin: 20px 0 10px; }
-        pre {
-            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
-            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
-        }
-        table {
-            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
-        }
-        th, td {
-            border: 1px solid #fcd34d; padding: 10px; text-align: left;
-        }
-        th { background: #fffbeb; }
-        .tip, .warning, .highlight {
-            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
-        }
-        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
-        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
-        .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第一章 · CAN 总线概述 — 从共享介质到差分信号</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+:root{--paper:#fffdf9;--ink:#203035;--muted:#53676d;--teal:#147f80;--border:#d9e6e3;--warm:#fff6e9}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;padding:0;background:#edf5f3;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.85}
+a{color:#126a71;text-underline-offset:3px}a:hover{color:#8c4d20}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #147f80;outline-offset:4px}
+.skip{position:absolute;top:-60px;left:15px;background:#fff;padding:8px 15px;z-index:5}.skip:focus{top:10px}
+.layout{max-width:1310px;margin:24px auto;display:grid;grid-template-columns:246px minmax(0,1fr);gap:28px;padding:0 18px;align-items:start}
+.course-nav{position:sticky;top:20px;border:1px solid #d8e5e1;background:#fff;border-radius:15px;padding:19px;max-height:calc(100vh - 40px);overflow-y:auto;font-size:14px;line-height:1.55}
+.course-nav .nav-brand{font-size:18px;font-weight:750;text-decoration:none;color:#214d4a;display:block;margin-bottom:12px}
+.course-nav summary{cursor:pointer;font-weight:650;color:#3e625d}
+.course-nav ol{list-style:none;margin:14px 0 0;padding:0}.course-nav li{margin:0}.course-nav li a{display:block;border-radius:7px;padding:5px 7px;color:#4c6268;text-decoration:none;font-size:13px}
+.course-nav li a[aria-current]{background:#e2f2ee;font-weight:750;color:#09695e}
+.course-nav li a:hover{background:#f3f4f4}
+.paper{background:var(--paper);padding:48px clamp(22px,5vw,72px) 60px;border:1px solid #e4e9e6;border-radius:16px;box-shadow:0 9px 35px #163f3810;min-width:0}
+.paper article{max-width:820px;margin:0 auto}
+.eyebrow{font-size:14px;font-weight:750;letter-spacing:.1em;color:#1a7c74}
+h1{font-size:clamp(34px,4vw,48px);line-height:1.23;letter-spacing:-.025em;margin:12px 0 20px;color:#1a3838}
+.dek{font-size:20px;line-height:1.7;color:#465d63;margin:0 0 24px}
+.jump{display:flex;flex-wrap:wrap;gap:10px;margin:23px 0 0}.jump a{border:1px solid #cfe4df;padding:5px 12px;border-radius:20px;text-decoration:none;font-size:14px;background:#f5fbf8}
+section{margin-top:70px}h2{font-size:clamp(24px,2.8vw,31px);color:#1a4442;border:0;padding:0;line-height:1.35;margin:0 0 22px}h3{font-size:21px;margin:30px 0 10px;color:#254e4b}p{margin:15px 0;line-height:1.86;color:var(--ink)}strong{color:#1a4240}
+.kicker{font-size:13px;letter-spacing:.08em;font-weight:700;color:#9a6231;display:block;margin-bottom:8px}
+figure{margin:30px 0;padding:18px;border:1px solid var(--border);border-radius:14px;background:#fff;min-width:0}
+figure img,figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:14px;line-height:1.65;color:var(--muted);margin-top:12px}
+.compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px 0}.stat{border-left:3px solid #27877b;background:#f1faf7;padding:12px 16px;border-radius:7px}.stat b{display:block;font-size:23px;color:#17655e}
+.callout{border-left:4px solid #d49a4e;background:#fff7e9;padding:12px 19px;margin:25px 0;border-radius:0 9px 9px 0}
+.table-scroll{overflow-x:auto;margin:24px 0}table{width:100%;border-collapse:collapse;min-width:540px;font-size:15px;background:#fff}th,td{padding:12px;border-bottom:1px solid #dce9e4;text-align:left;vertical-align:top}th{background:#eff7f4;color:#31564e;font-weight:700}
+.equation{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:18px;background:#eff7f5;border:1px solid #d4e6e0;padding:17px;border-radius:9px;margin:20px 0;overflow-wrap:anywhere}
+.demo-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:15px 0}
+.demo-controls button{font:inherit;border:1px solid #8fbfb6;background:#fff;color:#235955;border-radius:999px;padding:5px 18px;cursor:pointer}
+.demo-controls button[aria-pressed="true"]{background:#166e69;color:#fff;border-color:#166e69}
+#signal-svg[data-selected="recessive"] #dominant-panel{stroke:#bac8da;stroke-width:2}
+#signal-svg[data-selected="recessive"] #recessive-panel{stroke:#5aaba1;stroke-width:3}
+#signal-svg[data-selected="dominant"] #recessive-panel{opacity:.66}
+#signal-svg[data-selected="recessive"] #dominant-panel{opacity:.66}
+.demo-result{background:#f1faf7;border-radius:9px;padding:12px 16px;font-weight:650;color:#235d57}
+pre{background:#1b3335;color:#f0f8f5;padding:20px;border-radius:11px;overflow-x:auto;font-size:14px;line-height:1.65}
+pre code{background:transparent;color:inherit;padding:0}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}
+.small{font-size:14px;color:#5b706d}
+summary{cursor:pointer;font-weight:650}
+details.question{border-bottom:1px solid #dce6e2;padding:12px 0}
+.refs{font-size:15px;overflow-wrap:anywhere}
+.refs li{padding:3px 0}
+.next{display:flex;flex-wrap:wrap;justify-content:space-between;gap:15px;border-top:1px solid #cfdfda;margin-top:54px;padding-top:22px;font-size:15px}
+.next a{text-decoration:none;font-weight:650}
+@media(max-width:900px){.layout{grid-template-columns:minmax(0,1fr);margin:0;gap:0;padding:0}.course-nav{position:static;max-height:none;border-radius:0;padding:10px 20px;display:flex;align-items:center;gap:16px;justify-content:space-between}.course-nav .nav-brand{margin:0}.course-nav details{position:relative}.course-nav ol{max-height:260px;overflow-y:auto}.paper{border:0;border-radius:0;padding:30px clamp(18px,4vw,45px) 45px}}
+@media(max-width:480px){.paper{padding:26px 18px 38px}.compare{grid-template-columns:1fr}figure{padding:8px}section{margin-top:55px}.course-nav{font-size:13px;flex-wrap:wrap}.course-nav .nav-brand{font-size:15px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+@media print{body{background:#fff;color:#000}.layout{display:block;max-width:none;margin:0;padding:0}.skip,.course-nav,.jump,.demo-controls,.next{display:none!important}.paper{border:0;padding:0;box-shadow:none}.paper article{max-width:none}section{margin-top:35px}figure{break-inside:avoid}a{color:#000}pre{white-space:pre-wrap;overflow:visible}}
+</style>
 </head>
 <body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📚 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html" class="active">第1章 CAN总线概述</a></li>
-<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
-<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
-<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
-<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
-<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
-<li><a href="07.html" class="">第7章 CAN收发器</a></li>
-<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
-<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
-<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
-<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
-<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
-<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
-<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
-<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
-<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
-<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
-<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
-<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
-<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
-<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
-<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
-<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
-<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
-<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
-<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
-<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
-<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
-<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
-<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-        <h2>第一章：CAN总线概述</h2>
+<a class="skip" href="#content">跳转至正文</a>
+<div class="layout">
+<nav class="course-nav" aria-label="课程导航"><a class="nav-brand" href="index.html">CAN 总线课程</a><details><summary>切换章节（共 30 章）</summary><ol><li><a href="01.html" aria-current="page">第1章 CAN总线概述</a></li>
+<li><a href="02.html">第2章 CAN协议基础</a></li>
+<li><a href="03.html">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html">第7章 CAN收发器</a></li>
+<li><a href="08.html">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html">第10章 CAN报文发送</a></li>
+<li><a href="11.html">第11章 CAN报文接收</a></li>
+<li><a href="12.html">第12章 CAN中断编程</a></li>
+<li><a href="13.html">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html">第18章 CANopen协议入门</a></li>
+<li><a href="19.html">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html">第22章 J1939协议入门</a></li>
+<li><a href="23.html">第23章 J1939多包传输</a></li>
+<li><a href="24.html">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html">第30章 CAN总线项目实战</a></li></ol></details></nav>
+<main class="paper" id="content"><article><header class="article-header">
+<div class="eyebrow">CAN 基础知识 · 第一章</div>
+<h1>CAN 总线：为什么一对线能让多个控制器协作？</h1>
+<p class="dek">从一辆车里的通信难题出发，逐步理解 CAN 的共享总线、差分电平、终端匹配与工程边界。</p>
+<p>假设车速、发动机转速、车门状态都需要送给仪表、车身控制器和诊断设备：每增加一个接收方，就单独拉一组信号线吗？CAN 的关键思路不是让所有设备彼此直连，而是让多个节点<strong>共享一条通信介质</strong>，用报文标识符说明“这是什么数据”。</p>
+<nav aria-label="本章跳转" class="jump"><a href="#why">共享总线</a><a href="#history">发展脉络</a><a href="#signals">差分电平</a><a href="#wiring">布线与终端</a><a href="#limits">工程边界</a><a href="#try">动手验证</a></nav>
+</header>
 
-<p>大家好，我是你们的讲师。在汽车电子这行摸爬滚打十几年，CAN总线可以说是我最熟悉的"老伙计"了。今天咱们就来聊聊这个看似简单、实则门道不少的话题。</p>
+<section id="why" aria-labelledby="why-title"><span class="kicker">01 · 从布线问题理解设计</span>
+<h2 id="why-title">每个 ECU 都要和所有 ECU 直接连线吗？</h2>
+<p>传统的点到点信号连线容易随着功能增加而变复杂。CAN（Controller Area Network，控制器局域网）允许多个控制器在同一条逻辑总线上发送、监听报文；接收方通过标识符过滤感兴趣的数据，而不是每个报文都携带一个“目标设备地址”。</p>
+<figure><img src="assets/chapter01-network.svg" width="800" height="350" alt="左侧是多组独立信号线，右侧三个 ECU 通过收发器接入同一对 CAN_H 与 CAN_L 信号线。" loading="lazy"/><figcaption>图 1 · CAN 复用的是通信通道，而不是替代供电、接地与所有其他线束；每个节点还需要控制器、收发器及相应电源设计。</figcaption></figure>
+<p>多个节点都能尝试发言，那么如何避免互相把数据撞坏？CAN 采用<strong>逐位无破坏仲裁</strong>：在仲裁阶段，显性位 <code>0</code> 覆盖隐性位 <code>1</code>，发送隐性却读到显性的节点主动退出竞争，优先级较高的报文继续。更细的仲裁时序将在<a href="03.html">第三章</a>拆解。</p>
+<div class="callout"><strong>一个重要区分：</strong>“多主”指节点可主动请求发送，不代表它们在任一时刻可以各自占用总线传输不同报文。CAN 共享介质上一次只有一帧成功占用传输时隙。</div>
+</section>
 
-<h3>1.1 CAN总线的发展历史</h3>
+<section id="history" aria-labelledby="history-title"><span class="kicker">02 · 为什么它被广泛使用</span>
+<h2 id="history-title">CAN 的发展：可靠通信先于更高带宽</h2>
+<p>20 世纪 80 年代，随着车内电子设备增多，博世开始开发适合分布式控制的串行网络。按 <a href="https://www.can-cia.org/can-knowledge/history-of-can-technology">CAN in Automation（CiA）的历史记录</a>，CAN 于 <strong>1986 年</strong>在 SAE 大会上公开介绍，随后进入标准化与量产应用。</p>
+<div class="table-scroll"><table><thead><tr><th>时间</th><th>事件</th><th>意义</th></tr></thead><tbody>
+<tr><td>1983 年</td><td>博世启动相关串行通信研发</td><td>降低分散信号连接的复杂度</td></tr>
+<tr><td>1986 年</td><td>在 SAE 大会上公开 CAN</td><td>明确共享总线的控制通信方案</td></tr>
+<tr><td>1993 年</td><td>CAN 进入 ISO 11898 标准体系</td><td>协议和物理层逐步规范化</td></tr>
+<tr><td>2012 年</td><td>博世推出 CAN FD</td><td>扩展单帧数据容量，并允许数据阶段使用更高位速率</td></tr>
+</tbody></table></div>
+<p>传统 CAN（Classical CAN）单帧最多承载 <strong>8 字节</strong>数据；CAN FD 将上限扩至 <strong>64 字节</strong>。CAN FD 的数据阶段可在启用位速率切换（BRS）时高于仲裁阶段，但实际可用速率由控制器、收发器、线缆与网络时序共同决定，<strong>不是任何 CAN FD 网络都固定跑在 8 Mbit/s</strong>。参见 <a href="https://www.bosch-semiconductors.com/products/ip-modules/can-protocols/can-fd/">Bosch 的 CAN FD 介绍</a>。</p>
+<p>今天的车辆可在不同网络分区并用 CAN、CAN FD、LIN 或以太网。CAN FD 是扩展，不等于所有传统 CAN 节点已被取代；不同协议与控制器之间的兼容性必须明确设计。</p>
+<h3>它通常承载什么？</h3>
+<p>例如动力总成的状态量、底盘的控制与反馈、车身控制的开关状态、诊断与网关的状态消息。具体是否采用 CAN、使用哪种速率、报文优先级和网络隔离方案，均取决于整车架构、实时性及安全分析，不能仅按“动力一定 500 kbit/s，车身一定 125 kbit/s”套用。</p>
+</section>
 
-<p>说到CAN总线，得从上世纪80年代说起。那时候汽车里的电子设备越来越多，线束复杂得像蜘蛛网。我记得刚入行时，老师傅跟我说过一句话："一辆豪华车的线束，拉直了能绕操场一圈。"这话一点都不夸张。</p>
+<section id="signals" aria-labelledby="signals-title"><span class="kicker">03 · 从逻辑位到两根线</span>
+<h2 id="signals-title">为什么 <code>0</code> 能覆盖 <code>1</code>？</h2>
+<p>在典型的 <strong>ISO 11898-2 高速 CAN</strong>物理层中，收发器把控制器的逻辑位转换成两线电压差。显性（逻辑 0）时，CAN_H 典型约 <strong>3.5 V</strong>、CAN_L 约 <strong>1.5 V</strong>；隐性（逻辑 1）时，两线都典型约 <strong>2.5 V</strong>。这些是入门示意的典型值，实际判决须查目标收发器的数据手册与标准约束。<a href="https://www.can-cia.org/can-knowledge/can-hs-transmission">CiA 高速 CAN 传输说明</a>。</p>
+<div class="equation" aria-label="差分电压等于CAN高线电压减去CAN低线电压">V<sub>diff</sub> = V<sub>CAN_H</sub> − V<sub>CAN_L</sub></div>
+<figure class="signal-figure">
+<svg xmlns="http://www.w3.org/2000/svg" id="signal-svg" viewBox="0 0 640 280" role="img" aria-labelledby="signal-title signal-desc" data-selected="dominant">
+<title id="signal-title">高速 CAN 的典型显性与隐性差分电平</title>
+<desc id="signal-desc">左侧为显性逻辑零：CAN_H 约3.5伏，CAN_L 约1.5伏。右侧为隐性逻辑一：两线都约2.5伏。数值是典型示意而非全部收发器的绝对判决阈值。</desc>
+<rect x="8" y="8" width="304" height="264" rx="15" fill="#f0fbf7" stroke="#5aaba1" stroke-width="3" id="dominant-panel"/>
+<rect x="328" y="8" width="304" height="264" rx="15" fill="#f6f7fb" stroke="#bac8da" stroke-width="2" id="recessive-panel"/>
+<g font-family="Arial,sans-serif" text-anchor="middle"><text x="160" y="46" fill="#145c56" font-size="23" font-weight="700">显性 · 0</text><text x="480" y="46" fill="#465c6e" font-size="23" font-weight="700">隐性 · 1</text></g>
+<g stroke="#a6b9b9" stroke-width="1.5" stroke-dasharray="5 6"><path d="M34 143 H285 M356 143 H606"/></g>
+<g stroke-linecap="round" stroke-width="7"><path d="M54 91 H265" stroke="#007f86"/><path d="M54 195 H265" stroke="#d37e40"/><path d="M374 143 H585" stroke="#007f86"/><path d="M374 158 H585" stroke="#d37e40"/></g>
+<g font-family="Arial,sans-serif" font-size="18" text-anchor="middle"><text x="160" y="81" fill="#007079">CAN_H ≈ 3.5 V</text><text x="160" y="222" fill="#ac622e">CAN_L ≈ 1.5 V</text><text x="480" y="119" fill="#007079">CAN_H ≈ 2.5 V</text><text x="480" y="187" fill="#ac622e">CAN_L ≈ 2.5 V</text></g>
+<g font-family="Arial,sans-serif" font-size="17" text-anchor="middle"><text x="160" y="256" fill="#3d6260">差分 ≈ 2 V</text><text x="480" y="256" fill="#596a78">差分 ≈ 0 V</text></g>
+</svg>
+<figcaption>图 2 · 横线表示典型电平示意，不是带时间轴的示波器波形。显性差分约 2 V，隐性差分约 0 V；即使两根线一起受到一定的共模干扰，接收端仍可主要观察电压差。</figcaption></figure>
+<div class="demo-controls" role="group" aria-label="选择总线逻辑状态"><button type="button" data-bit="dominant" aria-pressed="true">显性 0</button><button type="button" data-bit="recessive" aria-pressed="false">隐性 1</button></div>
+<p id="demo-status" class="demo-result" aria-live="polite">当前：显性 0 → CAN_H ≈ 3.5 V，CAN_L ≈ 1.5 V，差分 ≈ 2 V。</p>
+<p class="small">点击切换是为了比较电压关系；没有模拟驱动器电流、线上传播延迟或接收器容限。</p>
+<p>“显性优先”不仅是软件约定，还依赖收发器在仲裁模式下实现的物理层行为。高层的消息优先级取决于标识符仲裁顺序；两者结合，才让多节点争用有确定结果。</p>
+</section>
 
-<p>1983年，德国博世公司开始研发一种新的串行通信协议。说白了，就是要用两根线代替原来几十根甚至上百根线。1986年，CAN（Controller Area Network）协议正式发布。嗯，这里要注意，最初的目标就是解决汽车内部点对点连线的痛点。</p>
+<section id="wiring" aria-labelledby="wiring-title"><span class="kicker">04 · 从一对线到一条网络</span>
+<h2 id="wiring-title">为什么两端要接终端电阻？</h2>
+<p>常见高速 CAN 布线推荐<strong>线型主干</strong>，节点经尽可能短的支线接入。主干的两个物理端点通常分别放置一只与电缆特性阻抗相匹配的 <strong>120 Ω</strong>终端电阻，帮助减少反射。这里说的是高速 CAN 的典型方案；其他 CAN 物理层不一定使用同样的终端方式。<a href="https://www.can-cia.org/can-knowledge/designing-a-can-network">CiA 网络设计建议</a>。</p>
+<figure><img src="assets/chapter01-topology.svg" width="800" height="310" alt="高速 CAN 线型总线，两端各有120欧姆终端电阻，三个中间节点接在同一 CAN_H 与 CAN_L 主干线上。" loading="lazy"/><figcaption>图 3 · 终端位于主干的两个物理端点，不在每个节点重复增加；支线长度需根据速率、传播延迟和信号完整性评估。</figcaption></figure>
+<p>在<strong>总线断电</strong>且可确认两只 120 Ω 终端并联、没有其他影响测量的负载时，用万用表测 CAN_H 与 CAN_L 之间的等效电阻，预期约为 <strong>60 Ω</strong>：</p>
+<div class="equation">R<sub>eq</sub> = (1/120 Ω + 1/120 Ω)<sup>−1</sup> = 60 Ω</div>
+<p>这是<strong>电阻并联的推导结果</strong>，不是“任何车辆插座都必须测出精确 60 Ω”的规则。测量前应断电、排除主动电路影响，且不能拿该数字替代对线束与节点电路的检查。</p>
+<div class="callout"><strong>诊断提示：</strong>若测到约 120 Ω，可以优先检查是否仅有一个终端参与测量；若接近 0 Ω，则排查短路。不过这只是排查线索，不是故障的唯一诊断结论。</div>
+</section>
 
-<p>为什么会选择CAN？我给大家列几个关键节点：</p>
+<section id="limits" aria-labelledby="limits-title"><span class="kicker">05 · 工程现实比口号复杂</span>
+<h2 id="limits-title">CAN 的“最大距离”和“最多节点”有固定答案吗？</h2>
+<p>没有一个不依赖条件、对所有网络都适用的固定上限。线缆长度、位速率、采样点、收发器延迟、端接、支线和节点负载都会影响可通信的距离。<a href="https://kvaser.com/lesson/can-physical-layers/">Kvaser 的物理层教程</a>给出了传统高速 CAN 在 <strong>1 Mbit/s 时约 40 m</strong>的常见经验值；它是特定工程假设下的参考，不是对任意电缆拓扑的保证。</p>
+<div class="compare"><div class="stat"><b>1 Mbit/s · 约 40 m</b><span>常见的经典高速 CAN 经验参考，需核对具体布线条件</span></div><div class="stat"><b>节点数 · 依器件而定</b><span>没有可直接套用的“CAN 统一最多 110 节点”规则</span></div></div>
+<p>增加节点通常意味着更多输入负载、电容与支线；同时也可能增加总线利用率和等待延迟。实际设计要基于器件数据手册、最坏时序预算、网络负载和硬件实测，而不是规定“支线一律 0.3 m”或“永远预留 30% 空闲”这样的脱离条件的常数。</p>
+<div class="table-scroll"><table><thead><tr><th>设计问题</th><th>重点检查</th><th>首先参考</th></tr></thead><tbody>
+<tr><td>能跑多快？</td><td>位时序、传播延迟、收发器及线束</td><td><a href="05.html">第五章：位时序</a></td></tr>
+<tr><td>怎样接线？</td><td>主干、端接、支线长度、接地与 EMC</td><td><a href="14.html">第十四章：拓扑</a></td></tr>
+<tr><td>消息会等多久？</td><td>标识符优先级、报文长度、总线负载</td><td><a href="03.html">第三章：仲裁</a></td></tr>
+<tr><td>为什么出现错误？</td><td>反射、噪声、波特率误配、错误计数</td><td><a href="04.html">第四章：错误处理</a></td></tr>
+</tbody></table></div>
+</section>
 
-<ul>
-  <li><strong>1986年</strong>：博世在SAE大会上首次提出CAN总线概念</li>
-  <li><strong>1991年</strong>：奔驰W140成为首款搭载CAN总线的量产车</li>
-  <li><strong>1993年</strong>：CAN 2.0A/B标准正式发布，成为ISO 11898标准</li>
-  <li><strong>2003年</strong>：CAN FD（灵活数据速率）开始酝酿</li>
-  <li><strong>2012年</strong>：博世发布CAN FD规范，数据传输速率提升到8Mbps</li>
-</ul>
+<section id="try" aria-labelledby="try-title"><span class="kicker">06 · 把概念变成可检查结果</span>
+<h2 id="try-title">三分钟验证两个关键直觉</h2>
+<h3>验证 A：断电端接为什么约 60 Ω？</h3>
+<p>下面是一个可运行的<strong>理想电阻计算示例</strong>，刻意不模拟寄生电容、收发器内部电路或电缆反射。复制到 Python 3 即可复算：</p>
+<pre><code>def parallel_ohms(*resistors):
+    assert resistors and all(r > 0 for r in resistors)
+    return 1 / sum(1 / r for r in resistors)
 
-<p>我个人习惯把CAN总线的发展分为三个阶段：第一阶段是"能用"，第二阶段是"好用"，第三阶段是"够快"。现在咱们正处于第三阶段，CAN FD正在逐步替代传统CAN。</p>
+assert parallel_ohms(120, 120) == 60
+assert parallel_ohms(120) == 120
+print("two 120 Ω terminators:", parallel_ohms(120, 120), "Ω")</code></pre>
+<h3>验证 B：你能区分逻辑状态和电压吗？</h3>
+<details class="question"><summary>问题 1：CAN_H≈3.5 V、CAN_L≈1.5 V，对应哪个逻辑位？</summary><p>差分电压约 2 V，对应典型高速 CAN 的<strong>显性 0</strong>。它可以覆盖另一个节点发送的隐性 1。</p></details>
+<details class="question"><summary>问题 2：断电测到约 120 Ω，能立即断言“某只终端坏了”吗？</summary><p>不能。先判断测点、网络是否断电、是否真的只存在两只端接，以及是否被其他电路影响；单个终端、断线或测量位置不同都可能导致读数变化。</p></details>
+<details class="question"><summary>问题 3：1 Mbit/s 一定能通信 40 m 吗？</summary><p>不是保证值。需要结合传播延迟预算、收发器、线缆、支线以及实际误码与波形验证。</p></details>
+</section>
 
-<div class="highlight">
-  <p><strong>核心要点</strong>：CAN总线从诞生到现在快40年了，依然活跃在汽车电子领域。为什么？因为它可靠、实时、成本低。我在项目中遇到过不少工程师想用其他总线替代CAN，最后都绕回来了。</p>
-</div>
-
-<h3>1.2 CAN总线在汽车电子中的应用</h3>
-
-<p>你想想看，一辆现代汽车上有多少个电子控制单元（ECU）？从发动机控制、变速箱控制，到ABS、安全气囊、空调、车窗...少说也有30-50个。这些ECU之间需要实时交换数据，CAN总线就是它们的"神经系统"。</p>
-
-<p>我给大家画个应用场景图（用文字描述）：</p>
-
-<ul>
-  <li><strong>动力系统</strong>：发动机ECU、变速箱ECU、电池管理系统（BMS）——这些节点对实时性要求极高，通常使用高速CAN（500kbps）</li>
-  <li><strong>底盘系统</strong>：ABS/ESP、转向系统、悬架控制——安全关键，需要冗余设计</li>
-  <li><strong>车身系统</strong>：车门模块、车窗控制、座椅调节——对速率要求不高，常用低速CAN（125kbps）</li>
-  <li><strong>信息娱乐系统</strong>：导航、音响、仪表盘——数据量大，现在很多已转向CAN FD或以太网</li>
-</ul>
-
-<table>
-  <tr>
-    <th>应用领域</th>
-    <th>典型节点</th>
-    <th>通信速率</th>
-    <th>优先级</th>
-  </tr>
-  <tr>
-    <td>动力总成</td>
-    <td>ECU、TCU、BMS</td>
-    <td>500kbps</td>
-    <td>最高</td>
-  </tr>
-  <tr>
-    <td>底盘安全</td>
-    <td>ABS、ESP、EPS</td>
-    <td>500kbps</td>
-    <td>高</td>
-  </tr>
-  <tr>
-    <td>车身控制</td>
-    <td>BCM、门窗、灯光</td>
-    <td>125kbps</td>
-    <td>中</td>
-  </tr>
-  <tr>
-    <td>信息娱乐</td>
-    <td>IVI、仪表、T-Box</td>
-    <td>500kbps~1Mbps</td>
-    <td>低</td>
-  </tr>
-</table>
-
-<p>我曾经参与过一个项目，客户抱怨车窗升降偶尔失灵。排查了整整两周，最后发现是CAN总线负载率过高，导致车窗控制报文被延迟了。从那以后，我设计CAN网络时一定会预留30%以上的带宽余量。</p>
-
-<div class="tip">
-  <p><strong>实战技巧</strong>：设计CAN网络时，建议把安全相关的节点（如制动、转向）放在同一个网段，并且使用独立的电源和地线。别问我怎么知道的，都是教训换来的。</p>
-</div>
-
-<h3>1.3 CAN总线的物理层特性</h3>
-
-<p>物理层，说白了就是CAN总线长什么样、怎么连、电气特性如何。这部分内容比较枯燥，但非常重要——很多通信问题都出在物理层。</p>
-
-<p><strong>1. 总线拓扑结构</strong></p>
-<p>CAN总线采用多主总线结构，所有节点都挂在两根线上：CAN_H和CAN_L。我习惯叫它们"双绞线兄弟"。为什么用双绞线？为了抗干扰。你想想看，发动机舱里电磁环境多恶劣，不用双绞线根本扛不住。</p>
-
-<p><strong>2. 差分信号传输</strong></p>
-<p>CAN总线用差分信号传输数据。简单说就是：</p>
-<ul>
-  <li>显性电平（逻辑0）：CAN_H比CAN_L高2V左右</li>
-  <li>隐性电平（逻辑1）：CAN_H和CAN_L电压相等（约2.5V）</li>
-</ul>
-
-<p>这种设计的好处是抗共模干扰。我在实验室做过测试，在CAN线上施加±10V的共模干扰，数据依然能正确传输。换成单端信号线，早就乱码了。</p>
-
-<p><strong>3. 终端电阻</strong></p>
-<p>CAN总线两端必须各接一个120Ω的终端电阻。为什么是120Ω？因为双绞线的特性阻抗大约是120Ω。不接终端电阻会怎样？信号反射，通信失败。我曾经见过一个新手工程师，把终端电阻焊在了中间节点上，结果总线怎么都跑不起来。</p>
-
-<div class="warning">
-  <p><strong>⚠️ 避坑指南</strong>：我曾经在产线上遇到过一批ECU通信不稳定，查了三天发现是终端电阻焊错了位置。记住：终端电阻只能放在总线的最两端，不能放在中间节点上。另外，电阻精度要选1%的，别为了省几分钱用5%的。</p>
-</div>
-
-<p><strong>4. 总线长度与速率的关系</strong></p>
-<p>CAN总线的通信距离和速率成反比。我给大家一个经验数据：</p>
-
-<table>
-  <tr>
-    <th>通信速率</th>
-    <th>最大总线长度</th>
-    <th>典型应用</th>
-  </tr>
-  <tr>
-    <td>1Mbps</td>
-    <td>40m</td>
-    <td>CAN FD、动力系统</td>
-  </tr>
-  <tr>
-    <td>500kbps</td>
-    <td>100m</td>
-    <td>高速CAN、底盘系统</td>
-  </tr>
-  <tr>
-    <td>250kbps</td>
-    <td>250m</td>
-    <td>中速CAN、车身系统</td>
-  </tr>
-  <tr>
-    <td>125kbps</td>
-    <td>500m</td>
-    <td>低速CAN、诊断系统</td>
-  </tr>
-  <tr>
-    <td>50kbps</td>
-    <td>1000m</td>
-    <td>工业控制、远程监控</td>
-  </tr>
-</table>
-
-<p>嗯，这里要注意，上面说的总线长度是指主干线的长度，不包括支线（stub）。支线长度也有讲究，一般不超过0.3m，速率越高支线要越短。</p>
-
-<p><strong>5. 节点数量限制</strong></p>
-<p>标准CAN总线最多支持110个节点（理论上），但实际上我建议不要超过32个。为什么？节点越多，总线电容越大，信号边沿会变缓，容易出错。我做过一个项目，挂了48个节点，结果通信误码率飙升到1%。后来分成两个网段，问题就解决了。</p>
-
-<div class="highlight">
-  <p><strong>总结一下</strong>：CAN总线的物理层看似简单，但细节决定成败。双绞线、差分信号、终端电阻、总线长度、节点数量，每一个参数都要仔细设计。我建议初学者先拿一个简单的两节点网络练手，跑通了再逐步增加复杂度。</p>
-</div>
-
-<p>好了，第一章的内容就到这里。下一章咱们聊聊CAN总线的数据链路层，看看报文是怎么在总线上"跑"起来的。有什么问题，欢迎在课程群里交流。</p>
-        <div class="footer-nav">
-            <a href="javascript:void(0)">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="02.html">下一章 →</a>
-        </div>
-        
-    </div>
-</div>
-</div>
+<section id="references" aria-labelledby="references-title"><span class="kicker">阅读来源</span>
+<h2 id="references-title">进一步查证</h2>
+<ol class="refs">
+<li><a href="https://www.can-cia.org/can-knowledge/history-of-can-technology">CiA · History of CAN technology</a>：发展年份及标准化脉络。</li>
+<li><a href="https://www.bosch-semiconductors.com/products/ip-modules/can-protocols/can-fd/">Bosch · CAN FD Protocol</a>：经典 CAN 与 CAN FD 数据长度、速率能力差异。</li>
+<li><a href="https://www.can-cia.org/can-knowledge/can-hs-transmission">CiA · CAN HS transmission</a>：典型高、低线电压与终端电阻。</li>
+<li><a href="https://www.can-cia.org/can-knowledge/designing-a-can-network">CiA · Designing a CAN network</a>：线型拓扑及端接建议。</li>
+<li><a href="https://kvaser.com/lesson/can-physical-layers/">Kvaser · CAN Physical Layers</a>：传统高速 CAN 的物理限制与经验距离。</li>
+</ol>
+<p>第一章建立的是“共享介质—差分电平—端接与时序”这条因果链。下一章将开始拆解一帧 CAN 报文的具体字段。</p>
+</section>
+<nav class="next" aria-label="章节导航"><a href="index.html">← 返回全部章节</a><a href="02.html">下一章 · CAN 协议基础 →</a></nav>
+</article></main>
+</div><script>
+(function () {
+  "use strict";
+  const buttons = Array.from(document.querySelectorAll("[data-bit]"));
+  const status = document.getElementById("demo-status");
+  const picture = document.getElementById("signal-svg");
+  const states = {
+    dominant: "当前：显性 0 → CAN_H ≈ 3.5 V，CAN_L ≈ 1.5 V，差分 ≈ 2 V。",
+    recessive: "当前：隐性 1 → CAN_H ≈ 2.5 V，CAN_L ≈ 2.5 V，差分 ≈ 0 V。"
+  };
+  for (const button of buttons) {
+    button.addEventListener("click", () => {
+      const state = button.dataset.bit;
+      if (!(state in states)) return;
+      for (const peer of buttons) peer.setAttribute("aria-pressed", String(peer === button));
+      picture.dataset.selected = state;
+      status.textContent = states[state];
+    });
+  }
+}());
+</script>
 </body>
 </html>
