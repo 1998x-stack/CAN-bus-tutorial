@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc" viewBox="0 0 900 313"><title id="title">SDO 分段上传与块传输的确认粒度</title><desc id="desc">分段上传每个最多 7 数据字节且 toggle 在 0 与 1 间交替；块传输通过整块确认减少往返，且序号语义与分段模式不同。</desc><rect width="900" height="313" fill="#fffdf9"/><style>text{font-family:system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;fill:#253e40} .label{font-weight:700;font-size:19px}.small{font-size:15px}.tiny{font-size:13px}.arrow{stroke:#647e7b;stroke-width:2.4;fill:none;marker-end:url(#tip)} .teal{fill:#e1f3ec;stroke:#168377} .peach{fill:#fff0e4;stroke:#d27b54} .violet{fill:#f0eafb;stroke:#8267b3} .gray{fill:#f1f5f3;stroke:#849d9b} .box{stroke-width:2;rx:13} </style><defs><marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#647e7b"/></marker></defs>
+<text class="label" x="32" y="38">分段上传（读长对象）</text>
+<text class="small" x="36" y="78">Client</text><text class="small" x="754" y="78">Server</text>
+<line x1="136" y1="100" x2="136" y2="263" stroke="#bfd4cb" stroke-width="2"/><line x1="770" y1="100" x2="770" y2="263" stroke="#bfd4cb" stroke-width="2"/>
+<path class="arrow" d="M137 112H769"/><text x="450" y="102" text-anchor="middle" class="small">请求下一段：toggle = 0（0x60）</text>
+<path class="arrow" d="M770 157H137"/><text x="450" y="146" text-anchor="middle" class="small">响应：0…7 个有效字节；末段 c = 1</text>
+<path class="arrow" d="M137 201H769"/><text x="450" y="190" text-anchor="middle" class="small">下一请求：toggle = 1（0x70）</text>
+<path class="arrow" d="M770 246H137"/><text x="450" y="237" text-anchor="middle" class="small">响应 toggle 必须匹配</text>
+<text class="tiny" x="34" y="292">块传输另有 1…127 的块内序号与块确认：不能把它误当成分段 toggle。</text>
+</svg>
