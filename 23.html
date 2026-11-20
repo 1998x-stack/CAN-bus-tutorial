@@ -114,9 +114,36 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
+    /* Chapter 22–24 reading layout */
+.main-content{min-width:0;padding:clamp(20px,4vw,54px)}.main-content article{max-width:920px;margin:0 auto;color:#203035;font-size:17px;line-height:1.86}
+.main-content article header{padding:0 0 1.1rem;border-bottom:1px solid #cbd5d9;margin-bottom:2.7rem}
+.main-content article h1{font-size:clamp(1.75rem,3.3vw,2.5rem);line-height:1.35;color:#16334b;letter-spacing:-.02em;margin:0 0 1rem}
+.main-content article .dek{color:#50666e;font-size:1.12rem}.main-content article h2{border-left:0;padding-left:0;color:#164f57;font-size:1.52rem;margin:3.4rem 0 1.1rem}
+.main-content article h3{font-size:1.15rem;margin:1.8rem 0 .6rem}.main-content article p{margin:.9rem 0 1.25rem}
+.main-content article ul,.main-content article ol{padding-left:1.55rem;margin:1rem 0}.main-content article li{margin:.45rem 0}
+.main-content article figure{margin:2rem 0;background:#f7faf9;border:1px solid #d6e2e0;border-radius:18px;padding:clamp(10px,2vw,24px)}
+.main-content article figure svg{display:block;width:100%;height:auto}.main-content article figcaption{font-size:.88rem;color:#52646a;margin-top:.8rem;line-height:1.6}
+.main-content article pre{font-size:.86rem;line-height:1.6;white-space:pre;overflow:auto;background:#172b36;color:#eff6f8}
+.main-content article code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.main-content article :not(pre)>code{padding:.12em .3em;background:#eaf1f1;border-radius:4px;font-size:.9em}
+.main-content article table{display:table;min-width:650px;background:white}.main-content article .table-scroll{width:100%;overflow-x:auto}
+.main-content article th{background:#e9f1ef}.main-content article th,.main-content article td{border:1px solid #cddbd8;vertical-align:top}
+.main-content article .note{background:#edf5f4;padding:1rem 1.2rem;border-left:4px solid #147f80;border-radius:5px;margin:1.4rem 0}
+.main-content article .caution{background:#fff6eb;border-left-color:#bf723d}.main-content article .equation{overflow-x:auto;max-width:100%;padding:1rem;border-radius:12px;background:#f3f7f6;margin:1.5rem 0}
+.main-content article math{font-size:1.1em}.main-content article a{color:#126b76;text-underline-offset:3px}
+.main-content article .lab{background:#f1f7f8;border:1px solid #bfd8db;border-radius:16px;padding:1.1rem 1.3rem;margin:1.6rem 0}
+.main-content article .lab label{font-weight:700;display:block}.main-content article .lab input,.main-content article .lab select{font:inherit;max-width:100%;margin:.4rem 0 .8rem;padding:.45rem .65rem;border:1px solid #829c9f;border-radius:8px;background:white}
+.main-content article .lab output{display:block;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:.89rem;overflow-wrap:anywhere}
+.skip-link{position:absolute;top:-60px;left:12px;z-index:50;background:white;padding:10px}.skip-link:focus{top:6px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #147f80;outline-offset:3px}
+@media(max-width:900px){body{padding:8px}.container{grid-template-columns:minmax(0,1fr)}.sidebar{border-right:0;border-bottom:1px solid #e8d6af;padding:12px 16px;max-height:185px;overflow:auto}.sidebar h3{font-size:1rem;margin:0 0 .5rem}.chapter-list{display:flex;flex-wrap:wrap;gap:3px}.chapter-list li{margin:0}.chapter-list a{font-size:.78rem;padding:5px 8px}.double-border{border-radius:12px}.footer-nav{gap:8px;flex-wrap:wrap}.footer-nav a{padding:7px 12px}}
+@media(max-width:480px){.main-content{padding:18px 14px}.main-content article{font-size:16px}.main-content article h2{font-size:1.3rem}.main-content article figure{padding:7px}.main-content article figure svg text{font-size:12px}.main-content article .lab{padding:.8rem}}
+@media(prefers-reduced-motion:reduce){.chapter-list a,.footer-nav a{transition:none!important;transform:none!important}}
+@media print{body{padding:0;background:white}.double-border{border:0;box-shadow:none}.container{display:block}.sidebar,.footer-nav,.lab{display:none!important}.main-content{padding:0}.main-content article{max-width:none}figure{break-inside:avoid}}
+
+</style>
 </head>
 <body>
+<a class="skip-link" href="#chapter-23">跳转至正文</a>
 <div class="double-border">
 <div class="container">
     <div class="sidebar">
@@ -155,136 +182,141 @@
         </ul>
     </div>
     <div class="main-content">
-        <h2>第23章 J1939多包传输：多包消息传输机制、连接管理、传输协议</h2>
 
-<p>各位工程师朋友，咱们今天聊聊J1939里一个绕不开的话题——多包传输。</p>
-<p>你想想看，CAN总线一帧数据最多只能带8个字节。可实际项目中，ECU之间要交换的参数表、标定数据、诊断信息，动不动就几十上百个字节。怎么办？J1939的传输协议（TP）就是干这个的。</p>
-<p>我个人习惯把多包传输理解成“拆快递”和“收快递”的过程。发送方把大包裹拆成小包裹，一帧一帧发出去；接收方收到后，再拼回原来的样子。嗯，这里要注意，拆和拼的过程是有严格规矩的，不是你想怎么拆就怎么拆。</p>
+<article id="chapter-23">
+<header><h1>第23章 J1939 多包传输：50 字节怎样通过 8 字节 CAN 帧？</h1>
+<p class="dek">从“拆成 8 包”这个简单答案出发，逐步认识 BAM、RTS/CTS、TP.DT，以及真正决定连接完成的是谁。</p></header>
 
-<h3>23.1 什么时候需要多包传输？</h3>
-<p>说白了，只要数据长度超过8个字节，就必须走多包传输。J1939-21标准里规定，单帧消息（Single Frame）最多承载8字节数据。超过这个数，就得用传输协议。</p>
-<p>我在项目中遇到过一种情况：某个ECU要上传一段长达200字节的标定数据。当时我图省事，想分成多个单帧发出去。结果接收端根本不理我——因为协议里没有定义这种“非连接”的多帧传输方式。后来老老实实按TP协议走，一次搞定。</p>
-
-<div class="highlight">
-  <p><strong>核心原则：</strong>任何超过8字节的应用数据，必须使用传输协议（Transport Protocol, TP）。</p>
+<section id="ch23-problem">
+<h2>23.1 为什么不能直接连续发送 8 帧？</h2>
+<p>Classical CAN 的一帧最多携带 8 字节。假设一个 J1939 参数组有 50 字节：即使发送方连续广播 8 个普通帧，接收方也无法只凭它们的 ID 知道“哪个是第几包、何时结束、原本属于哪个 PGN”。</p>
+<p>J1939-21 的传统 <strong>Transport Protocol（TP）</strong> 用两个专用 PGN 把这件事讲清楚：<code>TP.CM = 60416 (0xEC00)</code> 发控制信息，<code>TP.DT = 60160 (0xEB00)</code> 发连续编号的数据包。每个 TP.DT 帧第 1 字节放序号，因此只剩 <strong>7 字节有效数据空间</strong>。</p>
+<div class="equation" tabindex="0" aria-label="传统 J1939 TP 的分包数量">
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>N</mi><mo>=</mo><mo>⌈</mo><mfrac><mi>L</mi><mn>7</mn></mfrac><mo>⌉</mo><mo>,</mo><mspace width="1em"/><mn>9</mn><mo>≤</mo><mi>L</mi><mo>≤</mo><mn>1785</mn></mrow></math>
+<p>这里 <code>L</code> 是原始 PGN 的字节数，<code>N</code> 是 TP.DT 包数；上限是 255 包 × 7 字节 = 1785 字节。</p>
 </div>
-
-<h3>23.2 多包传输的两种模式</h3>
-<p>J1939定义了两种多包传输模式：</p>
-<ul>
-  <li><strong>广播式（Broadcast）</strong>：一对多，发送方不关心谁在收。常用于参数组广播。</li>
-  <li><strong>点对点式（Peer-to-Peer）</strong>：一对一，需要建立连接。常用于诊断、标定等需要确认的场景。</li>
-</ul>
-<p>我个人建议，能走广播就别走点对点。为什么？因为点对点要握手、要确认、要超时重传，通信开销大。但有些场景没办法，比如刷写ECU固件，你必须确保每个字节都准确到达。</p>
-
-<h3>23.3 连接管理——建立、维持、关闭</h3>
-<p>点对点多包传输的核心是“连接管理”。它分三步走：</p>
-<ol>
-  <li><strong>连接建立</strong>：发送方发一个RTS（Request to Send）帧，告诉接收方“我要发数据了，一共多少字节，分多少包”。接收方回一个CTS（Clear to Send）帧，说“准备好了，你发吧”。</li>
-  <li><strong>数据传输</strong>：发送方按CTS指定的包数发送数据包（Data Packet）。接收方每收完一批，可以再发CTS要求继续发。</li>
-  <li><strong>连接关闭</strong>：所有数据发完后，发送方发一个End of Message（EOM）帧，接收方确认，连接关闭。</li>
-</ol>
-
-<div class="tip">
-  <p><strong>避坑指南：</strong>我曾经在一个项目中，接收方CTS里指定的包数太大，发送方一次发了32包，结果接收方缓冲区溢出，直接丢包。后来我强制把CTS里的包数限制在8包以内，问题解决。记住，缓冲区大小要提前协商好。</p>
+<div class="lab">
+<label for="tp23-size">变换消息长度，观察最后一包</label>
+<input id="tp23-size" type="number" min="9" max="1785" step="1" value="50" />
+<output id="tp23-output" aria-live="polite">50 字节 → 8 包，最后 1 字节有效载荷 + 6 字节填充</output>
 </div>
+<div class="note caution">本章的上限与帧格式针对 <strong>J1939-21 的传统 TP</strong>。J1939-22（CAN FD）与 Extended Transport Protocol（ETP）具有不同的机制和限制，不能把 1785 字节上限泛化到所有 J1939 传输。</div>
+</section>
 
-<h3>23.4 传输协议帧格式</h3>
-<p>传输协议使用特定的PGN（参数组编号）来标识控制帧和数据帧。咱们直接看表格：</p>
+<section id="ch23-route">
+<h2>23.2 两条路径：广播 BAM，还是目的地址明确的 RTS/CTS？</h2>
+<p>真正的分叉点不在“数据有多大”，而在<strong>接收方是否需要控制发送节奏</strong>。广播 BAM（Broadcast Announce Message）由发送方公布总长度、包数和原 PGN，然后向全网依次发送 TP.DT；没有 CTS，也没有结束确认。RTS/CTS（Connection Mode Data Transfer, CMDT）则先向指定 DA 请求发送，接收方决定这一轮准许几包，收齐后由接收方返回 EOM ACK。</p>
+<figure>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 350" role="img" aria-labelledby="tp23-title tp23-desc" data-export="j1939-tp-flows.svg">
+<title id="tp23-title">J1939 BAM 与 RTS/CTS 消息时序对比</title>
+<desc id="tp23-desc">左边 BAM 从发送方广播 BAM 和 TP.DT，广播接收者不回 ACK；右边 CMDT 从发送方 RTS 开始，接收方 CTS 回应，发送方发数据，最后接收方回 EOM ACK。</desc>
+<g font-family="system-ui,sans-serif" fill="#1e3c47" font-size="17" text-anchor="middle">
+ <text x="215" y="26" font-weight="700">BAM · 广播，无确认</text><text x="650" y="26" font-weight="700">CMDT · 定向，有流控</text>
+ <line x1="87" y1="69" x2="87" y2="320" stroke="#9eb7b7" stroke-dasharray="5 5"/><line x1="342" y1="69" x2="342" y2="320" stroke="#9eb7b7" stroke-dasharray="5 5"/>
+ <line x1="523" y1="69" x2="523" y2="320" stroke="#9eb7b7" stroke-dasharray="5 5"/><line x1="778" y1="69" x2="778" y2="320" stroke="#9eb7b7" stroke-dasharray="5 5"/>
+ <text x="87" y="58" font-size="15">发送方</text><text x="342" y="58" font-size="15">所有接收者</text><text x="523" y="58" font-size="15">发送方</text><text x="778" y="58" font-size="15">目标接收者</text>
+ <g stroke-width="3" fill="none">
+  <path d="M87 103 H333" stroke="#147f80"/><path d="M323 97 L333 103 L323 109" stroke="#147f80"/>
+  <path d="M87 165 H333" stroke="#d06d4d"/><path d="M323 159 L333 165 L323 171" stroke="#d06d4d"/>
+  <path d="M87 227 H333" stroke="#d06d4d"/><path d="M323 221 L333 227 L323 233" stroke="#d06d4d"/>
+  <path d="M523 103 H769" stroke="#147f80"/><path d="M759 97 L769 103 L759 109" stroke="#147f80"/>
+  <path d="M778 155 H532" stroke="#7461ba"/><path d="M542 149 L532 155 L542 161" stroke="#7461ba"/>
+  <path d="M523 211 H769" stroke="#d06d4d"/><path d="M759 205 L769 211 L759 217" stroke="#d06d4d"/>
+  <path d="M778 271 H532" stroke="#7461ba"/><path d="M542 265 L532 271 L542 277" stroke="#7461ba"/>
+ </g>
+ <g font-size="16">
+  <text x="215" y="94">BAM</text><text x="215" y="155">DT #1</text><text x="215" y="217">DT #2…#N</text><text x="215" y="294" fill="#526c70">没有 EOM ACK</text>
+  <text x="650" y="94">RTS</text><text x="650" y="146">CTS</text><text x="650" y="202">DT #1…#N</text><text x="650" y="262">EOM ACK</text>
+  <text x="650" y="322" font-size="14">可能多轮 CTS ↔ DT</text>
+ </g>
+</g>
+</svg>
+<figcaption>重点不只是箭头数量：CMDT 中 <strong>CTS 和最终 EOM ACK 都由接收方发出</strong>；发送方不会主动发送 EOM ACK。</figcaption>
+</figure>
+<div class="table-scroll"><table><thead><tr><th>维度</th><th>BAM</th><th>RTS/CTS（CMDT）</th></tr></thead><tbody>
+<tr><td>目标</td><td>全网广播（DA = 0xFF）</td><td>一个特定目标地址</td></tr>
+<tr><td>开始</td><td>BAM（控制码 0x20）</td><td>RTS（0x10）与 CTS（0x11）握手</td></tr>
+<tr><td>数据阶段</td><td>按协议要求的间隔发送 TP.DT</td><td>按 CTS 放行的包数发送 TP.DT</td></tr>
+<tr><td>结束</td><td>接收方按长度/包数重组，无最终确认</td><td>接收方发送 EOM ACK（0x13）</td></tr>
+<tr><td>失败处理</td><td>不能依赖接收端确认</td><td>可通过 Abort（0xFF）终止会话</td></tr>
+</tbody></table></div>
+</section>
 
-<table>
-  <thead>
-    <tr>
-      <th>帧类型</th>
-      <th>PGN</th>
-      <th>数据域内容</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>RTS（请求发送）</td>
-      <td>60416 (0xEC00)</td>
-      <td>控制字节(0x10) + 总字节数 + 总包数 + 最大包数 + 保留</td>
-    </tr>
-    <tr>
-      <td>CTS（清除发送）</td>
-      <td>60416 (0xEC00)</td>
-      <td>控制字节(0x11) + 允许包数 + 下一包序号 + 保留</td>
-    </tr>
-    <tr>
-      <td>数据包（Data Packet）</td>
-      <td>60160 (0xEB00)</td>
-      <td>序列号(1-255) + 7字节数据</td>
-    </tr>
-    <tr>
-      <td>EOM（消息结束）</td>
-      <td>60416 (0xEC00)</td>
-      <td>控制字节(0x13) + 总字节数 + 总包数 + 保留</td>
-    </tr>
-  </tbody>
-</table>
+<section id="ch23-frames">
+<h2>23.3 控制帧携带原 PGN，数据帧只携带序号与内容</h2>
+<p>一个容易忽略的细节：<code>0xEC00</code> 和 <code>0xEB00</code> 只是传输通道，并不是正在传输的业务 PGN。TP.CM 的最后三个字节按<strong>低字节在前</strong>给出原始 PGN。例如原 PGN <code>0x00FF00</code> 写作 <code>00 FF 00</code>。</p>
+<div class="table-scroll"><table><thead><tr><th>控制帧</th><th>Byte 1–8（十六进制）</th><th>发送方</th></tr></thead><tbody>
+<tr><td>RTS，50 字节 / 8 包 / 每轮至多 8 包</td><td><code>10 32 00 08 08 00 FF 00</code></td><td>原发送方</td></tr>
+<tr><td>CTS，允许包 1–8</td><td><code>11 08 01 FF FF 00 FF 00</code></td><td>接收方</td></tr>
+<tr><td>EOM ACK，确认整条消息</td><td><code>13 32 00 08 FF 00 FF 00</code></td><td>接收方</td></tr>
+<tr><td>BAM，宣布 50 字节</td><td><code>20 32 00 08 FF 00 FF 00</code></td><td>原发送方</td></tr>
+<tr><td>TP.DT #1</td><td><code>01 [7 字节业务数据]</code></td><td>原发送方</td></tr>
+<tr><td>TP.DT #8</td><td><code>08 [最后 1 字节] FF FF FF FF FF FF</code></td><td>原发送方</td></tr>
+</tbody></table></div>
+<p>按地址构造的例子：发送方 SA <code>0x80</code>、接收方 DA <code>0x90</code>，优先级 6 时，RTS 的 CAN ID 是 <code>0x18EC9080</code>，CTS 与 EOM ACK 的 CAN ID 是 <code>0x18EC8090</code>，数据帧 ID 为 <code>0x18EB9080</code>。广播 BAM 则使用 <code>0x18ECFF80</code>。</p>
+<div class="note"><strong>约束：</strong>CTS 宣告的本轮包数不能大于接收端可处理的容量，也不能超出发送方 RTS 所宣告的每轮最大包数。CTS 可以分多轮发送；不能把第一轮收到 8 包当成所有消息都能一次完成。</div>
+</section>
 
-<p>你看，控制帧和数据帧用的是不同的PGN。控制帧统一走PGN 0xEC00，数据帧走PGN 0xEB00。这样接收方一看PGN就知道该往哪个缓冲区放数据。</p>
+<section id="ch23-timer">
+<h2>23.4 超时是状态机的一部分，不存在统一“自动重传三次”</h2>
+<p>传统 TP 会话的等待时间按状态分配；一个常见的 SAE J1939-21 时间参数组合如下。工程实现必须按采用的标准版本和协议栈状态进行处理，不应把所有超时机械地设为 750 ms。</p>
+<div class="table-scroll"><table><thead><tr><th>定时器</th><th>典型值</th><th>等待哪件事</th></tr></thead><tbody>
+<tr><td>T1</td><td>750 ms</td><td>接收端等待连续 TP.DT 数据包</td></tr>
+<tr><td>T2</td><td>1250 ms</td><td>接收端发出 CTS 后等待首个 TP.DT</td></tr>
+<tr><td>T3</td><td>1250 ms</td><td>发送端等待 CTS、下一轮 CTS 或 EOM ACK</td></tr>
+<tr><td>T4</td><td>1050 ms</td><td>发送端收到 CTS(0) 暂停指示后等待后续处理</td></tr>
+</tbody></table></div>
+<p>超时后应按会话状态终止、报告错误并清理缓存；协议并没有“任何情况下超时就自动重发整条消息三次”的通用规则。BAM 更没有接收者反馈通道。要求端到端确认或重试，应由上层业务协议另行设计。</p>
+</section>
 
-<h3>23.5 一个完整的传输实例</h3>
-<p>假设我们要发送一个50字节的标定数据。分多少包？每包7字节数据（因为第1字节是序列号），50字节需要8包（7*7=49，第8包只带1字节数据）。</p>
+<section id="ch23-impl">
+<h2>23.5 用 20 行 Python 验证分包与重组</h2>
+<p>这段代码只演示 <strong>TP.DT 有效负载的序号与填充规则</strong>，不是完整 J1939 协议栈。真实产品还要处理地址、PGN、BAM/RTS/CTS 状态、定时器、会话交错及 Abort。</p>
+<pre><code>def split_tp(data: bytes) -&gt; list[bytes]:
+    assert 9 &lt;= len(data) &lt;= 1785
+    packets = []
+    for i in range(0, len(data), 7):
+        seq = i // 7 + 1
+        chunk = data[i:i+7]
+        packets.append(bytes([seq]) + chunk.ljust(7, b"\xff"))
+    return packets
 
-<p>通信过程如下：</p>
-<ol>
-  <li>发送方发RTS：总字节数=50，总包数=8，最大包数=8（表示一次能发8包）</li>
-  <li>接收方回CTS：允许包数=8，下一包序号=1</li>
-  <li>发送方发数据包1~8，每包带序列号和7字节数据</li>
-  <li>发送方发EOM：总字节数=50，总包数=8</li>
-  <li>接收方确认，连接关闭</li>
-</ol>
+def join_tp(packets: list[bytes], total_size: int) -&gt; bytes:
+    expected = (total_size + 6) // 7
+    assert 9 &lt;= total_size &lt;= 1785
+    assert len(packets) == expected
+    for n, packet in enumerate(packets, 1):
+        assert len(packet) == 8 and packet[0] == n
+    data = b"".join(packet[1:] for packet in packets)
+    assert data[total_size:] == b"\xff" * (len(data) - total_size)
+    return data[:total_size]
 
-<div class="highlight">
-  <p><strong>注意：</strong>数据包的序列号从1开始，不是0。这是J1939的规定，别搞错了。我曾经见过一个同事把序列号从0开始编，结果接收方一直等序号1，死等超时。</p>
-</div>
+payload = bytes(range(50))
+packets = split_tp(payload)
+assert len(packets) == 8
+assert packets[-1] == bytes([8, 49, 255, 255, 255, 255, 255, 255])
+assert join_tp(packets, 50) == payload
+</code></pre>
+<p>如果故意交换第 2 包和第 3 包，<code>join_tp</code> 会失败。这比“把收到的数据直接拼接起来”多出的正是<strong>序号检查</strong>；生产代码还要校验每个会话的源/目标和原 PGN。</p>
+</section>
 
-<h3>23.6 超时与重传机制</h3>
-<p>多包传输不是发出去就完事了。协议里定义了严格的超时时间：</p>
-<ul>
-  <li><strong>T1</strong>：发送方发完RTS后，等待CTS的时间。默认750ms。</li>
-  <li><strong>T2</strong>：接收方发完CTS后，等待数据包的时间。默认750ms。</li>
-  <li><strong>T3</strong>：发送方发完数据包后，等待下一个CTS或EOM的时间。默认750ms。</li>
-  <li><strong>T4</strong>：接收方等待EOM的时间。默认750ms。</li>
-</ul>
-<p>超时了怎么办？重传。但重传次数有限制，一般是3次。超过3次还没成功，就报连接失败。</p>
+<section id="ch23-sources"><h2>23.6 参考规范与下一步</h2>
+<p>具体控制码、长度与状态机以 SAE J1939-21 及适用的栈文档为准。可公开核对的实现依据包括 <a href="https://www.kernel.org/doc/html/latest/networking/j1939.html">Linux J1939 传输层说明</a>、<a href="https://android.googlesource.com/kernel/common/+/refs/heads/android-gs-comet-6.1-android16/net/can/j1939/transport.c">Linux TP 状态机源码</a> 和 <a href="https://www.cankit.pro/packages/j1939tp/">J1939-21 定时器说明</a>。这些资料不替代标准原文。</p>
+<p>记忆方式：<strong>CM 描述整个传输，DT 描述一块数据；BAM 没有 ACK，CMDT 的 EOM ACK 来自接收方</strong>。下一章把协议报文和物理电平放在同一张诊断工作台上。</p></section>
+</article>
+<script>
+(function(){
+ const input=document.getElementById("tp23-size"),output=document.getElementById("tp23-output");
+ function render(){
+   const length=Number(input.value);
+   if(!Number.isInteger(length)||length<9||length>1785){output.textContent="请输入 9–1785 之间的整数（传统 TP 的长度区间）";return;}
+   const packets=Math.ceil(length/7),last=length-(packets-1)*7;
+   output.textContent=length+" 字节 → "+packets+" 包，每包序号占 1 字节；末包 "+last+" 字节有效数据 + "+(7-last)+" 字节 0xFF 填充。";
+ }
+ input.addEventListener("input",render);render();
+})();
+</script>
 
-<div class="warning">
-  <p><strong>警告：</strong>不要随意修改超时时间。我曾经为了“提高效率”把T1改成200ms，结果在总线负载高的时候频繁超时重传，效率反而更低。750ms是经过验证的合理值。</p>
-</div>
-
-<h3>23.7 广播式多包传输</h3>
-<p>广播式不需要建立连接。发送方直接发数据包，接收方自己拼。但广播式有个问题：接收方怎么知道数据什么时候开始、什么时候结束？</p>
-<p>J1939的解决方案是：广播式多包传输使用“连接抽象”的概念。发送方先发一个BAM（Broadcast Announce Message），告诉所有节点“我要广播一个多包消息”。然后直接发数据包。接收方根据BAM里的总包数，知道什么时候收完。</p>
-
-<p>BAM的格式：</p>
-<ul>
-  <li>控制字节：0x20</li>
-  <li>总字节数</li>
-  <li>总包数</li>
-  <li>最大包数（固定为255）</li>
-  <li>保留</li>
-</ul>
-
-<p>广播式没有CTS和EOM，所以可靠性不如点对点。但胜在效率高，适合参数广播这类场景。</p>
-
-<h3>23.8 实际项目中的注意事项</h3>
-<p>最后，我总结几个实战经验：</p>
-<ul>
-  <li><strong>缓冲区管理</strong>：接收方要预留足够大的缓冲区。我一般按最大消息长度（1785字节）来分配。</li>
-  <li><strong>序列号回绕</strong>：序列号是8位，最大255。如果数据包超过255包，序列号会回绕。但J1939规定单条消息最多255包（1785字节），所以一般不会遇到。</li>
-  <li><strong>中断处理</strong>：多包传输涉及多个帧的连续收发，最好用中断或DMA来处理，别在主循环里轮询。</li>
-  <li><strong>测试方法</strong>：我习惯用CANalyzer或PCAN-View抓取总线日志，手动检查RTS、CTS、数据包、EOM的时序是否正确。</li>
-</ul>
-
-<div class="tip">
-  <p><strong>个人经验：</strong>有一次我在调试多包传输时，发现接收方总是丢最后一包。查了半天，原来是发送方在发完EOM后立刻关闭了连接，接收方还没来得及处理。后来我在EOM后加了10ms延时，问题解决。嗯，有时候硬件处理速度跟不上，得给点缓冲时间。</p>
-</div>
-
-<p>好了，多包传输的内容就讲到这里。下一章咱们聊聊J1939的诊断协议，那又是另一个有意思的话题。</p>
         <div class="footer-nav">
             <a href="22.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
