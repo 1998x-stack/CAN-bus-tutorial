@@ -114,9 +114,9 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
+    </style><link rel="stylesheet" href="assets/olah-can-16-18.css">
 </head>
-<body>
+<body><a class="skip-link" href="#content">跳转至正文</a>
 <div class="double-border">
 <div class="container">
     <div class="sidebar">
@@ -154,130 +154,92 @@
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
     </div>
-    <div class="main-content">
-        <h2>第16章：CAN总线电平与差分信号</h2>
+    <main class="main-content" id="content"><article class="olah-article">
+<header>
+  <span class="eyebrow">CHAPTER 16 · PHYSICAL LAYER</span>
+  <h1>两根线上为什么能读出一个比特？</h1>
+  <p class="lede">示波器上 CAN_H 和 CAN_L 同时起伏，控制器却只需要判断“0”或“1”。关键不是某根线对地有多高，而是两根线之间的差值，以及收发器能否在噪声中可靠识别这个差值。</p>
+  <p class="reading-path">阅读路径：两种总线状态 → 差模与共模 → 抗干扰边界 → 安全测量</p>
+  <nav class="mini-toc" aria-label="本章小节"><a href="#states">总线状态</a><a href="#differential">差分信号</a><a href="#common">共模边界</a><a href="#measure">测量与排查</a><a href="#sources">资料来源</a></nav>
+</header>
+<section id="states" aria-labelledby="states-h">
+  <h2 id="states-h">16.1 先看两种状态，而不是两根线</h2>
+  <p>在高速经典 CAN（ISO 11898-2）的典型 5 V 收发器示例中，<strong>隐性（recessive）对应逻辑 1</strong>，总线两端的电位接近；<strong>显性（dominant）对应逻辑 0</strong>，驱动器将 CAN_H 拉高、CAN_L 拉低，形成正的差分电压。下图电压仅为帮助理解的<strong>典型示意值，不是所有芯片的硬性输出值</strong>。<a href="https://www.ti.com/document-viewer/lit/html/SSZTCN3">[TI：CAN 电平解读]</a></p>
+  <figure>
+    <svg viewBox="0 0 760 282" role="img" aria-labelledby="c16wave-title c16wave-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="c16wave-title">CAN_H 与 CAN_L 的隐性—显性—隐性示意波形</title>
+      <desc id="c16wave-desc">时间从左向右。隐性时 CAN_H 与 CAN_L 约为 2.5 伏；中间显性时 CAN_H 约 3.5 伏，CAN_L 约 1.5 伏。两线电位差从接近零升到约两伏再返回接近零。</desc>
+      <rect x="30" y="27" width="700" height="214" rx="12" fill="#f3f8f5"/>
+      <g stroke="#d0ded8" stroke-dasharray="4 7"><path d="M70 65H710M70 125H710M70 185H710"/></g>
+      <g fill="#526b68" font-size="15" font-family="sans-serif"><text x="17" y="69">3.5V</text><text x="17" y="129">2.5V</text><text x="17" y="189">1.5V</text><text x="135" y="265">隐性 · 1</text><text x="342" y="265">显性 · 0</text><text x="570" y="265">隐性 · 1</text></g>
+      <rect x="264" y="27" width="223" height="214" fill="#fceee6" opacity=".7"/>
+      <path d="M78 125H248Q264 125 280 65H470Q486 125 502 125H710" fill="none" stroke="#cf6c4d" stroke-width="6" stroke-linecap="round"/>
+      <path d="M78 125H248Q264 125 280 185H470Q486 125 502 125H710" fill="none" stroke="#147f80" stroke-width="6" stroke-linecap="round"/>
+      <g font-size="15" font-weight="700" font-family="sans-serif"><text x="570" y="91" fill="#b65638">CAN_H</text><text x="570" y="166" fill="#0a6869">CAN_L</text><text x="334" y="104" fill="#6e543e">差值 ≈ 2 V</text></g>
+    </svg>
+    <figcaption>图 16-1｜同一比特的两条互补电位轨迹。先判断 <code>CAN_H − CAN_L</code>，再谈单线对地电压。图形是理想化波形，不包含边沿斜率和振铃。</figcaption>
+  </figure>
+  <div class="key"><strong>为什么叫显性？</strong>在正常有线与（wired-AND）总线行为中，有节点发送显性位时，总线呈显性；发送隐性位的节点会监测到这一事实。这既支撑无损仲裁，也让“低标识符优先”的规则成为可能。不要把“显性”简单理解为 CAN_H 对地低电平。</div>
+</section>
+<section id="differential" aria-labelledby="diff-h">
+  <h2 id="diff-h">16.2 差分为什么能抑制共同干扰？</h2>
+  <p>接收器比较两线的差电压 <code>Vdiff</code>，同时两线的平均值称为共模电压 <code>Vcm</code>。两者是两种不同的观察角度：</p>
+  <div class="formula" tabindex="0" role="group" aria-label="差分和共模电压公式">
+    <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mtext>diff</mtext></msub><mo>=</mo><msub><mi>V</mi><mtext>CAN_H</mtext></msub><mo>−</mo><msub><mi>V</mi><mtext>CAN_L</mtext></msub><mspace width="1.7em"/><msub><mi>V</mi><mtext>cm</mtext></msub><mo>=</mo><mfrac><mrow><msub><mi>V</mi><mtext>CAN_H</mtext></msub><mo>+</mo><msub><mi>V</mi><mtext>CAN_L</mtext></msub></mrow><mn>2</mn></mfrac></mrow></math>
+  </div>
+  <p>例如显性状态的示意值为 3.5 V 与 1.5 V。若外界使两根线<strong>同时</strong>上移 1 V，差值仍为 2 V，但平均电位从 2.5 V 变为 3.5 V。这里有一个重要前提：两线受到近似相同的耦合，且没有超出接收器允许的工作范围。</p>
+  <div class="demo" id="c16-demo">
+    <strong>交互小实验｜给两根线同时加上共模扰动</strong>
+    <p>滑动下面的值，比较差分电压与共模电压谁会变化。它是理想化算术实验，不是收发器耐压测试。</p>
+    <label for="c16-noise">共同叠加的电压：<span id="c16-noise-label">+0.0 V</span></label>
+    <input type="range" id="c16-noise" min="-1" max="1" step="0.25" value="0" aria-controls="c16-result"/>
+    <output id="c16-result" aria-live="polite">CAN_H = 3.50 V　CAN_L = 1.50 V　Vdiff = 2.00 V　Vcm = 2.50 V</output>
+  </div>
+  <pre><code># Python 3 · 数值示意：共同叠加量会在相减时消失
+def levels(common_noise):
+    h, l = 3.5 + common_noise, 1.5 + common_noise
+    return round(h - l, 6), round((h + l) / 2, 6)
 
-<p>各位工程师朋友，今天我们来聊聊CAN总线最底层的物理基础——电平与差分信号。说实话，很多初学者一上来就研究协议、报文格式，却忽略了最基础的信号特性。我个人觉得，搞懂电平特性，你才算真正入了CAN的门。</p>
-
-<h3>16.1 显性电平与隐性电平</h3>
-
-<p>CAN总线只有两种逻辑状态：显性（Dominant）和隐性（Recessive）。这跟普通的UART、I2C不太一样。我刚开始接触时也纳闷，为什么非要搞两个名字？直接叫高电平低电平不就行了？</p>
-
-<p>嗯，这里要注意：CAN总线的电平是差分信号，不是单端信号。它靠CAN_H和CAN_L两根线的电压差来传递信息。</p>
-
-<ul>
-  <li><strong>隐性电平（Recessive）</strong>：CAN_H和CAN_L电压差接近0V。逻辑上代表"1"。</li>
-  <li><strong>显性电平（Dominant）</strong>：CAN_H比CAN_L高约2V。逻辑上代表"0"。</li>
-</ul>
-
-<p>你想想看，为什么叫"显性"和"隐性"？因为当多个节点同时发送时，显性电平会覆盖隐性电平。这就是CAN总线仲裁的基础。我在项目中遇到过一个问题：有个节点总是不响应，查了半天发现是它的CAN收发器坏了，一直输出隐性电平，根本抢不到总线控制权。</p>
-
-<div class="highlight">
-  <p><strong>关键点：</strong>显性电平的优先级高于隐性电平。总线空闲时是隐性电平，任何节点想发送数据，必须先拉低总线到显性电平。</p>
-</div>
-
-<h3>16.2 差分信号的优势</h3>
-
-<p>为什么CAN要用差分信号？说白了，就是为了抗干扰。我做过一个项目，在工厂车间里布CAN总线，旁边就是大功率电机和变频器。如果用单端信号，早就被干扰得没法看了。</p>
-
-<p>差分信号的核心原理：</p>
-<ul>
-  <li>信号用两根线的电压差表示，不是对地电压</li>
-  <li>外部干扰同时作用在两根线上，差值基本不变</li>
-  <li>共模噪声被自然抵消</li>
-</ul>
-
-<p>举个例子：假设CAN_H是3.5V，CAN_L是1.5V，差值是2V。突然来了个1V的共模干扰，CAN_H变成4.5V，CAN_L变成2.5V，差值还是2V。你看，干扰被抵消了。</p>
-
-<div class="tip">
-  <p><strong>我的经验：</strong>在长距离传输（比如100米以上）或者电磁环境恶劣的场合，差分信号的优势特别明显。我曾经在一条200米的CAN总线上跑过，用示波器看波形，虽然单端对地噪声很大，但差分信号依然清晰。</p>
-</div>
-
-<h3>16.3 共模电压范围</h3>
-
-<p>共模电压，就是CAN_H和CAN_L对地的平均电压。公式很简单：Vcm = (CAN_H + CAN_L) / 2。</p>
-
-<p>为什么关心这个？因为CAN收发器有它的工作范围。常见的CAN收发器（比如TJA1050、SN65HVD230）的共模电压范围是-2V到+7V。超出这个范围，收发器可能无法正确识别差分信号。</p>
-
-<table>
-  <tr>
-    <th>参数</th>
-    <th>典型值</th>
-    <th>说明</th>
-  </tr>
-  <tr>
-    <td>隐性电平（CAN_H）</td>
-    <td>2.5V</td>
-    <td>总线空闲时</td>
-  </tr>
-  <tr>
-    <td>隐性电平（CAN_L）</td>
-    <td>2.5V</td>
-    <td>总线空闲时</td>
-  </tr>
-  <tr>
-    <td>显性电平（CAN_H）</td>
-    <td>3.5V</td>
-    <td>发送显性位时</td>
-  </tr>
-  <tr>
-    <td>显性电平（CAN_L）</td>
-    <td>1.5V</td>
-    <td>发送显性位时</td>
-  </tr>
-  <tr>
-    <td>共模电压范围</td>
-    <td>-2V ~ +7V</td>
-    <td>收发器正常工作范围</td>
-  </tr>
-</table>
-
-<p>为什么会超出共模范围？最常见的原因是地电位差。两个节点距离很远，它们的地电位可能相差几伏。我曾经在一个项目中，两个设备相距300米，地电位差达到了3V。结果CAN通信时好时坏，最后加了隔离才解决。</p>
-
-<div class="warning">
-  <p><strong>避坑指南：</strong>我曾经在调试一个车载CAN网络时，发现某个节点总是间歇性丢帧。排查了三天，最后用万用表一量，CAN_H对地电压只有1.8V，CAN_L对地电压是0.2V。原来这个节点的电源地线接触不良，导致共模电压偏移到了收发器的工作范围之外。从那以后，我每次调试CAN网络，第一件事就是量共模电压。</p>
-</div>
-
-<h3>16.4 实际测量与调试技巧</h3>
-
-<p>说点实用的。怎么用示波器看CAN信号？我建议你这样操作：</p>
-
-<ol>
-  <li>示波器探头CH1接CAN_H，CH2接CAN_L</li>
-  <li>地线夹子接GND（注意：不是接CAN_GND，是系统GND）</li>
-  <li>打开数学运算功能，设置CH1 - CH2</li>
-  <li>看差分波形，显性位应该是约2V，隐性位接近0V</li>
-</ol>
-
-<p>你想想看，如果只看单端波形，CAN_H和CAN_L都在跳变，很难判断信号质量。但看差分波形，一眼就能看出问题。</p>
-
-<div class="highlight">
-  <p><strong>判断信号质量的几个指标：</strong></p>
-  <ul>
-    <li>显性电平幅度：1.5V ~ 2.5V（标准是2V）</li>
-    <li>隐性电平幅度：-0.5V ~ +0.5V（标准是0V）</li>
-    <li>上升/下降时间：一般几十纳秒</li>
-    <li>共模电压：在-2V到+7V之间</li>
-  </ul>
-</div>
-
-<h3>16.5 总结</h3>
-
-<p>CAN总线的电平特性，说白了就是三件事：显性/隐性电平的定义、差分信号的优势、共模电压的范围。搞懂这些，你就能理解为什么CAN能在恶劣环境下稳定工作。</p>
-
-<p>我个人习惯，在设计CAN电路时，一定会预留共模电感和TVS管的位置。虽然大多数情况下用不上，但万一现场环境恶劣，这些预留能救你一命。记住一句话：CAN总线不怕干扰，怕的是你不懂它的脾气。</p>
-
-<div class="tip">
-  <p><strong>最后一个小技巧：</strong>如果你在调试时发现CAN通信不稳定，先别急着怀疑软件。拿示波器看看差分波形，量量共模电压。我敢说，80%的问题都出在物理层。</p>
-</div>
-        <div class="footer-nav">
-            <a href="15.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="17.html">下一章 →</a>
-        </div>
-        
-    </div>
-</div>
-</div>
-</body>
-</html>
+assert levels(0.0) == (2.0, 2.5)
+assert levels(1.0) == (2.0, 3.5)
+assert levels(-1.0) == (2.0, 1.5)
+</code></pre>
+</section>
+<section id="common" aria-labelledby="common-h">
+  <h2 id="common-h">16.3 抗共模并不等于可以忽略共模</h2>
+  <p>下表区分了典型总线波形、计算量与器件限制。接收器有明确的共模输入范围和差分判决阈值；它们必须按<strong>所选型号的 datasheet 及工作条件</strong>审查。不能把某一型号的 <code>−2 V ～ +7 V</code> 写成所有 CAN 收发器的普遍极限。<a href="https://www.ti.com/product/SN65HVD230">[TI：SN65HVD230 资料]</a></p>
+  <div class="table-wrap"><table><thead><tr><th>量</th><th>典型 5 V 高速 CAN 示意</th><th>工程含义</th></tr></thead><tbody>
+  <tr><td>隐性差分</td><td>约 0 V</td><td>两线接近同电位；无须假设任一单线恒为 2.5 V</td></tr>
+  <tr><td>显性差分</td><td>约 +2 V</td><td>必须结合指定负载和驱动器的最小/最大输出规格</td></tr>
+  <tr><td>共模电压</td><td>两线平均值</td><td>受偏置、地电位差、共模干扰影响</td></tr>
+  <tr><td>接收容限</td><td>器件相关</td><td>查共模工作范围、输入阈值、故障耐受范围，三者不可混用</td></tr>
+  </tbody></table></div>
+  <div class="key caution"><strong>故障耐受 ≠ 正常通信范围。</strong>某芯片能承受较高的总线瞬态电压，不代表它在该电压下还能正确接收。长距离节点出现地电位差时，应先评估接地、隔离与共模范围，而非只看差分幅值。</div>
+</section>
+<section id="measure" aria-labelledby="measure-h">
+  <h2 id="measure-h">16.4 从示波器波形走到诊断结论</h2>
+  <ol>
+    <li><strong>先确认测量方式安全。</strong>台式接地示波器的探头地夹通常与保护地相连；不要在未确认接地关系时，将地夹随意夹到 CAN_H、CAN_L 或远端不同电位的地线上。优先使用额定合适的差分探头或隔离测量方案。</li>
+    <li><strong>同时观察差模与共模。</strong>若确认两通道共用安全参考地，可以用 CH1 测 CAN_H、CH2 测 CAN_L，并计算 <code>CH1 − CH2</code>；必要时观察 <code>(CH1 + CH2)/2</code>。</li>
+    <li><strong>定位问题来源。</strong>差分幅度不够时查收发器供电和端接；振铃明显时查支线与拓扑；共模漂移大时查地电位和隔离；单纯不出帧还需结合控制器状态与错误计数。</li>
+  </ol>
+  <p>还要分别记录测量点、负载、线缆长度、探头带宽和工作速率。同一网络在发送端和最远接收端看到的边沿可能不同，单次“看着挺干净”的波形不能替代误码与压力验证。</p>
+  <div class="example"><span class="tag">动手检查</span><strong>看到显性时 CAN_H=3.4 V、CAN_L=1.6 V</strong>，可先计算差值为 1.8 V、平均值为 2.5 V；再依据具体收发器与负载条件判断是否合格，而不是拿示意图的 2 V 当作硬阈值。</div>
+</section>
+<section id="sources" aria-labelledby="sources-h">
+  <h2 id="sources-h">进一步核对</h2>
+  <ol class="refs"><li><a href="https://www.ti.com/document-viewer/lit/html/SSZTCN3">Texas Instruments · CAN bus signal levels</a>：显性、隐性与典型波形。</li><li><a href="https://www.ti.com/product/SN65HVD230">TI · SN65HVD230 产品与数据手册</a>：以器件数据手册核对输入共模范围及差分特性。</li><li><a href="14.html">第 14 章：CAN 总线网络拓扑</a>：反射、支线和终端布局。</li></ol>
+</section></article><nav class="footer-nav" aria-label="章节导航"><a href="15.html">← 上一章</a><a href="index.html">📖 返回目录</a><a href="17.html">下一章 →</a></nav></main></div></div><script>
+(function () {
+  const slider = document.getElementById('c16-noise');
+  const label = document.getElementById('c16-noise-label');
+  const output = document.getElementById('c16-result');
+  function render() {
+    const n = Number(slider.value);
+    label.textContent = (n >= 0 ? '+' : '') + n.toFixed(2) + ' V';
+    output.textContent = 'CAN_H = ' + (3.5 + n).toFixed(2) + ' V　CAN_L = ' + (1.5 + n).toFixed(2) + ' V　Vdiff = ' + ((3.5 + n) - (1.5 + n)).toFixed(2) + ' V　Vcm = ' + (2.5 + n).toFixed(2) + ' V';
+  }
+  slider.addEventListener('input', render);
+  render();
+}());
+</script></body></html>

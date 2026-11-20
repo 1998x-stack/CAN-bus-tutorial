@@ -1,0 +1,43 @@
+{
+  "chapter": 17,
+  "scope": "CANopen CC / classic CAN",
+  "note": "Evidence ledger for Olah-style pedagogical revision. Illustrative entries are not field measurements.",
+  "claims": [
+    {
+      "id": "c17-bit",
+      "claim": "标称位包含同步段、传播段及相位段，采样在 Phase1 与 Phase2 交界",
+      "kind": "technical",
+      "source_url": "https://kvaser.com/lesson/can-bit-timing/",
+      "locator": "The Layout of a Bit",
+      "status": "verified",
+      "notes": "不同芯片寄存器编码不同"
+    },
+    {
+      "id": "c17-physical",
+      "claim": "长线传播时间和收发器延迟影响最高可靠位速率",
+      "kind": "technical",
+      "source_url": "https://www.analog.com/en/resources/analog-dialogue/articles/configure-can-bit-timing.html",
+      "locator": "Propagation delay and sample point",
+      "status": "verified",
+      "notes": "未提供无条件的最大线长表"
+    },
+    {
+      "id": "c17-length20",
+      "claim": "20m 以 5ns/m 估算约 100ns 单程/200ns 往返",
+      "kind": "derived",
+      "source_url": "https://kvaser.com/knowledge-base/could-you-recommend-the-most-suitable-baud-rate-for-our-analysers/",
+      "locator": "20 m / 100 ns example",
+      "status": "derived",
+      "notes": "仅示意线缆延迟，未包括收发器、支线"
+    },
+    {
+      "id": "c17-bxcan",
+      "claim": "36MHz/(4×18)=500kbit/s，采样点15/18=83.33%",
+      "kind": "derived",
+      "source_url": null,
+      "locator": "Chapter formula / Python example",
+      "status": "derived",
+      "notes": "假设 36MHz 是实际 bxCAN 外设时钟，BS1=14 BS2=3 BRP=4"
+    }
+  ]
+}

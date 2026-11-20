@@ -1,0 +1,11 @@
+<svg viewBox="0 0 760 282" role="img" aria-labelledby="c16wave-title c16wave-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="c16wave-title">CAN_H 与 CAN_L 的隐性—显性—隐性示意波形</title>
+      <desc id="c16wave-desc">时间从左向右。隐性时 CAN_H 与 CAN_L 约为 2.5 伏；中间显性时 CAN_H 约 3.5 伏，CAN_L 约 1.5 伏。两线电位差从接近零升到约两伏再返回接近零。</desc>
+      <rect x="30" y="27" width="700" height="214" rx="12" fill="#f3f8f5"/>
+      <g stroke="#d0ded8" stroke-dasharray="4 7"><path d="M70 65H710M70 125H710M70 185H710"/></g>
+      <g fill="#526b68" font-size="15" font-family="sans-serif"><text x="17" y="69">3.5V</text><text x="17" y="129">2.5V</text><text x="17" y="189">1.5V</text><text x="135" y="265">隐性 · 1</text><text x="342" y="265">显性 · 0</text><text x="570" y="265">隐性 · 1</text></g>
+      <rect x="264" y="27" width="223" height="214" fill="#fceee6" opacity=".7"/>
+      <path d="M78 125H248Q264 125 280 65H470Q486 125 502 125H710" fill="none" stroke="#cf6c4d" stroke-width="6" stroke-linecap="round"/>
+      <path d="M78 125H248Q264 125 280 185H470Q486 125 502 125H710" fill="none" stroke="#147f80" stroke-width="6" stroke-linecap="round"/>
+      <g font-size="15" font-weight="700" font-family="sans-serif"><text x="570" y="91" fill="#b65638">CAN_H</text><text x="570" y="166" fill="#0a6869">CAN_L</text><text x="334" y="104" fill="#6e543e">差值 ≈ 2 V</text></g>
+    </svg>

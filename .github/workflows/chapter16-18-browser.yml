@@ -1,0 +1,57 @@
+name: Chapters 16-18 article and browser QA
+on:
+  push:
+    paths:
+      - "16.html"
+      - "17.html"
+      - "18.html"
+      - "assets/olah-can-16-18.css"
+      - "assets/chapter16-*.svg"
+      - "assets/chapter17-*.svg"
+      - "assets/chapter18-*.svg"
+      - "docs/evidence/16.json"
+      - "docs/evidence/17.json"
+      - "docs/evidence/18.json"
+      - "tests/test_chapters16_18.py"
+      - "tests/browser_chapters16_18.py"
+      - ".github/workflows/chapter16-18-browser.yml"
+  pull_request:
+    paths:
+      - "16.html"
+      - "17.html"
+      - "18.html"
+      - "assets/olah-can-16-18.css"
+      - "assets/chapter16-*.svg"
+      - "assets/chapter17-*.svg"
+      - "assets/chapter18-*.svg"
+      - "docs/evidence/16.json"
+      - "docs/evidence/17.json"
+      - "docs/evidence/18.json"
+      - "tests/test_chapters16_18.py"
+      - "tests/browser_chapters16_18.py"
+      - ".github/workflows/chapter16-18-browser.yml"
+jobs:
+  chapter-tests:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run static content and formula regression checks
+        run: python -m unittest discover -s tests -p 'test_chapters16_18.py' -v
+      - name: Install browser QA tooling
+        run: |
+          python -m pip install playwright==1.56.0
+          command -v google-chrome
+      - name: Render and check HTML at 1440, 390 and 360 pixels
+        run: python tests/browser_chapters16_18.py
+      - name: Upload visual snapshots and QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chapters16-18-visual-qa
+          path: reports/chapters16-18/
+          if-no-files-found: ignore
