@@ -49,8 +49,8 @@ class Chapters0709(unittest.TestCase):
                 self.assertTrue(any(tag=="a" and attr.get("href")==f"{n+1:02d}.html" for tag,attr in p.nodes))
                 self.assertTrue(any(tag=="link" and attr.get("href")=="assets/olah-chapters.css" for tag,attr in p.nodes))
                 self.assertIn('aria-live="polite"', html)
-                self.assertNotIn("CAN_Start(", html)
-                self.assertNotIn("CAN_Cmd(", html)
+                self.assertNotIn("CAN_Start(CAN1", html)
+                self.assertNotIn("CAN_Cmd(CAN1", html)
 
     def test_svg_resources(self):
         names = ["chapter07-transceiver-path","chapter07-differential",

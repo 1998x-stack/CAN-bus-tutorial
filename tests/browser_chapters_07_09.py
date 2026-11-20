@@ -22,7 +22,9 @@ with sync_playwright() as p:
                 page.locator("#recessive").click()
                 assert "差分 0.0 V" in page.locator("#voltage-readout").inner_text()
                 page.locator("#dominant").click()
-                page.locator("#noise").fill("1")
+                page.locator("#noise").evaluate(
+                    "(el)=>{el.value='1';el.dispatchEvent(new Event('input',{bubbles:true}));}"
+                )
                 assert "差分 2.0 V" in page.locator("#voltage-readout").inner_text()
             elif chapter=="08":
                 assert "500.000 kbit/s" in page.locator("#timing-result").inner_text()

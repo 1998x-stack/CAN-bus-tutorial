@@ -30,7 +30,7 @@ CAN_FilterInit(&amp;filter);
 </code></pre></div></section>
 <section id="interrupt"><h2>中断能触发，为什么仍然丢帧？</h2><p>每个 bxCAN 接收 FIFO 只有三个报文槽位，ISR 必须及时取走消息以释放硬件 FIFO。开启 NVIC 中断通道和 <code>CAN_IT_FMP0</code> 是两个不同步骤。ISR 中不做 <code>printf</code>、阻塞发送或耗时解析，必要时转存到预先分配的环形缓冲区。</p>
 <div class="code-wrap"><pre><code>static volatile uint32_t rx_seen = 0; // 教学统计量
-void CAN1_RX0_IRQHandler(void)
+void USB_LP_CAN1_RX0_IRQHandler(void)
 {
     while (CAN_MessagePending(CAN1, CAN_FIFO0) != 0u) {
         CanRxMsg msg;
@@ -70,15 +70,16 @@ int CAN1_Setup(void)
     can.CAN_SJW = CAN_SJW_1tq;
     if (CAN_Init(CAN1, &amp;can) != CAN_InitStatus_Success) return -1;
 
-    CAN_FilterInit(&amp;(CAN_FilterInitTypeDef){
-        .CAN_FilterNumber = 0,
-        .CAN_FilterMode = CAN_FilterMode_IdMask,
-        .CAN_FilterScale = CAN_FilterScale_32bit,
-        .CAN_FilterIdHigh = 0x0000, .CAN_FilterIdLow = 0x0000,
-        .CAN_FilterMaskIdHigh = 0x0000, .CAN_FilterMaskIdLow = 0x0000,
-        .CAN_FilterFIFOAssignment = CAN_FIFO0,
-        .CAN_FilterActivation = ENABLE
-    }); // 先全收便于本地环回调试
+    filter.CAN_FilterNumber = 0;
+    filter.CAN_FilterMode = CAN_FilterMode_IdMask;
+    filter.CAN_FilterScale = CAN_FilterScale_32bit;
+    filter.CAN_FilterIdHigh = 0x0000;
+    filter.CAN_FilterIdLow = 0x0000;
+    filter.CAN_FilterMaskIdHigh = 0x0000;
+    filter.CAN_FilterMaskIdLow = 0x0000;
+    filter.CAN_FilterFIFOAssignment = CAN_FIFO0;
+    filter.CAN_FilterActivation = ENABLE;
+    CAN_FilterInit(&amp;filter); // 先全收便于本地环回调试
 
     nvic.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn; // STM32F103 非连接型头文件
     nvic.NVIC_IRQChannelPreemptionPriority = 1;
@@ -89,6 +90,6 @@ int CAN1_Setup(void)
     return 0; // SPL CAN_Init 已完成退出初始化模式
 }
 </code></pre></div>
-<p>注意 <strong>STM32F103 的接收 0 IRQ 名称通常为 <code>USB_LP_CAN1_RX0_IRQn</code></strong>，对应处理函数为 <code>USB_LP_CAN1_RX0_IRQHandler</code>；以上独立 ISR 段落里的短名需要按芯片启动文件调整。若使用重映射 PB8/PB9，还必须额外开启 GPIOB 和 AFIO 时钟，调用 <code>GPIO_PinRemapConfig(GPIO_Remap1_CAN1, ENABLE)</code>，并修改 GPIO 端口。</p>
+<p>注意 <strong>STM32F103 的接收 0 IRQ 名称通常为 <code>USB_LP_CAN1_RX0_IRQn</code></strong>，对应处理函数为 <code>USB_LP_CAN1_RX0_IRQHandler</code>；上述 ISR 使用这一 F103 中断入口；换成其他产品线时仍须核对启动文件。若使用重映射 PB8/PB9，还必须额外开启 GPIOB 和 AFIO 时钟，调用 <code>GPIO_PinRemapConfig(GPIO_Remap1_CAN1, ENABLE)</code>，并修改 GPIO 端口。</p>
 <p>先以全收过滤器和环回证明本地数据路径，再换成目标 ID 过滤器并切换正常模式。上实物总线之前，检查两个终端、收发器模式和第二个可以 ACK 的节点。</p></section>
 <section id="sources"><h2>进一步查证</h2><p><a href="https://www.st.com/resource/en/reference_manual/cd00171190.pdf">ST RM0008：bxCAN 第 24 章</a>（不同版次章节页码可能不同）；<a href="https://github.com/STMicroelectronics/STM32F1xx_HAL_Driver">ST F1 HAL 驱动</a>可用于辨别 HAL/SPL 的 API 差异。涉及 IRQ 名称、过滤器数量请以工程所选芯片的 CMSIS 头文件和启动文件为准。</p></section><footer class="chapter-nav"><a href="08.html">← 上一章</a><a href="index.html">课程目录</a><a href="10.html">下一章 →</a></footer></article></main></div><script>(function(){const mode=document.getElementById("filter-mode"),id=document.getElementById("frame-id"),type=document.getElementById("frame-type"),result=document.getElementById("filter-result");function show(){const x=Number(id.value),ext=type.value==="ext",rtr=type.value==="rtr",key=(ext?((x<<3)|4):(x<<21))|(rtr?2:0),target=(0x123<<21),mask=0xffe00006,ok=mode.value==="all"||((key&mask)===(target&mask));result.textContent=(ok?"通过":"拒绝")+"："+(ext?"扩展数据帧":rtr?"标准远程帧":"标准数据帧")+" "+id.value.toUpperCase()+"；"+(mode.value==="all"?"全0掩码忽略全部比较位。":"ID/IDE/RTR 按 0xFFE00006 掩码比较。");}for(const el of [mode,id,type])el.addEventListener("change",show);show()})();</script></body></html>
