@@ -98,7 +98,7 @@ class CANopenChapterTests(unittest.TestCase):
                         self.assertTrue((ROOT / local).is_file(), local)
                 self.assertIn(f"assets/chapter{n}-", page)
                 self.assertIn('aria-current="page"', page)
-                self.assertEqual(parser.tags.count("math"), 1 if n in (20, 21) else 0)
+                self.assertEqual(parser.tags.count("math"), {19: 0, 20: 1, 21: 2}[n])
 
     def test_svg_title_desc_and_evidence(self):
         names = {
