@@ -1,281 +1,277 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>第3章 CAN总线仲裁机制</title>
-    <link rel="stylesheet" href="theme.css">
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            padding: 20px;
-        }
-        /* 双边框设计：外边框 + 内阴影 */
-        .double-border {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #ffffff;
-            border: 2px solid #f1c40f;
-            border-radius: 24px;
-            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
-            overflow: hidden;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 0;
-        }
-        .sidebar {
-            background: #fefcf5;
-            border-right: 2px solid #fdebb3;
-            padding: 24px 16px;
-        }
-        .sidebar h3 {
-            font-size: 1.4rem;
-            color: #b45f06;
-            border-left: 5px solid #f39c12;
-            padding-left: 15px;
-            margin-bottom: 25px;
-        }
-        .chapter-list {
-            list-style: none;
-        }
-        .chapter-list li {
-            margin-bottom: 6px;
-        }
-        .chapter-list a {
-            display: block;
-            padding: 8px 12px;
-            text-decoration: none;
-            color: #2c3e50;
-            border-radius: 12px;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .chapter-list a:hover {
-            background: #fdebd0;
-            transform: translateX(3px);
-        }
-        .chapter-list .active {
-            background: #3b82f6;
-            color: white;
-            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
-        }
-        .main-content {
-            padding: 30px 35px;
-            background: white;
-        }
-        .footer-nav {
-            margin-top: 45px;
-            padding-top: 20px;
-            border-top: 2px solid #f0e6d2;
-            display: flex;
-            justify-content: space-between;
-        }
-        .footer-nav a {
-            padding: 8px 24px;
-            background: #f1f5f9;
-            text-decoration: none;
-            color: #1e40af;
-            border-radius: 40px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .footer-nav a:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            color: #64748b;
-            border-top: 1px dashed #e2e8f0;
-            font-size: 0.9rem;
-        }
-        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
-        h3 { color: #2c3e50; margin: 20px 0 10px; }
-        pre {
-            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
-            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
-        }
-        table {
-            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
-        }
-        th, td {
-            border: 1px solid #fcd34d; padding: 10px; text-align: left;
-        }
-        th { background: #fffbeb; }
-        .tip, .warning, .highlight {
-            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
-        }
-        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
-        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
-        .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📚 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
-<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
-<li><a href="03.html" class="active">第3章 CAN总线仲裁机制</a></li>
-<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
-<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
-<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
-<li><a href="07.html" class="">第7章 CAN收发器</a></li>
-<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
-<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
-<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
-<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
-<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
-<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
-<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
-<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
-<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
-<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
-<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
-<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
-<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
-<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
-<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
-<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
-<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
-<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
-<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
-<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
-<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
-<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
-<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-        <h2>3. CAN总线仲裁机制：位仲裁原理、CSMA/CR机制、仲裁失败处理</h2>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第三章 · CAN 无破坏仲裁与逐位优先级</title><link rel="stylesheet" href="theme.css"><style>
+:root{--paper:#fffdf9;--ink:#203035;--muted:#53676d;--teal:#147f80;--border:#d9e6e3;--warm:#fff6e9}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;padding:0;background:#edf5f3;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.85}
+a{color:#126a71;text-underline-offset:3px}a:hover{color:#8c4d20}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #147f80;outline-offset:4px}
+.skip{position:absolute;top:-60px;left:15px;background:#fff;padding:8px 15px;z-index:5}.skip:focus{top:10px}
+.layout{max-width:1310px;margin:24px auto;display:grid;grid-template-columns:246px minmax(0,1fr);gap:28px;padding:0 18px;align-items:start}
+.course-nav{position:sticky;top:20px;border:1px solid #d8e5e1;background:#fff;border-radius:15px;padding:19px;max-height:calc(100vh - 40px);overflow-y:auto;font-size:14px;line-height:1.55}
+.course-nav .nav-brand{font-size:18px;font-weight:750;text-decoration:none;color:#214d4a;display:block;margin-bottom:12px}
+.course-nav summary{cursor:pointer;font-weight:650;color:#3e625d}
+.course-nav ol{list-style:none;margin:14px 0 0;padding:0}.course-nav li{margin:0}.course-nav li a{display:block;border-radius:7px;padding:5px 7px;color:#4c6268;text-decoration:none;font-size:13px}
+.course-nav li a[aria-current]{background:#e2f2ee;font-weight:750;color:#09695e}
+.course-nav li a:hover{background:#f3f4f4}
+.paper{background:var(--paper);padding:48px clamp(22px,5vw,72px) 60px;border:1px solid #e4e9e6;border-radius:16px;box-shadow:0 9px 35px #163f3810;min-width:0}
+.paper article{max-width:820px;margin:0 auto}
+.eyebrow{font-size:14px;font-weight:750;letter-spacing:.1em;color:#1a7c74}
+h1{font-size:clamp(34px,4vw,48px);line-height:1.23;letter-spacing:-.025em;margin:12px 0 20px;color:#1a3838}
+.dek{font-size:20px;line-height:1.7;color:#465d63;margin:0 0 24px}
+.jump{display:flex;flex-wrap:wrap;gap:10px;margin:23px 0 0}.jump a{border:1px solid #cfe4df;padding:5px 12px;border-radius:20px;text-decoration:none;font-size:14px;background:#f5fbf8}
+section{margin-top:70px}h2{font-size:clamp(24px,2.8vw,31px);color:#1a4442;border:0;padding:0;line-height:1.35;margin:0 0 22px}h3{font-size:21px;margin:30px 0 10px;color:#254e4b}p{margin:15px 0;line-height:1.86;color:var(--ink)}strong{color:#1a4240}
+.kicker{font-size:13px;letter-spacing:.08em;font-weight:700;color:#9a6231;display:block;margin-bottom:8px}
+figure{margin:30px 0;padding:18px;border:1px solid var(--border);border-radius:14px;background:#fff;min-width:0}
+figure img,figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:14px;line-height:1.65;color:var(--muted);margin-top:12px}
+.compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px 0}.stat{border-left:3px solid #27877b;background:#f1faf7;padding:12px 16px;border-radius:7px}.stat b{display:block;font-size:23px;color:#17655e}
+.callout{border-left:4px solid #d49a4e;background:#fff7e9;padding:12px 19px;margin:25px 0;border-radius:0 9px 9px 0}
+.table-scroll{overflow-x:auto;margin:24px 0}table{width:100%;border-collapse:collapse;min-width:540px;font-size:15px;background:#fff}th,td{padding:12px;border-bottom:1px solid #dce9e4;text-align:left;vertical-align:top}th{background:#eff7f4;color:#31564e;font-weight:700}
+.equation{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:18px;background:#eff7f5;border:1px solid #d4e6e0;padding:17px;border-radius:9px;margin:20px 0;overflow-wrap:anywhere}
+.demo-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:15px 0}
+.demo-controls button{font:inherit;border:1px solid #8fbfb6;background:#fff;color:#235955;border-radius:999px;padding:5px 18px;cursor:pointer}
+.demo-controls button[aria-pressed="true"]{background:#166e69;color:#fff;border-color:#166e69}
+#signal-svg[data-selected="recessive"] #dominant-panel{stroke:#bac8da;stroke-width:2}
+#signal-svg[data-selected="recessive"] #recessive-panel{stroke:#5aaba1;stroke-width:3}
+#signal-svg[data-selected="dominant"] #recessive-panel{opacity:.66}
+#signal-svg[data-selected="recessive"] #dominant-panel{opacity:.66}
+.demo-result{background:#f1faf7;border-radius:9px;padding:12px 16px;font-weight:650;color:#235d57}
+pre{background:#1b3335;color:#f0f8f5;padding:20px;border-radius:11px;overflow-x:auto;font-size:14px;line-height:1.65}
+pre code{background:transparent;color:inherit;padding:0}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}
+.small{font-size:14px;color:#5b706d}
+summary{cursor:pointer;font-weight:650}
+details.question{border-bottom:1px solid #dce6e2;padding:12px 0}
+.refs{font-size:15px;overflow-wrap:anywhere}
+.refs li{padding:3px 0}
+.next{display:flex;flex-wrap:wrap;justify-content:space-between;gap:15px;border-top:1px solid #cfdfda;margin-top:54px;padding-top:22px;font-size:15px}
+.next a{text-decoration:none;font-weight:650}
+@media(max-width:900px){.layout{grid-template-columns:minmax(0,1fr);margin:0;gap:0;padding:0}.course-nav{position:static;max-height:none;border-radius:0;padding:10px 20px;display:flex;align-items:center;gap:16px;justify-content:space-between}.course-nav .nav-brand{margin:0}.course-nav details{position:relative}.course-nav ol{max-height:260px;overflow-y:auto}.paper{border:0;border-radius:0;padding:30px clamp(18px,4vw,45px) 45px}}
+@media(max-width:480px){.paper{padding:26px 18px 38px}.compare{grid-template-columns:1fr}figure{padding:8px}section{margin-top:55px}.course-nav{font-size:13px;flex-wrap:wrap}.course-nav .nav-brand{font-size:15px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+@media print{body{background:#fff;color:#000}.layout{display:block;max-width:none;margin:0;padding:0}.skip,.course-nav,.jump,.demo-controls,.next{display:none!important}.paper{border:0;padding:0;box-shadow:none}.paper article{max-width:none}section{margin-top:35px}figure{break-inside:avoid}a{color:#000}pre{white-space:pre-wrap;overflow:visible}}
 
-<p>好，咱们今天聊点硬核的。CAN总线为什么能在汽车这种嘈杂环境里稳定工作？</p>
-<p>说白了，靠的就是这套仲裁机制。我刚开始接触CAN时，觉得这东西挺玄乎——多个节点同时发数据，怎么就不冲突呢？后来亲手调过几次总线，才真正体会到设计者的高明。</p>
 
-<h3>3.1 位仲裁原理：谁的数据更“强势”</h3>
 
-<p>先讲个最基础的概念。CAN总线上的信号，有两种状态：<strong>显性（Dominant）</strong>和<strong>隐性（Recessive）</strong>。</p>
-<ul>
-    <li><strong>显性电平</strong>：逻辑0，电压差约2V。谁都能拉低它。</li>
-    <li><strong>隐性电平</strong>：逻辑1，电压差约0V。总线空闲时的默认状态。</li>
-</ul>
-<p>关键规则来了：<strong>显性位会覆盖隐性位</strong>。也就是说，只要有一个节点发0，总线就是0。所有节点都发1，总线才是1。</p>
 
-<div class="highlight">
-    <p><strong>核心思想</strong>：CAN的仲裁，就是比谁的报文ID更“小”。ID越小，优先级越高。</p>
+.experiment{border:1px solid #c0d9d3;background:#f6fbf9;border-radius:13px;padding:20px;margin:30px 0}
+.scenarios,.step-controls{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin:15px 0}
+.scenarios button,.step-controls button{background:#fff;border:1px solid #8fbfb6;color:#285c55;padding:8px 13px;border-radius:25px;font:inherit;font-size:14px;cursor:pointer}
+.scenarios button[aria-pressed=true]{background:#186f68;color:white;border-color:#186f68}
+.step-controls button:disabled{opacity:.46;cursor:default}
+#bit-position{font-size:14px;color:#526c68;font-variant-numeric:tabular-nums}
+.trace-scroll{overflow-x:auto;border:1px solid #d2e4e0;background:#fff;border-radius:10px}
+.trace{border-spacing:4px;border-collapse:separate;table-layout:fixed;min-width:700px;width:max-content;margin:0;background:white}
+.trace th,.trace td{border:none;padding:7px;text-align:center;min-width:44px;white-space:nowrap;font-size:14px}
+.trace th:first-child{position:sticky;left:0;z-index:2;text-align:left;background:#fff;min-width:120px;font-size:13px}
+.trace thead th{color:#55726c;font-size:13px}
+.trace td{background:#ecf6f3;border-radius:5px;font-weight:700}
+.trace tr[data-row=bus] td{background:#d3ece5}
+.trace td[data-current=true]{box-shadow:inset 0 0 0 3px #bd7f40}
+.trace td[data-lost=true]{background:#f3f4f4;color:#8a9998}
+.trace td[data-result=win]{background:#bee6d9;color:#14534e}
+.trace td[data-result=lose]{background:#ffe6cb;color:#96511d}
+.trace caption{caption-side:bottom;font-size:13px;color:#5c7470;text-align:left;padding:9px}
+.demo-result{background:#e5f4ed;padding:13px 16px;border-left:4px solid #14867c;border-radius:5px;margin:14px 0;font-weight:650}
+.side-by-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+.side-by-side>div{background:#fff;border:1px solid #d4e4df;border-radius:9px;padding:14px}
+.side-by-side strong{display:block}
+.code-line{font-family:ui-monospace,Consolas,monospace;padding:13px;background:#f0f8f5;border-radius:9px;overflow-wrap:anywhere}
+.small{font-size:14px;color:#5b706d}
+@media(max-width:480px){.experiment{padding:12px}.side-by-side{grid-template-columns:1fr}.trace th:first-child{min-width:95px}}
+@media print{.scenarios,.step-controls{display:none}.trace-scroll{overflow:visible}.trace{min-width:0;width:100%}.trace th,.trace td{min-width:0;padding:3px;font-size:10px}}
+</style></head>
+<body><a class="skip" href="#content">跳转至正文</a><div class="layout"><nav class="course-nav" aria-label="课程导航"><a class="nav-brand" href="index.html">CAN 总线课程</a><details><summary>切换章节（共 30 章）</summary><ol><li><a href="01.html">第1章 CAN总线概述</a></li>
+<li><a href="02.html">第2章 CAN协议基础</a></li>
+<li><a href="03.html" aria-current="page">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html">第7章 CAN收发器</a></li>
+<li><a href="08.html">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html">第10章 CAN报文发送</a></li>
+<li><a href="11.html">第11章 CAN报文接收</a></li>
+<li><a href="12.html">第12章 CAN中断编程</a></li>
+<li><a href="13.html">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html">第18章 CANopen协议入门</a></li>
+<li><a href="19.html">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html">第22章 J1939协议入门</a></li>
+<li><a href="23.html">第23章 J1939多包传输</a></li>
+<li><a href="24.html">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html">第30章 CAN总线项目实战</a></li></ol></details></nav><main class="paper" id="content"><article><header class="article-header">
+<div class="eyebrow">CAN 基础知识 · 第三章</div>
+<h1>CAN 总线仲裁：两个节点同时发，为什么赢家的帧不会损坏？</h1>
+<p class="dek">从 0x100 与 0x200 的逐位竞争开始，沿着一条线上真实的显性和隐性状态，推导出无破坏仲裁、格式优先级和重试边界。</p>
+<p>想象两个 ECU 同时检测到总线空闲，都从 SOF 开始发送。它们如何在共享介质上选出赢家，同时保留赢家已经传输的位？CAN 的答案不是“撞坏再随机等待”，而是<strong>边发送、边观察总线</strong>，让较低优先级的发送者在第一个不同的仲裁位主动退让。</p>
+<nav aria-label="本章快速导航" class="jump"><a href="#physical">物理基础</a><a href="#example">逐位竞争</a><a href="#demo">交互实验</a><a href="#formats">格式差异</a><a href="#retry">失败与重试</a><a href="#practice">工程边界</a><a href="#code">验证</a></nav>
+</header>
+<section id="physical" aria-labelledby="physical-title"><span class="kicker">01 · 物理信号先决定规则</span>
+<h2 id="physical-title">为什么发出隐性 1，却读到了显性 0？</h2>
+<p>在 CAN 仲裁模式中，逻辑 <strong>0 为显性</strong>，逻辑 <strong>1 为隐性</strong>。只要有节点在相应时刻发送显性 0，公共总线就呈显性；只有所有正在发送的节点都释放为隐性，线路才显示隐性 1。这依赖 CAN 收发器的物理层实现，而不是把普通 CMOS 输出端直接并在一起。<a href="https://www.can-cia.org/can-knowledge/can-cc">CiA · Classical CAN</a></p>
+<figure><img src="assets/chapter03-dominance.svg" width="840" height="300" loading="lazy" alt="A 发显性0，B 发隐性1，总线最终为显性0；B 在合法仲裁位置退让。"/><figcaption>图 1 · 显性覆盖隐性，所有发送器可以监视实际总线位。注意：只有发生在允许仲裁的位位置上的退让才属于正常仲裁，不能把任何“发 1 读 0”都叫作仲裁失败。</figcaption></figure>
+<p>发送隐性却采样到显性的节点，若正在进行合法仲裁，就知道自己不再是当前优先级最高的发送者，退出本轮发送并转为接收。较高优先级的发送者仍然按原计划继续发送，因此称为<strong>无破坏性逐位仲裁</strong>。</p>
+</section>
+<section id="example" aria-labelledby="example-title"><span class="kicker">02 · 在第一处差异决定结果</span>
+<h2 id="example-title">0x100 与 0x200：究竟输在第几位？</h2>
+<p>只比较两条<strong>经典 CAN 11 位标识符数据帧</strong>。标识符从最高有效位开始发送，须写成 11 位：<code>0x100 = 00100000000</code>、<code>0x200 = 01000000000</code>。第一位都是 0，第二位 A 为 0、B 为 1。线上是 0；B 发的是隐性 1 却读到了显性 0，便退出竞争。</p>
+<div class="code-line">A = 00100000000<br> B = 01000000000<br>第 2 个 ID 位：A=0，B=1，总线=0 → A 获胜</div>
+<figure><img src="assets/chapter03-bitwise.svg" width="940" height="350" loading="lazy" alt="11位A0x100和B0x200的位流并列，第2位A0 B1，总线0，B退出。"/><figcaption>图 2 · 橙色框标出双方第一次不同的标识符位。B 后续不再发送自己原来的标识符，胜出的是 A 的整帧，不是拼接两人的数据。</figcaption></figure>
+<p>这也是“ID 越小，优先级越高”这句口诀的前提：<strong>相同格式、两个不同的 11 位标识符</strong>，按 MSB 到 LSB 的顺序比较。遇到不同帧类型，就不能只拿十六进制 ID 当数值做排序。</p>
+</section>
+<section id="demo" aria-labelledby="demo-title"><span class="kicker">03 · 让读者亲自推动每一位</span>
+<h2 id="demo-title">切换情境，看看第一个决定性位在哪儿</h2>
+<div class="experiment" id="arbitration-demo">
+<h3>逐位仲裁实验</h3>
+<p class="small">这是<strong>仲裁相关字段的教学模型</strong>，非完整波形：省略 SOF、动态位填充、CRC 和传播延迟。表格中灰色破折号表示输家已停止本轮发送。</p>
+<div class="scenarios" role="group" aria-label="仲裁场景选择">
+<button type="button" data-scenario="different" aria-pressed="true">11 位：0x100 vs 0x200</button>
+<button type="button" data-scenario="remote" aria-pressed="false">同 ID：数据 vs 远程</button>
+<button type="button" data-scenario="extended" aria-pressed="false">标准远程 vs 扩展</button>
+<button type="button" data-scenario="same" aria-pressed="false">同 ID 双数据帧</button>
 </div>
-
-<p>我举个例子。假设节点A发ID=0x100，节点B发ID=0x200。二进制展开：</p>
-<pre><code>节点A: 0001 0000 0000
-节点B: 0010 0000 0000</code></pre>
-<p>从最高位开始逐位比较。第1位都是0，没问题。第2位，A是0，B是1。A拉低了总线，B发现自己发的1被覆盖了——好，B立刻闭嘴，转为接收模式。</p>
-<p>仲裁结束。A胜出，继续发后面的数据。</p>
-
-<div class="tip">
-    <p><strong>我的经验</strong>：设计系统时，把最紧急的信号（比如刹车、气囊）分配最小的ID。我见过有人把空调控制ID设得比刹车还小，结果急刹车时总线还在传空调温度……这设计，你说吓不吓人？</p>
-</div>
-
-<h3>3.2 CSMA/CR机制：先听后说，边说边听</h3>
-
-<p>CAN用的不是传统的CSMA/CD（冲突检测），而是<strong>CSMA/CR（冲突解决）</strong>。</p>
-<p>区别在哪？CSMA/CD是撞了再处理，CSMA/CR是边发边仲裁，根本不让冲突发生。</p>
-
-<p>具体流程分三步：</p>
-<ol>
-    <li><strong>监听总线</strong>：发数据前，先看看总线是不是空闲。空闲才能发。</li>
-    <li><strong>同步发送</strong>：所有节点同时开始发帧起始位（SOF），一个显性位，大家步调一致。</li>
-    <li><strong>逐位仲裁</strong>：发ID时，每个节点都在“边说边听”。如果自己发的位和总线状态不一致，说明有更高优先级的节点在发，自己立刻退出。</li>
-</ol>
-
-<div class="highlight">
-    <p><strong>关键点</strong>：仲裁过程不破坏任何数据。胜出的节点继续发，失败的节点自动转为接收。整个过程对应用层透明。</p>
-</div>
-
-<p>我记得有一次调试，发现总线偶尔丢帧。查了半天，原来是某个节点的晶振偏差太大，导致位时序错位，仲裁时误判了。嗯，晶振精度这东西，真不能省。</p>
-
-<h3>3.3 仲裁失败处理：输了怎么办？</h3>
-
-<p>仲裁失败的节点，不会傻等。它会立刻做三件事：</p>
-<ul>
-    <li><strong>停止发送</strong>：从发送器变为接收器。</li>
-    <li><strong>仲裁失败不属于错误：</strong>在仲裁场发送隐性位却读取到显性位时，节点退出仲裁、转为接收，不增加TEC或REC。</li>
-    <li><strong>等待重发</strong>：等总线空闲后，自动重新尝试发送。</li>
-</ul>
-
-<p>这里有个容易踩的坑。很多人以为仲裁失败就是出错了，其实不是。仲裁失败是正常现象，是CAN协议设计的一部分。只有<strong>位错误</strong>、<strong>填充错误</strong>这些才算真故障。</p>
-
-<div class="warning">
-    <p><strong>纠正：</strong>即便低优先级节点反复输掉仲裁，也不会仅因此增加TEC/REC或进入Bus Off。错误计数增长应另行排查真正的位、ACK、填充、CRC或格式错误。连续仲裁失败只会增加发送等待时间，不能与Bus Off混为一谈。</p>
-</div>
-
-<p>仲裁失败后的重发机制，有几个细节要注意：</p>
-<table>
-    <thead>
-        <tr>
-            <th>场景</th>
-            <th>行为</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>仲裁失败</td>
-            <td>立即转为接收，等待总线空闲后重发</td>
-        </tr>
-        <tr>
-            <td>位错误</td>
-            <td>发送错误帧，重发（可能影响实时性）</td>
-        </tr>
-        <tr>
-            <td>连续仲裁失败</td>
-            <td>不增加错误计数器；可能增加低优先级报文等待时间</td>
-        </tr>
-    </tbody>
+<div class="step-controls"><button type="button" id="step-prev" disabled>上一位</button><button type="button" id="step-next">下一位</button><span id="bit-position" aria-live="polite">第 1 / 12 位</span></div>
+<div class="trace-scroll" tabindex="0">
+<table class="trace" aria-label="逐位 CAN 仲裁表">
+<thead id="trace-head"><tr><th scope="col">位</th><th>ID10</th><th>ID9</th></tr></thead>
+<tbody id="trace-body"><tr><th>A</th><td>0</td><td>0</td></tr><tr><th>B</th><td>0</td><td>1</td></tr><tr><th>总线</th><td>0</td><td>0</td></tr></tbody>
+<caption>逐位表：从左到右比较，显性 0 覆盖隐性 1。</caption>
 </table>
-
-<p>你想想看，如果总线上有10个节点同时发数据，最终只有一个能赢。其他9个都得等下一轮。如果某个节点的数据特别紧急，但ID又很大，它可能等很久。这就是为什么<strong>ID分配是CAN网络设计的核心</strong>。</p>
-
-<h3>3.4 实战中的仲裁问题</h3>
-
-<p>说几个我实际遇到过的案例，帮你避坑。</p>
-
-<p><strong>案例1：ID冲突</strong></p>
-<p>两个节点用了相同的ID。结果呢？一个发0，一个发1，总线一直是0。发1的节点检测到位错误，不断重发，总线被堵死。排查方法：用CAN分析仪抓包，看有没有异常的错误帧。</p>
-
-<p><strong>案例2：位时序不匹配</strong></p>
-<p>不同节点的采样点设置不一致。仲裁时，一个节点在采样点读到0，另一个读到1，导致误判。解决办法：统一所有节点的位时序参数，尤其是<strong>采样点位置</strong>（通常设在75%~85%之间）。</p>
-
-<p><strong>案例3：隐性位干扰</strong></p>
-<p>总线终端电阻没接好，隐性电平不稳定。仲裁时，本该是隐性的位被噪声拉成了显性，导致仲裁结果错误。嗯，这种问题最难查，因为不是每次都出现。我的建议是：先检查终端电阻，再检查共模电压。</p>
-
-<div class="tip">
-    <p><strong>个人习惯</strong>：设计CAN网络时，我会预留几个低ID给诊断和紧急报文。平时不用，关键时刻能抢到总线。就像开车时的应急车道，平时空着，但你不能没有。</p>
 </div>
-
-<h3>3.5 小结</h3>
-
-<p>仲裁机制是CAN总线的灵魂。它让多个节点能共享一根线，还不打架。核心就三点：</p>
-<ul>
-    <li>显性位覆盖隐性位</li>
-    <li>ID越小优先级越高</li>
-    <li>仲裁失败自动重发，不丢数据</li>
-</ul>
-<p>下次你调CAN总线时，如果发现某个节点总发不出数据，先别急着怀疑硬件。看看它的ID是不是太大了，或者是不是有人在跟它抢总线。很多时候，问题就出在这些细节上。</p>
-        <div class="footer-nav">
-            <a href="02.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="04.html">下一章 →</a>
-        </div>
-        
-    </div>
+<p class="demo-result" id="arbitration-status" aria-live="polite">第 1 位：A、B 都发送 0，总线为 0，仍在竞争。</p>
 </div>
+</section>
+<section id="formats" aria-labelledby="formats-title"><span class="kicker">04 · ID 之外还有关键位</span>
+<h2 id="formats-title">同样的前 11 位，数据帧、远程帧、扩展帧谁优先？</h2>
+<p>对于<strong>经典 CAN</strong>，标准数据帧的 <code>RTR=0</code>，标准远程帧的 <code>RTR=1</code>。扩展帧在前 11 位后传输 <code>SRR=1</code> 和 <code>IDE=1</code>；标准格式的 <code>IDE=0</code>。因此即便前 11 位相同，也必须继续比较真正出现在线上的仲裁相关位。<a href="https://www.can-cia.org/can-knowledge/can-cc">CiA · Frame formats</a></p>
+<div class="side-by-side">
+<div><strong>同 ID：标准数据 vs 标准远程</strong><p>第 12 位是 RTR：<code>0</code> 对 <code>1</code>，标准数据帧先获胜。</p></div>
+<div><strong>标准远程 vs 扩展数据</strong><p>同基础 ID 时，RTR/SRR 都是 <code>1</code>；随后标准格式 <code>IDE=0</code> 优于扩展格式 <code>IDE=1</code>。</p></div>
 </div>
-</body>
-</html>
+<figure><img src="assets/chapter03-format-priority.svg" width="920" height="340" loading="lazy" alt="相同基础11位标识符情况下标准数据、标准远程、扩展数据在 RTR/SRR 与 IDE 的比较。" /><figcaption>图 3 · 仅抽出有决定作用的基础标识符、RTR/SRR 与 IDE。完整的扩展帧还要发送后续 18 位标识符；不能把 11 位与 29 位整数不加处理地直接比较。</figcaption></figure>
+<div class="callout"><strong>标准格式和更新一代协议的边界：</strong>这里聚焦经典 CAN。CAN FD 仍利用逐位仲裁，但不支持经典远程帧；CAN XL 的标识符职责也不同。不要把此处的 RTR/SRR 例子原样套进所有 CAN 代际。<a href="https://www.can-cia.org/can-knowledge/can-data-link-layer-generations">CiA · DLL generations</a></div>
+</section>
+<section id="retry" aria-labelledby="retry-title"><span class="kicker">05 · 优先级输了，消息未必丢了</span>
+<h2 id="retry-title">仲裁失败是故障吗？等待什么时候结束？</h2>
+<p><strong>合法仲裁失败本身不是位错误</strong>：输家转为接收当前帧，并不会仅因这次退让而增加 TEC/REC。正常控制器会在总线重新可竞争时再次请求发送，具体还需看控制器的发送队列、重发配置和发送模式。<a href="https://kvaser.com/lesson/can-error-handling/">Kvaser · CAN Error Handling</a></p>
+<div class="table-scroll"><table><thead><tr><th>情况</th><th>表现</th><th>调试判断</th></tr></thead><tbody>
+<tr><td>正常仲裁失败</td><td>赢家继续完整发送；输家改为接收</td><td>不能仅凭退让判断通信故障</td></tr>
+<tr><td>后续重试</td><td>发送请求通常会再次参与仲裁</td><td>受硬件模式、软件取消、队列和负载影响</td></tr>
+<tr><td>数据阶段位错误</td><td>可能触发错误标志和计数变化</td><td>这是错误处理，不是优先级比较</td></tr>
+<tr><td>低优先级长期排队</td><td>等待时间可能超过业务时限</td><td>检查最坏延迟，不只看平均总线利用率</td></tr>
+</tbody></table></div>
+<p>“自动重发”不能解释为<strong>任意情况下最终保证送达</strong>。某些控制器启用单次发送模式、取消发送请求、软件缓冲区溢出、Bus-Off 或持续高优先级流量，都可能改变交付结果。</p>
+</section>
+<section id="practice" aria-labelledby="practice-title"><span class="kicker">06 · 把概念带到真实网络</span>
+<h2 id="practice-title">同 ID、低优先级和实时性：三个常见误区</h2>
+<h3>误区一：两个发送者 ID 相同，也会自动选出一个</h3>
+<p>如果两个发送者有相同的<strong>完整仲裁字段</strong>，它们就无法在仲裁阶段区分彼此。若后续数据位不同，可能触发位错误与错误帧；这不是合法的优先级退让。若后续所有受监测的位都相同，物理层也不能据此识别有多少个节点同时发送。标识符与发送源的规划应避免不受控的同字段争用。<a href="https://kvaser.com/can-protocol-tutorial/">Kvaser · Protocol Tutorial</a></p>
+<h3>误区二：高优先级报文可以中途抢占正在发送的帧</h3>
+<p>仲裁只在能够开始新帧时生效。低优先级帧若已经成功获得总线，随后到达的更高优先级帧仍需等当前帧结束及必要间歇。<strong>高优先级不等于零等待时间</strong>，最坏时延分析还需考虑已有帧阻塞、周期流量、填充位、重发与发送队列。</p>
+<h3>误区三：为了安全只要把关键帧 ID 设到最小</h3>
+<p>安全设计应从消息周期、截止时间、故障容忍、端到端需求与整网负载出发分配优先级；不能把“越紧急越小”当作独立的安全保证，也不能用一个固定采样点百分比修复所有仲裁问题。</p>
+</section>
+<section id="code" aria-labelledby="code-title"><span class="kicker">07 · 复算和验证</span>
+<h2 id="code-title">用 11 位比较确认赢家</h2>
+<p>最小示例仅模拟相同格式的两个标准数据帧标识符，从最高位开始逐位比较。它不含完整帧、位填充、CRC 或误码状态机。</p>
+<pre><code>def first_difference(a, b):
+    if not (0 &lt;= a &lt;= 0x7FF and 0 &lt;= b &lt;= 0x7FF):
+        raise ValueError("11-bit ID required")
+    for index, (x, y) in enumerate(
+        zip(f"{a:011b}", f"{b:011b}"), start=1
+    ):
+        if x != y:
+            return index, a if x == "0" else b
+    return None
+
+assert first_difference(0x100, 0x200) == (2, 0x100)
+assert first_difference(0x123, 0x123) is None</code></pre>
+<p>项目中另外提供 <a href="https://github.com/1998x-stack/CAN-bus-tutorial/blob/main/examples/can_chapter03_arbitration.py">可运行的完整仲裁字段教学模型</a>，以单元测试验证数据/远程优先级、标准/扩展优先级、相同字段并列，以及无效标识符检查。</p>
+<details class="question"><summary>问题：标准远程帧和扩展数据帧的前 11 位完全一样，在哪个位置决定结果？</summary><p>标准帧 RTR=1 与扩展帧 SRR=1 仍相同；在下一位标准帧 IDE=0 覆盖扩展帧 IDE=1。</p></details>
+<details class="question"><summary>问题：输了仲裁会让 TEC 增加吗？</summary><p>不会。合法仲裁退让不是位错误，也不会仅凭一次退让进入 Bus-Off。</p></details>
+<details class="question"><summary>问题：两个节点相同 ID 且数据不同，是不是低优先级节点再试一次即可？</summary><p>不是。相同仲裁字段没有被分出高低，后续不同数据可能引发位错误，需要解决发送源 ID 规划问题。</p></details>
+</section>
+<section id="references" aria-labelledby="refs-title"><span class="kicker">来源与查证</span>
+<h2 id="refs-title">参考资料</h2>
+<ol class="refs">
+<li><a href="https://www.can-cia.org/can-knowledge/can-cc">CAN in Automation · Classical CAN</a>：逐位仲裁、格式区别和优先级。</li>
+<li><a href="https://kvaser.com/can-protocol-tutorial/">Kvaser · CAN Protocol Tutorial</a>：同字段仲裁竞争、错误边界。</li>
+<li><a href="https://kvaser.com/lesson/can-error-handling/">Kvaser · CAN Error Handling</a>：仲裁失败不按位错误处理。</li>
+<li><a href="https://www.can-cia.org/can-knowledge/can-data-link-layer-generations">CiA · CAN DLL generations</a>：经典 CAN、FD、XL 的适用范围。</li>
+</ol>
+<p>第四章将继续解释真正的错误检测、错误标志与错误计数，而不是把仲裁退让当作故障。</p>
+</section>
+<nav class="next" aria-label="章节导航"><a href="02.html">← 第二章 · 帧格式</a><a href="index.html">返回目录</a><a href="04.html">第四章 · 错误处理 →</a></nav></article></main></div><script>
+(function() {
+"use strict";
+const bits11=id=>id.toString(2).padStart(11,"0").split("").map((bit,i)=>({label:"ID"+(10-i),bit}));
+const b=(id,remote)=>[...bits11(id),{label:"RTR",bit:remote?"1":"0"},{label:"IDE",bit:"0"}];
+const e=(id,sub)=>[...bits11(id),{label:"SRR",bit:"1"},{label:"IDE",bit:"1"},...Array.from({length:18},(_,i)=>({label:"X"+(17-i),bit:String((sub>>(17-i))&1)})),{label:"RTR",bit:"0"}];
+const sets={
+ different:{a:"A · 0x100",b:"B · 0x200",l:b(0x100,false).slice(0,12),r:b(0x200,false).slice(0,12)},
+ remote:{a:"A · 数据",b:"B · 远程",l:b(0x123,false).slice(0,12),r:b(0x123,true).slice(0,12)},
+ extended:{a:"A · 标准远程",b:"B · 扩展数据",l:b(0x123,true),r:e(0x123,0x12)},
+ same:{a:"A · 同ID数据",b:"B · 同ID数据",l:b(0x123,false).slice(0,12),r:b(0x123,false).slice(0,12)}
+};
+let scenario="different",step=0;
+const head=document.getElementById("trace-head"),body=document.getElementById("trace-body");
+const status=document.getElementById("arbitration-status"),pos=document.getElementById("bit-position");
+const prev=document.getElementById("step-prev"),next=document.getElementById("step-next");
+const buttons=[...document.querySelectorAll("[data-scenario]")];
+function draw(){
+ const s=sets[scenario],limit=scenario==="extended"?13:12;
+ const l=s.l.slice(0,limit),r=s.r.slice(0,limit);
+ const first=l.findIndex((v,i)=>v.bit!==r[i].bit);
+ const victor=first<0?null:l[first].bit==="0"?"A":"B";
+ const bus=l.map((v,i)=>{
+   const a=(first<0||i<=first||victor==="A")?v.bit:"1";
+   const b=(first<0||i<=first||victor==="B")?r[i].bit:"1";
+   return a==="0"||b==="0"?"0":"1";
+ });
+ const h=document.createElement("tr");
+ const hc=document.createElement("th");hc.textContent="位 / 位置";hc.scope="col";h.append(hc);
+ l.forEach((v,i)=>{const el=document.createElement("th");el.textContent=v.label===r[i].label?v.label:v.label+"/"+r[i].label;el.scope="col";h.append(el)});
+ head.replaceChildren(h);
+ const fragment=document.createDocumentFragment();
+ for(const row of [{id:"a",title:s.a,data:l.map(x=>x.bit)},{id:"b",title:s.b,data:r.map(x=>x.bit)},{id:"bus",title:"总线",data:bus}]){
+   const tr=document.createElement("tr");tr.dataset.row=row.id;
+   const th=document.createElement("th");th.scope="row";th.textContent=row.title;tr.append(th);
+   row.data.forEach((bit,i)=>{
+     const cell=document.createElement("td");
+     const lost=first>=0&&i>first&&((row.id==="a"&&victor==="B")||(row.id==="b"&&victor==="A"));
+     cell.textContent=lost?"—":bit;
+     if(lost)cell.dataset.lost="true";
+     if(i===step)cell.dataset.current="true";
+     if(i===first&&row.id!=="bus")cell.dataset.result=(row.id.toUpperCase()===victor)?"win":"lose";
+     tr.append(cell);
+   });fragment.append(tr);
+ }
+ body.replaceChildren(fragment);
+ const name=l[step].label===r[step].label?l[step].label:l[step].label+"/"+r[step].label;
+ if(first===-1){status.textContent="第 "+(step+1)+" 位 "+name+"：双方仲裁位仍相同。整段仲裁没有选出唯一发送者；后续数据若不同，可能进入位错误处理。";}
+ else if(step<first){status.textContent="第 "+(step+1)+" 位 "+name+"：A="+l[step].bit+"，B="+r[step].bit+"，总线="+bus[step]+"，尚未决出胜负。";}
+ else if(step===first){status.textContent="第 "+(step+1)+" 位 "+name+"：A="+l[step].bit+"，B="+r[step].bit+"，总线=0；"+victor+" 发送显性0获胜，另一发送方退让。";}
+ else{status.textContent="第 "+(step+1)+" 位 "+name+"："+victor+" 已获胜，败者本轮停止发送，线上只剩赢家的有效位。";}
+ pos.textContent="第 "+(step+1)+" / "+limit+" 位";
+ prev.disabled=step===0;next.disabled=step===limit-1;
+ buttons.forEach(btn=>btn.setAttribute("aria-pressed",String(btn.dataset.scenario===scenario)));
+}
+buttons.forEach(btn=>btn.addEventListener("click",()=>{scenario=btn.dataset.scenario;step=0;draw()}));
+prev.addEventListener("click",()=>{if(step>0){step--;draw()}});
+next.addEventListener("click",()=>{if(step<(scenario==="extended"?13:12)-1){step++;draw()}});
+draw();
+})();
+</script></body></html>
