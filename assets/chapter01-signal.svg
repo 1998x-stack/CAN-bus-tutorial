@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="signal-svg" viewBox="0 0 640 280" role="img" aria-labelledby="signal-title signal-desc" data-selected="dominant">
+<title id="signal-title">高速 CAN 的典型显性与隐性差分电平</title>
+<desc id="signal-desc">左侧为显性逻辑零：CAN_H 约3.5伏，CAN_L 约1.5伏。右侧为隐性逻辑一：两线都约2.5伏。数值是典型示意而非全部收发器的绝对判决阈值。</desc>
+<rect x="8" y="8" width="304" height="264" rx="15" fill="#f0fbf7" stroke="#5aaba1" stroke-width="3" id="dominant-panel"/>
+<rect x="328" y="8" width="304" height="264" rx="15" fill="#f6f7fb" stroke="#bac8da" stroke-width="2" id="recessive-panel"/>
+<g font-family="Arial,sans-serif" text-anchor="middle"><text x="160" y="46" fill="#145c56" font-size="23" font-weight="700">显性 · 0</text><text x="480" y="46" fill="#465c6e" font-size="23" font-weight="700">隐性 · 1</text></g>
+<g stroke="#a6b9b9" stroke-width="1.5" stroke-dasharray="5 6"><path d="M34 143 H285 M356 143 H606"/></g>
+<g stroke-linecap="round" stroke-width="7"><path d="M54 91 H265" stroke="#007f86"/><path d="M54 195 H265" stroke="#d37e40"/><path d="M374 143 H585" stroke="#007f86"/><path d="M374 158 H585" stroke="#d37e40"/></g>
+<g font-family="Arial,sans-serif" font-size="18" text-anchor="middle"><text x="160" y="81" fill="#007079">CAN_H ≈ 3.5 V</text><text x="160" y="222" fill="#ac622e">CAN_L ≈ 1.5 V</text><text x="480" y="119" fill="#007079">CAN_H ≈ 2.5 V</text><text x="480" y="187" fill="#ac622e">CAN_L ≈ 2.5 V</text></g>
+<g font-family="Arial,sans-serif" font-size="17" text-anchor="middle"><text x="160" y="256" fill="#3d6260">差分 ≈ 2 V</text><text x="480" y="256" fill="#596a78">差分 ≈ 0 V</text></g>
+</svg>
