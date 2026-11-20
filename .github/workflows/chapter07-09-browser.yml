@@ -1,0 +1,19 @@
+name: Chapter 07-09 browser QA
+on:
+  push:
+    paths: ["07.html", "08.html", "09.html", "assets/olah-chapters.css", "assets/chapter07-*.svg", "assets/chapter08-*.svg", "assets/chapter09-*.svg", "tests/browser_chapters_07_09.py", ".github/workflows/chapter07-09-browser.yml"]
+  pull_request:
+    paths: ["07.html", "08.html", "09.html", "assets/olah-chapters.css", "assets/chapter07-*.svg", "assets/chapter08-*.svg", "assets/chapter09-*.svg", "tests/browser_chapters_07_09.py"]
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install playwright
+      - run: python -m playwright install --with-deps chromium
+      - run: python tests/browser_chapters_07_09.py

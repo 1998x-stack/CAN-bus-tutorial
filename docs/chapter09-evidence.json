@@ -1,0 +1,41 @@
+{
+  "chapter": 9,
+  "scope": "STM32F103 SPL / classical CAN where relevant",
+  "claims": [
+    {
+      "id": "timing",
+      "statement": "PCLK1=36MHz示例500kbps与83.33%采样点",
+      "locator": "36000000/[4*(1+14+3)] and 15/18",
+      "source_url": "https://www.st.com/resource/en/reference_manual/cd00171190.pdf",
+      "status": "derived"
+    },
+    {
+      "id": "filter-layout",
+      "statement": "bxCAN标准ID在32bit寄存器位31:21,IDE位2,RTR位1",
+      "locator": "ST RM0008 CAN filter register encoding",
+      "source_url": "https://www.st.com/resource/en/reference_manual/cd00171190.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "mask",
+      "statement": "0x123标准数据帧键0x24600000 掩码0xFFE00006",
+      "locator": "bitwise expression / 32-bit ID mask",
+      "source_url": "https://www.st.com/resource/en/reference_manual/cd00171190.pdf",
+      "status": "derived"
+    },
+    {
+      "id": "fifo",
+      "statement": "每RX FIFO三深度,中断需读取释放",
+      "locator": "ST RM0008 receive FIFOs and interrupts",
+      "source_url": "https://www.st.com/resource/en/reference_manual/cd00171190.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "irq-scope",
+      "statement": "STM32F103非连接型CAN1 RX0的USB_LP_CAN1_RX0_IRQn命名",
+      "locator": "STM32F103 CMSIS device header and startup vector",
+      "source_url": "https://www.st.com/resource/en/reference_manual/cd00171190.pdf",
+      "status": "verified"
+    }
+  ]
+}
