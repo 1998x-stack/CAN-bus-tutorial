@@ -1,0 +1,69 @@
+{
+  "chapter": 21,
+  "scope": "Classic CANopen CiA 301 / examples; source anchors and assumptions",
+  "claims": [
+    {
+      "id": "pdo-producer",
+      "claim": "PDO uses producer/consumer semantics; classic CAN data is at most 8 bytes.",
+      "kind": "protocol",
+      "source_url": "https://www.can-cia.org/can-knowledge/pdo-protocol/",
+      "locator": "PDO protocol overview",
+      "status": "verified",
+      "notes": "Not inherently one-to-one"
+    },
+    {
+      "id": "pdo-mapping",
+      "claim": "Mapping entry has index in bits 31–16, subindex in 15–8 and bit length in 7–0.",
+      "kind": "protocol",
+      "source_url": "https://canopennode.github.io/md_tutorial_2PDO.html",
+      "locator": "PDO mapping parameter section",
+      "status": "verified",
+      "notes": "Map length 64 bits in the illustrated example"
+    },
+    {
+      "id": "cia402",
+      "claim": "0x606C and 0x6064 are velocity and position actual values, while 0x6041 is statusword.",
+      "kind": "protocol",
+      "source_url": "https://www.can-cia.org/can-knowledge/cia-402-series-canopen-device-profile-for-drives-and-motion-control",
+      "locator": "CiA 402 device profile; object names backed by existing P0 verification ledger",
+      "status": "verified",
+      "notes": "Device engineering units and mappability are vendor-dependent"
+    },
+    {
+      "id": "type-ranges",
+      "claim": "Type 0 synchronous acyclic, 1–240 synchronous cyclic, 254/255 asynchronous event-driven.",
+      "kind": "protocol",
+      "source_url": "https://canopennode.github.io/md_tutorial_2PDO.html",
+      "locator": "PDO communication parameter, transmission type",
+      "status": "verified",
+      "notes": "Legacy RTR exceptions not universally supported"
+    },
+    {
+      "id": "timer-registers",
+      "claim": "0x1800:03 inhibit time is 100us units, :05 event timer ms, :06 SYNC start value.",
+      "kind": "protocol",
+      "source_url": "https://canopennode.github.io/md_tutorial_2PDO.html",
+      "locator": "PDO communication parameter fields 3,5,6",
+      "status": "verified",
+      "notes": "Vendor implementation may vary"
+    },
+    {
+      "id": "mapping-example",
+      "claim": "Two 32-bit entries encode as 0x606C0020 and 0x60640020; 1000/-2000 encode 8 bytes LE.",
+      "kind": "calculation",
+      "source_url": "https://canopennode.github.io/md_tutorial_2PDO.html",
+      "locator": "Mapping formula and reference/canopen_ch19_21.py",
+      "status": "derived",
+      "notes": "Payload e8 03 00 00 30 f8 ff ff"
+    },
+    {
+      "id": "bandwidth",
+      "claim": "50 nodes x 100 frames/s x 111 bits / 500000bit/s = 111% minimum load.",
+      "kind": "calculation",
+      "source_url": "https://www.can-cia.org/can-knowledge/pdo-protocol/",
+      "locator": "Reference model nominal_bus_load in reference/can_p0.py",
+      "status": "derived",
+      "notes": "Excludes bit stuffing, error frames, retry and all other traffic"
+    }
+  ]
+}
