@@ -1,0 +1,43 @@
+{
+  "chapter": 16,
+  "scope": "CANopen CC / classic CAN",
+  "note": "Evidence ledger for Olah-style pedagogical revision. Illustrative entries are not field measurements.",
+  "claims": [
+    {
+      "id": "c16-wave",
+      "claim": "典型高速 CAN 隐性近零差分、显性为正差分；3.5/1.5V 仅示意",
+      "kind": "technical",
+      "source_url": "https://www.ti.com/document-viewer/lit/html/SSZTCN3",
+      "locator": "Signal levels / bus states",
+      "status": "verified",
+      "notes": "不把示意电压当成任意器件的保证值"
+    },
+    {
+      "id": "c16-common",
+      "claim": "相等共模扰动在 V_CANH-V_CANL 中抵消",
+      "kind": "derived",
+      "source_url": null,
+      "locator": "Elementary voltage subtraction",
+      "status": "derived",
+      "notes": "理想两线同幅扰动模型，不覆盖非对称/超范围"
+    },
+    {
+      "id": "c16-limit",
+      "claim": "具体收发器的输入共模工作范围与故障耐受规格要分别查表",
+      "kind": "technical",
+      "source_url": "https://www.ti.com/product/SN65HVD230",
+      "locator": "Datasheet electrical characteristics",
+      "status": "verified",
+      "notes": "不可将单个芯片的范围概化为所有 CAN 产品"
+    },
+    {
+      "id": "c16-probe",
+      "claim": "接地示波器测量需考虑探头地与保护地连接",
+      "kind": "engineering",
+      "source_url": "https://www.tek.com/en/documents/primer/oscilloscope-probe-fundamentals",
+      "locator": "Probe grounding/safety",
+      "status": "unverified",
+      "notes": "通用安全提示；此参考未在本轮逐段核对"
+    }
+  ]
+}
