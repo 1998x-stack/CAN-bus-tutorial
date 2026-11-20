@@ -73,6 +73,8 @@ def speed_position_payload(speed: int, position: int) -> bytes:
     """Example raw signed int32 values; physical units require the device EDS."""
     if any(not isinstance(x, int) or isinstance(x, bool) for x in (speed, position)):
         raise ValueError("raw values must be integers")
+    if any(x < -(1 << 31) or x > (1 << 31) - 1 for x in (speed, position)):
+        raise ValueError("raw values outside signed int32 range")
     return pack("<ii", speed, position)
 
 
