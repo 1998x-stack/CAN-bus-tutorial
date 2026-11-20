@@ -1,0 +1,17 @@
+<svg viewBox="0 0 744 327" role="img" aria-labelledby="c18layers-t c18layers-d" xmlns="http://www.w3.org/2000/svg">
+      <title id="c18layers-t">CANopen 在经典 CAN 上构造应用服务与对象字典</title>
+      <desc id="c18layers-d">底部是物理层的差分线和数据链路层的 CAN 帧，中间是 CANopen NMT、SDO、PDO、心跳和紧急报文服务，顶部是对象字典中按 index 与 sub-index 定位的数据项。PDO 搬运映射的数据，SDO 按索引访问数据。</desc>
+      <rect x="22" y="241" width="700" height="64" rx="10" fill="#e8efeb" stroke="#a4b9b0"/>
+      <g font-family="sans-serif" fill="#2c4847"><text x="42" y="265" font-size="17" font-weight="700">经典 CAN</text><text x="42" y="289" font-size="14">物理层差分信号 + 链路层标识符、仲裁、CRC、ACK</text></g>
+      <g font-family="sans-serif" font-size="16" font-weight="700" text-anchor="middle">
+        <rect x="22" y="132" width="130" height="76" rx="9" fill="#e8e4f5"/><text x="87" y="174" fill="#635095">NMT</text>
+        <rect x="165" y="132" width="130" height="76" rx="9" fill="#e6f2ee"/><text x="230" y="174" fill="#0d666a">SDO</text>
+        <rect x="308" y="132" width="130" height="76" rx="9" fill="#fcece5"/><text x="373" y="174" fill="#b85d3b">PDO</text>
+        <rect x="451" y="132" width="130" height="76" rx="9" fill="#e8e4f5"/><text x="516" y="174" fill="#635095">心跳</text>
+        <rect x="594" y="132" width="128" height="76" rx="9" fill="#eef2df"/><text x="659" y="174" fill="#5b7049">EMCY</text>
+      </g>
+      <rect x="104" y="18" width="536" height="82" rx="11" fill="#f9fbf8" stroke="#aacbc0" stroke-width="2"/>
+      <g font-family="sans-serif" text-anchor="middle" fill="#315755"><text x="373" y="47" font-size="20" font-weight="700">对象字典（OD）</text><text x="373" y="77" font-size="16">Index : Sub-index → 类型、访问权限、数值</text></g>
+      <path d="M230 100V125M373 100V125" stroke="#628d82" stroke-width="3" stroke-dasharray="5 5"/>
+      <path d="M373 212V238M230 212V238" stroke="#628d82" stroke-width="3"/>
+    </svg>
