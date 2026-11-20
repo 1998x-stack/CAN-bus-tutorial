@@ -1,0 +1,97 @@
+{
+  "chapter": "03.html",
+  "scope": "Classical CAN arbitration. Illustrations and Python are deterministic teaching models, not controller simulation.",
+  "claims": [
+    {
+      "id": "C03-LEVEL",
+      "claim": "In CAN arbitration a dominant 0 overrides recessive 1",
+      "kind": "physical-mechanism",
+      "status": "verified",
+      "source_url": "https://www.can-cia.org/can-knowledge/can-cc",
+      "locator": "CAN CC: bus arbitration",
+      "notes": "Transceiver behavior assumed in arbitration mode"
+    },
+    {
+      "id": "C03-BITWISE",
+      "claim": "Losers transmitting recessive while reading dominant give up sending without destroying winner's frame",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://www.can-cia.org/can-knowledge/can-cc",
+      "locator": "CAN CC: arbitration",
+      "notes": "Contrasts with arbitrary bit discrepancy outside arbitration"
+    },
+    {
+      "id": "C03-ID",
+      "claim": "Standard ID 0x100 and 0x200 differ first at the second MSB bit (ID9)",
+      "kind": "calculation",
+      "status": "derived",
+      "source_url": null,
+      "locator": "00100000000 versus 01000000000",
+      "notes": "11-bit standard IDs exactly; SOF not included"
+    },
+    {
+      "id": "C03-RTR",
+      "claim": "For matching 11-bit identifier data frame has RTR dominant 0 and wins against remote RTR recessive 1",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://www.can-cia.org/can-knowledge/can-cc",
+      "locator": "CAN CC base/remote formats",
+      "notes": "Classic CAN only; FD does not permit remote frames"
+    },
+    {
+      "id": "C03-IDE",
+      "claim": "Same first 11 identifier bits: standard remote frame beats extended data frame at IDE after RTR/SRR are both recessive",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://www.can-cia.org/can-knowledge/can-cc",
+      "locator": "CAN CC base versus extended frames",
+      "notes": "Base IDE 0, extended IDE 1; distinction in field grouping explained"
+    },
+    {
+      "id": "C03-ERROR",
+      "claim": "Normal arbitration loss is not a bit error and does not by itself increase TEC/REC",
+      "kind": "fault-confinement",
+      "status": "verified",
+      "source_url": "https://kvaser.com/lesson/can-error-handling/",
+      "locator": "CAN Error Handling bit error exception in arbitration",
+      "notes": "Other faults can still trigger errors"
+    },
+    {
+      "id": "C03-DUP",
+      "claim": "Two simultaneous transmitters with the same arbitration field are not separated by arbitration; differing later data bits may raise bit errors",
+      "kind": "engineering-boundary",
+      "status": "verified",
+      "source_url": "https://kvaser.com/can-protocol-tutorial/",
+      "locator": "Arbitration Field uniqueness condition",
+      "notes": "Actual frames may be identical and indistinguishable at bus level"
+    },
+    {
+      "id": "C03-GENERATIONS",
+      "claim": "CAN FD excludes remote frames; CAN XL has a distinct priority identifier/content addressing distinction",
+      "kind": "version-boundary",
+      "status": "verified",
+      "source_url": "https://www.can-cia.org/can-knowledge/can-data-link-layer-generations",
+      "locator": "CAN CC, CAN FD, CAN XL overview",
+      "notes": "This chapter's remote-frame examples restricted to classical CAN"
+    },
+    {
+      "id": "C03-RETRY",
+      "claim": "Defeated transmitter can re-arbitrate when bus is free; successful delivery is not unconditionally guaranteed",
+      "kind": "engineering-qualification",
+      "status": "verified",
+      "source_url": "https://www.can-cia.org/cia-groups/cia-glossary-of-terms",
+      "locator": "re-arbitration and arbitration mode",
+      "notes": "One-shot, queue cancellation, overload and faults are implementation-dependent"
+    },
+    {
+      "id": "C03-SVG",
+      "claim": "Three original drawings show bit dominance, first divergence, and RTR/SRR/IDE precedence",
+      "kind": "illustration",
+      "status": "illustrative",
+      "source_url": null,
+      "locator": "Figures 1–3",
+      "notes": "Simplified diagrams; no signal timing or waveform-scale claim"
+    }
+  ]
+}
+
