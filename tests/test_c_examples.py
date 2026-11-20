@@ -86,6 +86,49 @@ int main(void) {
         self.compile_and_run(source.replace("CAN_SendStd(", function_name + "("))
 
     def test_chapter_27_signal_decode(self):
+        fragment = snippet("27", 0)
+        if "protocol_decode_speed(" in fragment:
+            # Chapter 27's revised architecture uses a boolean status + output
+            # sample rather than a sentinel float. Compile that real decoder.
+            source = r"""
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <assert.h>
+typedef struct {
+    uint32_t id;
+    uint32_t timestamp_ms;
+    uint8_t dlc;
+    uint8_t extended;
+    uint8_t rtr;
+    uint8_t data[8];
+} CanFrame;
+""" + fragment + r"""
+int main(void) {
+    CanFrame frame = {0};
+    SpeedSample out = {0};
+    frame.id = 0x100u;
+    frame.dlc = 3;
+    frame.timestamp_ms = 42;
+    frame.data[1] = 0xB8;
+    frame.data[2] = 0x0B;
+    assert(protocol_decode_speed(&frame, &out));
+    assert(out.kmh > 29.99f && out.kmh < 30.01f);
+    assert(out.received_ms == 42u);
+    frame.dlc = 2;
+    assert(!protocol_decode_speed(&frame, &out));
+    frame.dlc = 3;
+    frame.extended = 1;
+    assert(!protocol_decode_speed(&frame, &out));
+    frame.extended = 0;
+    frame.rtr = 1;
+    assert(!protocol_decode_speed(&frame, &out));
+    return 0;
+}
+"""
+            self.compile_and_run(source)
+            return
+
         source = r"""
 #include <stdint.h>
 #include <stddef.h>
