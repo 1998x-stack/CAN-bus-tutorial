@@ -187,7 +187,7 @@
 <text x="391" y="250" text-anchor="middle" font-size="13" fill="#52666d">RQCP 表示请求处理完毕；不代表 TXOK 一定成立</text>
 </svg>
 </div>
-<figcaption>图 10-1：三个发送邮箱是 bxCAN 的硬件资源，不是软件任务优先级。示例中 mailbox 1 的 ID 最小，但实际调度还取决于 TXFP 设置。</figcaption>
+<figcaption>图 10-1：三个发送邮箱是 bxCAN 的硬件资源，不是软件任务优先级。示例中 mailbox 1 的 ID 最小，但实际调度还取决于 TXFP 设置。 <a href="assets/chapter10-tx-flow.svg">单独查看图 10-1</a></figcaption>
 </figure>
 <div class="callout"><p><strong>三件不同的事：</strong>软件申请到了邮箱；控制器完成了一次发送请求；CAN 控制器确认成功发送（TXOK）。应用层收到并处理是更高层的协议问题，不能从 TXOK 推断。</p></div>
 </section>
