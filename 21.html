@@ -56,7 +56,7 @@ E8 03 00 00 | 30 F8 FF FF
 # 只是原始值；要变成 rpm / mm/s / mm 等须有设备单位与标定信息。</code></pre>
 </section>
 <section id="remap"><h2>真正的配置难点：改映射时不能让半成品 PDO 工作</h2>
-<p>如果设备<strong>支持动态 PDO 映射</strong>，常见步骤是在预操作状态禁用目标 PDO、清空有效映射数、写入条目、恢复映射数、设置通信参数并重新启用。下列是<strong>对象层顺序示意</strong>，不是可对任意设备盲写的 CAN 报文脚本：</p>
+<p>如果设备<strong>支持可变或动态 PDO 映射</strong>，常见步骤是在预操作状态禁用目标 PDO、清空有效映射数、写入条目、恢复映射数、设置通信参数并重新启用。下列是<strong>对象层顺序示意</strong>，不是可对任意设备盲写的 CAN 报文脚本：</p>
 <pre><code># 使用 SDO 操作节点 5，假设设备允许改写 TPDO1
 # 0x1800:01 是 COB-ID；保留原本 ID/其他位，仅按设备规则置 bit31 禁用
 0x1800:01 <- old_COB_ID | 0x80000000
@@ -96,6 +96,6 @@ E8 03 00 00 | 30 F8 FF FF
 </section>
 <section id="sources"><h2>资料与适用边界</h2>
 <p>本章讨论的是经典 CANopen、11 位默认标识符与经典 CAN 的 8 字节 PDO；CANopen FD、特殊设备 Profile 和具有专有映射约束的驱动器需要另行验证。</p>
-<ol class="refs"><li><a href="https://canopennode.github.io/md_tutorial_2PDO.html">CANopenNode PDO Tutorial</a>：通信参数、映射字编码、传输类型实现范围。</li><li><a href="https://www.analog.com/cn/resources/app-notes/an-076.html">Analog Devices AN-076</a>：设备映射步骤与同步/异步类型。</li><li><a href="https://infosys.beckhoff.com/content/1033/bk51x0/2519207947.html">Beckhoff Process Data Objects</a>：SYNC 语义、历史 RTR 类型与触发分类。</li><li><a href="https://www.can-cia.org/can-knowledge/process-data-objects/">CAN in Automation — Process Data Objects</a>：CANopen PDO 的概念与职责。</li></ol>
+<ol class="refs"><li><a href="https://canopennode.github.io/md_tutorial_2PDO.html">CANopenNode PDO Tutorial</a>：通信参数、映射字编码、传输类型实现范围。</li><li><a href="https://www.analog.com/cn/resources/app-notes/an-076.html">Analog Devices AN-076</a>：设备映射步骤与同步/异步类型。</li><li><a href="https://infosys.beckhoff.com/content/1033/bk51x0/2519207947.html">Beckhoff Process Data Objects</a>：SYNC 语义、历史 RTR 类型与触发分类。</li><li><a href="https://www.can-cia.org/can-knowledge/pdo-protocol/">CAN in Automation — Process Data Objects</a>：CANopen PDO 的概念与职责。</li></ol>
 <p>下一章切换协议体系：J1939 的 PGN、SPN 与地址声明规则不直接沿用 CANopen 的对象字典与 PDO 映射。</p>
 </section><nav class="chapter-nav" aria-label="章节前后导航"><a href="20.html">← 第 20 章：SDO</a><a href="index.html">返回目录</a><a href="22.html">第 22 章：J1939 →</a></nav></article></main></div><script>(()=>{'use strict';const n=document.getElementById('node'),v=document.getElementById('speed'),p=document.getElementById('pos'),o=document.getElementById('result');const hex=(x,w)=>x.toString(16).toUpperCase().padStart(w,'0');function render(){const a=[Number(n.value),Number(v.value),Number(p.value)];if(!a.every(Number.isInteger)||a[0]<1||a[0]>127||a.slice(1).some(x=>x<(-2147483648)||x>2147483647)){o.textContent='输入无效：Node-ID 应在 1–127，两个原始值应为 32 位有符号整数。';return;}const b=new ArrayBuffer(8),dv=new DataView(b);dv.setInt32(0,a[1],true);dv.setInt32(4,a[2],true);const bytes=Array.from(new Uint8Array(b),x=>hex(x,2)).join(' ');o.textContent='TPDO1: CAN-ID 0x'+hex(0x180+a[0],3)+', DLC 8\n'+bytes+'\n映射: 606C0020 + 60640020 = 64 bit\n单位/比例：仍须参考设备对象字典。';}for(const el of [n,v,p])el.addEventListener('input',render);render();})();</script></body></html>
