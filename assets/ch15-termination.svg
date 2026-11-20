@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 340" role="img" aria-labelledby="t d">
+<title id="t">CAN 总线两端的差分终端电阻位置示意</title><desc id="d">CAN_H和CAN_L是水平平行的两条导线，在两端各有一个跨线120欧姆电阻。中间节点只连接总线，不再增加终端电阻。断电时两只120欧姆并联，理论测量为60欧姆。</desc>
+<rect width="840" height="340" rx="16" fill="#fffdf9"/>
+<text x="32" y="39" font-size="23" font-weight="700" fill="#21464b">两端各 120 Ω，中间节点不加端接</text>
+<g font-size="18" font-weight="700"><text x="35" y="124" fill="#147f80">CAN_H</text><text x="35" y="255" fill="#7461ba">CAN_L</text></g>
+<path d="M115 116H784" stroke="#147f80" stroke-width="6" stroke-linecap="round"/><path d="M115 246H784" stroke="#7461ba" stroke-width="6" stroke-linecap="round"/>
+<g stroke="#c46f48" stroke-width="3" fill="none"><path d="M172 116V155 L165 163 L179 171 L165 179 L179 187 L165 195 L179 203 L172 211V246"/><path d="M727 116V155 L720 163 L734 171 L720 179 L734 187 L720 195 L734 203 L727 211V246"/></g>
+<g font-size="16" fill="#9d552f" font-weight="700" text-anchor="middle"><text x="174" y="153">120 Ω</text><text x="728" y="153">120 Ω</text></g>
+<path d="M448 116V164 M448 218V246" stroke="#42787b" stroke-width="3"/>
+<rect x="394" y="163" width="108" height="56" rx="10" fill="#def2f0" stroke="#147f80" stroke-width="2"/>
+<text x="448" y="197" text-anchor="middle" font-size="18" font-weight="700" fill="#1b5757">中间节点</text>
+<text x="448" y="278" text-anchor="middle" font-size="14" fill="#527477">高阻输入；不接第 3 个终端</text>
+<rect x="231" y="300" width="378" height="28" rx="14" fill="#edf3f2"/>
+<text x="420" y="319" text-anchor="middle" fill="#205b5d" font-size="15">断电等效：120 Ω ∥ 120 Ω = 60 Ω</text>
+</svg>
