@@ -1,0 +1,191 @@
+{
+  "chapter": "06",
+  "scope": "Classical CAN; SJA1000 PeliCAN vs MCP2515; no actual hardware exercised",
+  "sources": {
+    "NXP_SJA1000": "https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf",
+    "Microchip_MCP2515": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+    "NXP_AN97076": "https://www.nxp.com/docs/en/application-note/AN97076.pdf"
+  },
+  "claims": [
+    {
+      "id": "control-vs-transceiver",
+      "claim": "SJA1000和MCP2515是CAN协议控制器；CAN收发器是独立电气层组件",
+      "kind": "architecture",
+      "status": "verified",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf",
+      "locator": "§6.1 controller blocks / application note §2.2",
+      "notes": "两个例子均为独立控制器，典型拓扑须另配物理层驱动"
+    },
+    {
+      "id": "sja-host",
+      "claim": "SJA1000通过存储器映射的并行CPU接口访问",
+      "kind": "architecture",
+      "status": "verified",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf",
+      "locator": "§6.3.1, §6.4.1",
+      "notes": "不可将SJA1000误描述为SPI控制器"
+    },
+    {
+      "id": "mcp-spi",
+      "claim": "MCP2515用SPI连接主机，支持SPI模式0,0或1,1",
+      "kind": "architecture",
+      "status": "verified",
+      "source_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+      "locator": "§12.1",
+      "notes": "应用时检查CS时序、上升/下降沿规则"
+    },
+    {
+      "id": "sja-modes",
+      "claim": "SJA1000 BasicCAN兼容性模式与PeliCAN模式并非发送/接收工作状态",
+      "kind": "mode",
+      "status": "verified",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf",
+      "locator": "§6.2.2, §6.5.4.6",
+      "notes": "CDR.7选择，切换需遵守复位态"
+    },
+    {
+      "id": "sja-alias",
+      "claim": "SJA1000 PeliCAN 0x10..0x17 复位态为ACR/AMR；运行态为TXB/RXB访问窗口",
+      "kind": "register",
+      "status": "verified",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf",
+      "locator": "Table 10: PeliCAN address allocation",
+      "notes": "地址既取决于模式也取决于读写方向"
+    },
+    {
+      "id": "sja-btr",
+      "claim": "SJA1000的TQ=2*(BRP编码+1)/fXTAL，BTR0存SJW和BRP",
+      "kind": "timing",
+      "status": "verified",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf",
+      "locator": "§6.5.1.1",
+      "notes": "不同于bxCAN的分频公式"
+    },
+    {
+      "id": "sja-sample-example",
+      "claim": "fXTAL16MHz、BRP实际1、TSEG1=13、TSEG2=2得BTR0=0x00 BTR1=0x1C且500kbps/87.5%",
+      "kind": "timing",
+      "status": "derived",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf",
+      "locator": "§6.5.1–6.5.2 + examples/can_chapter06_checks.py",
+      "notes": "单采样SAM=0；纯标称计算"
+    },
+    {
+      "id": "sja-bitmask",
+      "claim": "SJA1000 AMR mask=1为don't care，0为比较",
+      "kind": "filter",
+      "status": "verified",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf",
+      "locator": "§6.3.9.2, §6.4.15",
+      "notes": "与MCP2515掩码位极性相反"
+    },
+    {
+      "id": "sja-listen",
+      "claim": "SJA1000 PeliCAN MOD.1监听且不应答；MOD.2为自测试",
+      "kind": "mode",
+      "status": "verified",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf",
+      "locator": "§6.4.3 Table 12",
+      "notes": "不能与MCP2515 CANCTRL 模式值等同"
+    },
+    {
+      "id": "mcp-buffer",
+      "claim": "MCP2515含3 TX缓冲、2 RX缓冲、6 RX过滤器和2掩码",
+      "kind": "architecture",
+      "status": "verified",
+      "source_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+      "locator": "Features and §4.0 Receive Buffers",
+      "notes": "有RXB0→RXB1 rollover机制与限制"
+    },
+    {
+      "id": "mcp-filter-map",
+      "claim": "RXF0/1配RXM0到RXB0，RXF2-5配RXM1到RXB1",
+      "kind": "filter",
+      "status": "verified",
+      "source_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+      "locator": "§4.0 Receive Buffers, Figure 4-2, Table 4-2",
+      "notes": "具体RXM和BUKT影响路由"
+    },
+    {
+      "id": "mcp-mask",
+      "claim": "MCP2515 mask=1要求比较，0表示忽略",
+      "kind": "filter",
+      "status": "verified",
+      "source_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+      "locator": "Table 4-2 FILTER/MASK TRUTH TABLE",
+      "notes": "与SJA1000相反"
+    },
+    {
+      "id": "mcp-sid-packed",
+      "claim": "11位0x123映射MCP2515 SIDH=0x24 SIDL=0x60, EXIDE=0",
+      "kind": "register",
+      "status": "derived",
+      "source_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+      "locator": "§4.0 RXFnSIDH/RXFnSIDL and example Python",
+      "notes": "只编码标准ID，不含扩展帧和数据字节"
+    },
+    {
+      "id": "mcp-command",
+      "claim": "MCP2515 SPI RESET为0xC0、WRITE0x02、READ0x03、BIT MODIFY0x05、LOAD TX 0x40族、READ RX 0x90族、RTS0x80族",
+      "kind": "spi",
+      "status": "verified",
+      "source_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+      "locator": "§12.0 Table 12-1",
+      "notes": "原章的0x05=reset与0x80=read RX错误"
+    },
+    {
+      "id": "mcp-mode",
+      "claim": "CANCTRL.REQOP[7:5]配置等模式；CANSTAT.OPMOD[7:5]读回真实模式",
+      "kind": "mode",
+      "status": "verified",
+      "source_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+      "locator": "§10.1–10.5, REGISTER 10-1 & 10-2",
+      "notes": "不能只写CANCTRL=0就认定切换已成功"
+    },
+    {
+      "id": "mcp-silence",
+      "claim": "MCP2515 listen-only不发送ACK/错误帧；loopback内部收发且TXCAN隐性",
+      "kind": "mode",
+      "status": "verified",
+      "source_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+      "locator": "§10.3, §10.4",
+      "notes": "不是通用的线缆/收发器实测"
+    },
+    {
+      "id": "mcp-reset",
+      "claim": "MCP2515的硬复位和SPI RESET均可使进入配置模式；复位时间按器件电气参数",
+      "kind": "init",
+      "status": "verified",
+      "source_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+      "locator": "§9.0 RESET, §12.2 RESET Instruction",
+      "notes": "不能所有芯片统一固定5us"
+    },
+    {
+      "id": "sja-accept",
+      "claim": "SJA1000 PeliCAN滤波器单32位与双16位两种结构，AFM=1单过滤",
+      "kind": "filter",
+      "status": "verified",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf",
+      "locator": "§6.4.3 Table 12, §6.4.15",
+      "notes": "演示代码的11位比较非硬件全量行为"
+    },
+    {
+      "id": "mcp-sleep",
+      "claim": "MCP2515睡眠时振荡器停止，总线活动唤醒需考虑OST；监听唤醒后需主动切回normal",
+      "kind": "mode",
+      "status": "verified",
+      "source_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+      "locator": "§10.2, §10.2.1",
+      "notes": "不能把唤醒等价于立刻发报文"
+    },
+    {
+      "id": "demo-boundary",
+      "claim": "过滤器交互仅模拟11位ID比较，忽略帧类型、扩展ID与标准帧数据字节滤波等细节",
+      "kind": "demo",
+      "status": "illustrative",
+      "source_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf",
+      "locator": "§4.0 / JS teaching lab",
+      "notes": "不能替代硬件配置/逻辑分析仪"
+    }
+  ]
+}
