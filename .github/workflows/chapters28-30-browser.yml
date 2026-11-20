@@ -1,0 +1,47 @@
+name: CAN chapters 28–30 browser QA
+on:
+  push:
+    paths:
+      - "28.html"
+      - "29.html"
+      - "30.html"
+      - "assets/chapters28-30.css"
+      - "assets/chapter28-*.svg"
+      - "assets/chapter29-*.svg"
+      - "assets/chapter30-*.svg"
+      - "tests/browser_chapters28_30.py"
+      - ".github/workflows/chapters28-30-browser.yml"
+  pull_request:
+    paths:
+      - "28.html"
+      - "29.html"
+      - "30.html"
+      - "assets/chapters28-30.css"
+      - "assets/chapter28-*.svg"
+      - "assets/chapter29-*.svg"
+      - "assets/chapter30-*.svg"
+      - "tests/browser_chapters28_30.py"
+      - ".github/workflows/chapters28-30-browser.yml"
+jobs:
+  visual-smoke:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Playwright
+        run: |
+          python -m pip install playwright==1.56.0
+          command -v google-chrome
+      - name: Check layouts, diagrams, controls and print
+        run: python tests/browser_chapters28_30.py
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: can-ch28-30-browser-qa
+          path: reports/chapters28-30/
+          if-no-files-found: ignore
