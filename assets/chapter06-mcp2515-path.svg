@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 456" role="img" aria-labelledby="title desc">
+<title id="title">MCP2515 的 SPI 控制路径、发送缓冲和接收过滤路径</title>
+<desc id="desc">MCU经SPI的CS/SCK/SI/SO访问MCP2515寄存器及三个发送缓冲，输出到CAN协议引擎；从CAN协议引擎接收的帧先经六个验收滤波器和两组掩码，再进入两个接收缓冲。RXF0至1与RXM0对应RXB0，RXF2至5与RXM1对应RXB1。所有CAN位流最终经单独收发器进入总线。</desc>
+<rect width="1060" height="456" rx="18" fill="#fffdf9"/>
+<g font-family="system-ui,Microsoft YaHei,sans-serif" fill="#203035">
+<text x="35" y="42" font-size="25" font-weight="750">MCP2515：SPI 只搬运寄存器和缓冲区，不代替 CAN 协议引擎</text>
+<rect x="35" y="91" width="180" height="293" rx="11" fill="#e7f2ef" stroke="#6bada3" stroke-width="2"/>
+<text x="125" y="142" text-anchor="middle" font-size="23" font-weight="700">MCU</text><text x="125" y="172" text-anchor="middle" font-size="16">SPI 主机</text>
+<text x="125" y="221" text-anchor="middle" font-size="14" fill="#52666b">CS / SCK</text>
+<text x="125" y="243" text-anchor="middle" font-size="14" fill="#52666b">SI / SO</text>
+<rect x="268" y="91" width="528" height="293" rx="13" fill="#fff" stroke="#8ba8bb" stroke-width="2"/>
+<text x="532" y="123" text-anchor="middle" font-size="21" font-weight="750">MCP2515 · CAN 控制器内部</text>
+<rect x="294" y="144" width="191" height="70" rx="8" fill="#dcefe9" stroke="#6aafa0"/>
+<text x="389" y="171" text-anchor="middle" font-size="17" font-weight="700">TXB0 / TXB1 / TXB2</text>
+<text x="389" y="193" text-anchor="middle" font-size="14">3 个发送缓冲区</text>
+<rect x="550" y="144" width="220" height="70" rx="8" fill="#e1ebf7" stroke="#88a8c8"/>
+<text x="660" y="171" text-anchor="middle" font-size="17" font-weight="700">位时序 / 仲裁 / CRC</text>
+<text x="660" y="193" text-anchor="middle" font-size="14">CAN 协议处理</text>
+<rect x="294" y="240" width="228" height="119" rx="8" fill="#fff1df" stroke="#dcad76"/>
+<text x="408" y="265" text-anchor="middle" font-size="17" font-weight="700">验收过滤与屏蔽</text>
+<text x="408" y="294" text-anchor="middle" font-size="14">RXF0–1  +  RXM0</text>
+<text x="408" y="319" text-anchor="middle" font-size="14">RXF2–5  +  RXM1</text>
+<text x="408" y="341" text-anchor="middle" font-size="13" fill="#796343">6 个过滤器 / 2 个掩码</text>
+<rect x="558" y="240" width="212" height="119" rx="8" fill="#e9e4f7" stroke="#9c88c1"/>
+<text x="664" y="264" text-anchor="middle" font-size="17" font-weight="700">RXB0 / RXB1</text>
+<text x="664" y="291" text-anchor="middle" font-size="14">2 个接收缓冲区</text>
+<text x="664" y="318" text-anchor="middle" font-size="13" fill="#695d83">RXB0 可按条件</text>
+<text x="664" y="337" text-anchor="middle" font-size="13" fill="#695d83">rollover 到 RXB1</text>
+<rect x="847" y="179" width="179" height="124" rx="11" fill="#fbe8d9" stroke="#cb9162" stroke-width="2"/>
+<text x="936" y="214" text-anchor="middle" font-size="20" font-weight="700">CAN 收发器</text>
+<text x="936" y="243" text-anchor="middle" font-size="15">TXCAN / RXCAN</text>
+<text x="936" y="270" text-anchor="middle" font-size="15">→ CAN_H / CAN_L</text>
+<g stroke="#5c777e" stroke-width="3" fill="none" stroke-linecap="round">
+<path d="M215 205 H283 l-10 -7 m10 7 l-10 7"/><path d="M485 179 H538 l-10 -7 m10 7 l-10 7"/>
+<path d="M770 179 H836 l-10 -7 m10 7 l-10 7"/><path d="M847 291 H814 V299 H782"/>
+<path d="M558 301 H535 l11 -7 m-11 7 l11 7"/><path d="M294 323 H255 V331 H215"/>
+</g>
+<g font-size="13" fill="#53676d" text-anchor="middle"><text x="252" y="188">SPI</text><text x="814" y="166">TX</text><text x="813" y="313">RX</text><text x="254" y="352">读取</text></g>
+<text x="36" y="428" font-size="14" fill="#53676d">概念流图：实际接收帧先由 CAN 引擎检查，再按 RXBnCTRL / RXFn / RXMn 设置路由到接收缓冲区。</text>
+</g></svg>
