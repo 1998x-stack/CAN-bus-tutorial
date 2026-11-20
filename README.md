@@ -60,6 +60,25 @@ python3 -m unittest discover -s tests -v
 
 具体修复清单、计算基准与实机验证边界见 [docs/P0_VERIFICATION.md](docs/P0_VERIFICATION.md)。Python单元测试通过不代表某块STM32开发板已经完成交叉编译或硬件总线验证。
 
+## 🔎 第 10–12 章：发送 / 接收 / 中断编程
+
+- [第 10 章 · CAN 报文发送](10.html)：三邮箱调度、TXFP、总线仲裁、RQCP/TXOK 的区别及 TX 中断。
+- [第 11 章 · CAN 报文接收](11.html)：过滤器、双 FIFO、RFLM 溢出策略、SPSC 队列与消息时效性。
+- [第 12 章 · CAN 中断编程](12.html)：STM32F103 共享向量、NVIC 分组、标志处理与 ISR 周期测量。
+
+三章共享 [阅读样式](reading.css)，每章的可独立查看的 SVG 图示位于 [assets/](assets/)；主张与参考手册的出处列在 [docs/chapter10-evidence.json](docs/chapter10-evidence.json)、[docs/chapter11-evidence.json](docs/chapter11-evidence.json)、[docs/chapter12-evidence.json](docs/chapter12-evidence.json)。
+
+在仓库根目录执行：
+
+```bash
+python -m unittest discover -s tests -p 'test_chapters_10_12.py' -v
+pip install playwright
+python -m playwright install chromium
+python tests/browser_chapters_10_12.py
+```
+
+浏览器检查覆盖 1440 / 768 / 390 / 360 px、章节内交互、SVG、导航和页面横向溢出。GitHub Actions 的 [Chapter 10-12 QA](.github/workflows/chapter10-12-browser.yml) 工作流可在变更时运行；能否通过以实际工作流结果为准。代码示例基于 **STM32F103 / bxCAN / STM32F10x SPL**，仍须按实际板卡和启动文件做编译、接线与总线验证。
+
 ## 📂 项目结构
 
 ```text
