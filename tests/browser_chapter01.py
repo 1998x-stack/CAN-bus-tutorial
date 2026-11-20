@@ -1,6 +1,7 @@
 """Playwright smoke QA for the interactive Chapter 01 CAN overview."""
 from pathlib import Path
 import json
+import shutil
 
 from playwright.sync_api import sync_playwright
 
@@ -14,7 +15,9 @@ SIZES = [(1440, 900), (768, 1024), (390, 844), (360, 800)]
 def run():
     results = []
     with sync_playwright() as engine:
-        browser = engine.chromium.launch(headless=True)
+        chrome = shutil.which("google-chrome") or shutil.which("chromium")
+        assert chrome, "GitHub runner has no installed Chrome/Chromium"
+        browser = engine.chromium.launch(headless=True, executable_path=chrome)
         for width, height in SIZES:
             page = browser.new_page(viewport={"width": width, "height": height}, device_scale_factor=1)
             errors = []
