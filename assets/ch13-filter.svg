@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 355" role="img" aria-labelledby="t d">
+<title id="t">过滤器只决定本节点接收哪些报文</title><desc id="d">总线上的三个标准帧标识符进入过滤器，配置标识符0x200和掩码0x7F0后，0x200与0x20F进入FIFO，0x210被拒收，总线上依然传输所有帧。</desc>
+<rect width="840" height="355" rx="18" fill="#fffdf9"/>
+<text x="35" y="38" font-size="23" font-weight="700" fill="#21464b">总线流量 ≠ 节点接收负担</text>
+<text x="35" y="70" font-size="15" fill="#617477">总线仍承载全部报文，硬件过滤器仅决定本节点 FIFO 的入口</text>
+<path d="M48 116 H788" stroke="#526e77" stroke-width="8" stroke-linecap="round"/><text x="46" y="102" font-size="13" fill="#526e77">CAN_H / CAN_L（示意）</text>
+<g font-size="20" font-weight="700" text-anchor="middle">
+<rect x="95" y="140" width="140" height="53" rx="12" fill="#def2f0" stroke="#147f80"/><text x="165" y="174" fill="#156e70">0x200</text>
+<rect x="282" y="140" width="140" height="53" rx="12" fill="#def2f0" stroke="#147f80"/><text x="352" y="174" fill="#156e70">0x20F</text>
+<rect x="469" y="140" width="140" height="53" rx="12" fill="#fff0e7" stroke="#d06d4d"/><text x="539" y="174" fill="#a55432">0x210</text>
+</g>
+<path d="M165 117V139 M352 117V139 M539 117V139" stroke="#789198" stroke-width="2"/>
+<g fill="none" stroke="#147f80" stroke-width="3" stroke-linecap="round"><path d="M165 196 V226 H310"/><path d="M352 196 V226"/></g><path d="M539 196V241" stroke="#d06d4d" stroke-width="3" stroke-dasharray="6 5"/>
+<rect x="310" y="210" width="222" height="71" rx="14" fill="#e3f3ee" stroke="#147f80" stroke-width="2"/>
+<text x="421" y="238" font-size="18" text-anchor="middle" font-weight="700" fill="#1b5757">过滤器 → FIFO0</text>
+<text x="421" y="262" font-size="14" text-anchor="middle" fill="#41696a">ID = 0x200, MASK = 0x7F0</text>
+<path d="M539 241H585" stroke="#d06d4d" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="593" y="246" font-size="16" fill="#a55432">不匹配</text>
+<text x="35" y="322" font-size="15" fill="#617477">匹配关系：(接收 ID AND 掩码) = (目标 ID AND 掩码)</text>
+</svg>
