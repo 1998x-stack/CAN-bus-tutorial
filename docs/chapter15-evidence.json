@@ -1,0 +1,60 @@
+{
+  "chapter": "15",
+  "scope": "Classical high-speed CAN linear bus; ideal terminated differential transmission-line model",
+  "claims": [
+    {
+      "id": "termination-endpoints",
+      "claim": "Two 120-ohm resistors are normally placed across CAN_H/CAN_L at opposite physical ends of the main trunk",
+      "kind": "reference",
+      "source_url": "https://www.ti.com/tool/TIDA-01238",
+      "locator": "Physical endpoint termination in reference design",
+      "status": "verified",
+      "notes": ""
+    },
+    {
+      "id": "equivalent-sixty",
+      "claim": "Two identical 120-ohm resistors in parallel have an ideal 60-ohm DC equivalent",
+      "kind": "formula",
+      "source_url": "https://www.ti.com/document-viewer/lit/html/SLLA555/GUID-B6EFC304-6CF0-429D-A913-0E138E894DF3",
+      "locator": "chapter 15 derivation; examples/can_chapters13_15_checks.py",
+      "status": "derived",
+      "notes": ""
+    },
+    {
+      "id": "reflection-formula",
+      "claim": "Ideal voltage reflection coefficient is (R_L-Z0)/(R_L+Z0); zero when R_L matches Z0",
+      "kind": "formula",
+      "source_url": "https://www.ti.com/document-viewer/lit/html/SLLA555/GUID-B6EFC304-6CF0-429D-A913-0E138E894DF3",
+      "locator": "chapter 15 ideal transmission-line formula",
+      "status": "derived",
+      "notes": ""
+    },
+    {
+      "id": "split-termination",
+      "claim": "Split termination can substitute two series resistors with a midpoint capacitance for a 120-ohm equivalent",
+      "kind": "reference",
+      "source_url": "https://www.ti.com/document-viewer/ja-jp/lit/html/SSZTAM0",
+      "locator": "standard vs split termination application comparison",
+      "status": "verified",
+      "notes": ""
+    },
+    {
+      "id": "power-illustrative",
+      "claim": "Under a specified 2V differential assumption, each 120-ohm resistor dissipates about 0.033 W",
+      "kind": "teaching example",
+      "source_url": "https://www.ti.com/tool/TIDA-01238",
+      "locator": "P=V^2/R; chapter 15 teaching calculation",
+      "status": "illustrative",
+      "notes": "Not a resistor power-rating design rule; transients/faults excluded."
+    },
+    {
+      "id": "measurement-limit",
+      "claim": "About 60-ohm powered-off reading cannot by itself verify endpoint placement or wave quality",
+      "kind": "formula",
+      "source_url": "https://www.ti.com/tool/TIDA-01238",
+      "locator": "chapter 15 DC-vs-transmission-line explanation",
+      "status": "derived",
+      "notes": ""
+    }
+  ]
+}

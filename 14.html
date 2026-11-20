@@ -115,8 +115,10 @@
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
     </style>
+<link rel="stylesheet" href="assets/olah-chapters-13-15.css">
 </head>
 <body>
+<a class="skip-to-content" href="#content">跳转到正文</a>
 <div class="double-border">
 <div class="container">
     <div class="sidebar">
@@ -155,159 +157,58 @@
         </ul>
     </div>
     <div class="main-content">
-        <h2>第14章：CAN总线网络拓扑：总线拓扑、星型拓扑、终端电阻匹配、总线长度与速率关系</h2>
-
-<p>大家好，我是你们的老朋友。今天咱们聊聊CAN总线的网络拓扑。说实话，这块内容看着简单，但实际项目中踩坑的人真不少。我见过太多工程师，原理图画得漂漂亮亮，一上电就是各种通信故障，最后发现是拓扑结构出了问题。</p>
-
-<h3>14.1 总线拓扑：CAN的“正统”玩法</h3>
-
-<p>CAN总线最标准、最推荐的拓扑结构，就是总线型拓扑。说白了，就是一根主干线，所有节点都挂在这根线上。像一串葡萄，每个节点都是其中一颗。</p>
-
-<div class="highlight">
-  <p><strong>核心要点：</strong>CAN总线是“多主从”通信，所有节点共享同一物理介质。总线拓扑能保证信号反射最小，通信最稳定。</p>
-</div>
-
-<p>我在项目中遇到过一件事。有个同事非要用星型拓扑，说布线方便。结果呢？通信距离一拉长，各种错误帧就冒出来了。最后乖乖改回总线拓扑，问题全消。嗯，这就是经验教训。</p>
-
-<p>总线拓扑的几个关键参数：</p>
-<ul>
-  <li><strong>主干线</strong>：就是那根贯穿所有节点的线，一般用双绞线</li>
-  <li><strong>分支线（stub）</strong>：从主干线分到节点的短线，越短越好</li>
-  <li><strong>节点间距</strong>：任意两个节点间的距离，受速率限制</li>
-</ul>
-
-<div class="tip">
-  <p><strong>我的习惯：</strong>分支线长度尽量控制在0.3米以内。实在没办法，也别超过0.5米。你想想看，分支线越长，信号反射越严重，通信质量就越差。</p>
-</div>
-
-<h3>14.2 星型拓扑：能用，但别乱用</h3>
-
-<p>星型拓扑，就是所有节点都连到一个中心节点上。像车轮的辐条。这种拓扑在工业现场偶尔能看到，但说实话，我不推荐。</p>
-
-<p>为什么会这样？因为星型拓扑会引入严重的信号反射问题。每个分支的末端如果不做特殊处理，信号到了那里就会反弹回来，干扰正常通信。</p>
-
-<p>我曾经在一个项目中，客户非要搞星型拓扑，说这样方便维护。我劝了半天没用，只好在中心节点加了中继器，每个分支末端都加了终端电阻。折腾了整整一周，总算能跑了。但通信速率只能降到100kbps，原本设计是500kbps的。</p>
-
-<div class="warning">
-  <p><strong>避坑指南：</strong>如果你非要用星型拓扑，记住三点：</p>
-  <ul>
-    <li>每个分支末端必须加终端电阻（120Ω）</li>
-    <li>分支长度尽量短，最好小于1米</li>
-    <li>通信速率要降档，别想着跑高速</li>
-  </ul>
-  <p>我曾经见过一个案例，星型拓扑没加终端电阻，结果整个网络像抽风一样，时不时丢帧。查了三天才找到原因。</p>
-</div>
-
-<h3>14.3 终端电阻匹配：小电阻，大作用</h3>
-
-<p>终端电阻，说白了就是防止信号反射的。CAN总线两端各放一个120Ω的电阻，这是标准做法。为什么是120Ω？因为CAN双绞线的特性阻抗大约是120Ω，匹配了才能吸收信号能量，不让它反弹。</p>
-
-<p>我记得刚入行时，有个老工程师跟我说：“终端电阻就是CAN总线的刹车片，没有它，信号会像脱缰的野马一样乱窜。”这个比喻很形象，我一直记到现在。</p>
-
-<p>终端电阻的选型要点：</p>
-<table>
-  <tr>
-    <th>参数</th>
-    <th>推荐值</th>
-    <th>说明</th>
-  </tr>
-  <tr>
-    <td>阻值</td>
-    <td>120Ω ±1%</td>
-    <td>匹配双绞线特性阻抗</td>
-  </tr>
-  <tr>
-    <td>功率</td>
-    <td>0.25W 或 0.5W</td>
-    <td>一般应用足够，高电压场景需计算</td>
-  </tr>
-  <tr>
-    <td>精度</td>
-    <td>±1% 或更高</td>
-    <td>精度越高，匹配效果越好</td>
-  </tr>
-</table>
-
-<div class="highlight">
-  <p><strong>重要提醒：</strong>终端电阻必须放在总线的两端，不是随便哪个节点都行。我见过有人把两个电阻放在同一个节点上，结果通信距离一长就出问题。记住，是“两端”，不是“两头凑”。</p>
-</div>
-
-<h3>14.4 总线长度与速率关系：鱼和熊掌不可兼得</h3>
-
-<p>CAN总线的长度和速率是成反比的。速率越高，能跑的距离就越短。这个关系不是线性的，而是受信号传播延迟和采样点位置共同决定的。</p>
-
-<p>标准CAN（ISO 11898-2）给出的参考数据：</p>
-<table>
-  <tr>
-    <th>速率（kbps）</th>
-    <th>最大总线长度（m）</th>
-    <th>典型应用场景</th>
-  </tr>
-  <tr>
-    <td>1000</td>
-    <td>40</td>
-    <td>车内短距离高速通信</td>
-  </tr>
-  <tr>
-    <td>500</td>
-    <td>100</td>
-    <td>常见车载网络</td>
-  </tr>
-  <tr>
-    <td>250</td>
-    <td>250</td>
-    <td>工业控制</td>
-  </tr>
-  <tr>
-    <td>125</td>
-    <td>500</td>
-    <td>楼宇自动化</td>
-  </tr>
-  <tr>
-    <td>50</td>
-    <td>1000</td>
-    <td>远程监控</td>
-  </tr>
-  <tr>
-    <td>10</td>
-    <td>5000</td>
-    <td>超远距离通信</td>
-  </tr>
-</table>
-
-<p>你想想看，为什么速率高了距离就短？因为CAN总线是依靠电平变化来传输数据的。速率越高，每个bit的时间就越短。如果总线太长，信号在线上传播的时间就会超过一个bit的时间，那接收端就分不清哪个bit是哪个了。</p>
-
-<div class="tip">
-  <p><strong>我的经验：</strong>实际项目中，我一般会留20%的余量。比如需要跑500kbps，我按100米设计，但实际布线控制在80米以内。这样即使线缆质量差一点，或者环境干扰大一点，系统也能稳定运行。</p>
-</div>
-
-<h3>14.5 实战中的拓扑设计建议</h3>
-
-<p>好了，理论讲完了，咱们聊聊实战。我总结了几条经验，希望对你有帮助：</p>
-
+        <main class="deep-dive" id="content"><article>
+<header class="article-header">
+<p class="eyebrow">CHAPTER 14 · 物理层拓扑</p>
+<h1>CAN 网络拓扑：为什么节点越多，线不能随便分叉？</h1>
+<p class="dek">同样的收发器、同样的波特率，把节点接成一条主干与一颗“星”，示波器上却可能出现完全不同的波形。原因不在仲裁算法，而在<strong>阻抗不连续与传播延迟</strong>。</p>
+<p class="chapter-key">设计起点：高速 CAN 通常采用<strong>两端端接的线型主干、短分支</strong>。被动星型不是“每根支线装一个 120 Ω”就能变正确。</p>
+<nav class="in-article-toc" aria-label="本章导航"><a href="#topology">主干与分叉</a><a href="#delay">时序预算</a><a href="#experiment">长度实验</a><a href="#design">工程检查</a><a href="#sources">资料来源</a></nav>
+</header>
+<section class="dive-section" id="topology"><span class="kicker">01 / 看见反射的起点</span><h2>先把网络画成一根线，而不是一张逻辑关系图</h2>
+<p>CAN 是<strong>多主、共享介质</strong>的总线，不是“多主从”：所有收发器连接到同一差分链路，发送节点通过显性/隐性位进行无损仲裁。逻辑上所有节点可彼此通信，不代表物理线缆可以任意长距离分叉。</p>
+<figure><img src="assets/ch14-topology.svg" width="840" height="430" alt="线型主干两端各一个120欧姆电阻，中间节点通过短分支接入；与多条长支线汇聚于中心的被动星型结构对比。"><figcaption>图 14-1｜一条有两个物理末端的主干便于匹配阻抗。被动星型在中心产生多个传播路径和反射点。</figcaption></figure>
+<p>电气信号遇到分支点、开路末端或其他阻抗突变时，会产生反射与振铃。短分支不会魔法般消除反射，而是使反射返回得足够早、幅度足够小，以便接收器在采样时仍可靠判决。</p>
+<h3>为什么“所有星型支线都加 120 Ω”有风险？</h3>
+<p>在<strong>同一条被动总线</strong>上，如果有四条支线末端各并联一个 120 Ω，静态等效负载约为 30 Ω，可能超出收发器的设计负载，同时又不能消除分叉处的阻抗突变。因此，被动星型没有一种通用的“每臂都端接”做法。</p>
+<div class="note"><strong>重要区分：</strong>使用主动 CAN 集线器、隔离中继器或网桥，把多个支路分割成<strong>独立电气总线段</strong>后，每个独立线段可以按其器件要求分别端接。这不同于把四根电缆直接短接到同一个端子。</div>
+</section>
+<section class="dive-section" id="delay"><span class="kicker">02 / 把距离变成纳秒</span><h2>波特率限制的关键，是远端显性位来不来得及被采样</h2>
+<p>CAN 仲裁不仅要求接收数据，还要求发送节点能及时观察到远端显性位。传播段要覆盖线缆往返、收发器等器件延迟以及必要裕量。这里先只计算线缆往返时间的<strong>示意下界</strong>，假设单程传播延迟为 <code>5 ns/m</code>。</p>
+<div class="formula" tabindex="0" role="group" aria-label="线缆往返传播延迟模型"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>t</mi><mtext>round-trip,cable</mtext></msub><mo>≈</mo><mn>2</mn><mo>×</mo><mi>L</mi><mo>×</mo><mn>5</mn><mfrac><mtext>ns</mtext><mtext>m</mtext></mfrac></mrow></math></div>
+<p>例如：主干长度 <code>40 m</code>，线缆往返约 <code>2 × 40 × 5 = 400 ns</code>；在 <code>1 Mbit/s</code> 下，一个位只有 <code>1000 ns</code>。<strong>400 ns 不等于完整传播延迟</strong>，也不能单凭占比判定 40 米一定可用；还需计入收发器、隔离器、时钟误差、采样点和相位缓冲等因素。</p>
+<div class="table-scroll"><table><caption>仅线缆往返延迟；5 ns/m 的教学计算，不是标准允许的最大长度</caption><thead><tr><th>主干长度</th><th>线缆往返延迟</th><th>500 kbit/s 的位时间占比</th></tr></thead><tbody><tr><td>20 m</td><td>200 ns</td><td>10%</td></tr><tr><td>40 m</td><td>400 ns</td><td>20%</td></tr><tr><td>100 m</td><td>1000 ns</td><td>50%</td></tr></tbody></table></div>
+<p>网络长度与速率的工程经验表在不同设备和线缆下差异很大。不能把“1 Mbit/s 只能 40 m、500 kbit/s 能 100 m”等典型经验值称为 ISO 11898-2 的统一最大长度表。</p>
+</section>
+<section class="dive-section" id="experiment"><span class="kicker">03 / 改变量看看</span><h2>增加线长或提高速率，时序压力怎样变化？</h2>
+<p>选择主干长度和通信速率，比较线缆往返传播延迟与单个位时间。结果只检验一项必要预算，不是整网可通信性验证。</p>
+<div class="demo" data-demo="length"><h3>线缆传播预算示意</h3><p>主干长度</p>
+<div class="choice-row" role="group" aria-label="选择主干长度" data-choices="length"><button type="button" data-length="20" aria-pressed="false">20 m</button><button type="button" data-length="40" aria-pressed="true">40 m</button><button type="button" data-length="100" aria-pressed="false">100 m</button></div>
+<p>通信速率</p>
+<div class="choice-row" role="group" aria-label="选择通信速率" data-choices="rate"><button type="button" data-rate="500" aria-pressed="true">500 kbit/s</button><button type="button" data-rate="1000" aria-pressed="false">1 Mbit/s</button></div>
+<p class="demo-result" data-output aria-live="polite">40 m 主干，500 kbit/s：仅线缆往返约 400 ns；单个位时间 2000 ns；占位时间约 20.0%（未计收发器与其他时序裕量）。</p></div>
+<p class="small">假设传播延迟固定 5 ns/m，忽略分支支路与器件延迟；实际布线应依据所用收发器的时序规格重新计算。</p>
+</section>
+<section class="dive-section" id="design"><span class="kicker">04 / 把仿真变成检查单</span><h2>布线评审时，先核实五件事</h2>
 <ol>
-  <li><strong>优先选总线拓扑</strong>：这是最省心的方案，没有之一。除非有特殊原因，否则别折腾星型。</li>
-  <li><strong>终端电阻别省</strong>：两个120Ω电阻，成本不到一毛钱，但能省你几天的调试时间。</li>
-  <li><strong>分支线越短越好</strong>：我个人的极限是0.3米，超过这个长度，我会考虑加中继器。</li>
-  <li><strong>速率和长度要匹配</strong>：别想着用1Mbps跑1000米，那是做梦。老老实实按表格来。</li>
-  <li><strong>预留测试点</strong>：在每个节点附近留个CAN_H和CAN_L的测试点，方便以后排查问题。</li>
+<li><strong>标记两个物理端点：</strong>普通高速 CAN 线型主干只在两端端接，中间节点避免额外负载。</li>
+<li><strong>逐段量线长：</strong>把主干、每条分支与累计分支长度记录下来；分支可接受长度取决于位速率、边沿与收发器，<strong>没有适用于所有项目的 0.3 m 绝对上限</strong>。</li>
+<li><strong>计算完整传播预算：</strong>参考控制器位时序章节，加入驱动器与接收器延迟、隔离路径和采样点位置。</li>
+<li><strong>检查线缆特性：</strong>差分阻抗、双绞结构、连接器、共模扼流圈与 EMC 环境都会影响波形。</li>
+<li><strong>验证最差场景：</strong>最高速、最长线、最多节点、极限供电/温度下测量显性/隐性差分波形、振铃、错误计数和报文完整性。</li>
 </ol>
-
-<div class="warning">
-  <p><strong>最后提醒一句：</strong>我曾经在一个项目中，为了省成本，用了劣质双绞线。结果通信距离只能跑到标称值的60%。后来换了正规的CAN专用线缆，问题全解决了。线缆的钱，真不能省。</p>
-</div>
-
-<p>好了，这一章就到这里。下一章咱们聊聊CAN总线的错误处理机制，那可是个有意思的话题。到时候见！</p>
-
-<div class="highlight">
-  <p><strong>本章小结：</strong></p>
-  <ul>
-    <li>总线拓扑是CAN的标准玩法，星型拓扑慎用</li>
-    <li>终端电阻必须放在总线两端，阻值120Ω</li>
-    <li>总线长度和速率成反比，设计时要留余量</li>
-    <li>分支线越短越好，线缆质量不能省</li>
-  </ul>
-</div>
+<p class="pull-quote">拓扑图应该画出<strong>电缆和端接的真实位置</strong>，而不只是方框之间的逻辑连线。</p>
+<p>下一章将把两端端接进一步拆开，推导为什么断电测量常见约 60 Ω，以及这个数值为什么并不能证明端接“位置正确”。</p>
+</section>
+<section class="dive-section references" id="sources"><span class="kicker">05 / 工程资料</span><h2>参考与限制</h2>
+<ul>
+<li><a href="https://www.ti.com/document-viewer/lit/html/SLLA555/GUID-B6EFC304-6CF0-429D-A913-0E138E894DF3">Texas Instruments：CAN 多主总线与端接布局（SLLA555）</a></li>
+<li><a href="https://www.ti.com/tool/TIDA-01238">Texas Instruments：CAN 总线两物理末端的端接参考设计（TIDA-01238）</a></li>
+<li><a href="https://www.nxp.com/company/about-nxp/smarter-world-blog/BL-REIMAGINING-CAN-FOR-INDUSTRIAL">NXP：复杂多分支网络与 CAN SIC 收发器</a>（特定器件可改善拓扑容限，不代表所有普通收发器适用）</li>
+</ul>
+<p class="small">传播数值为标明假设的计算示例，不引用成 ISO 强制限值；物理层验收需要实际示波器与总线分析仪。</p>
+</section>
+</article></main>
         <div class="footer-nav">
             <a href="13.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
@@ -317,5 +218,6 @@
     </div>
 </div>
 </div>
+<script src="assets/olah-chapters-13-15.js"></script>
 </body>
 </html>

@@ -1,0 +1,57 @@
+/* Chapter 13–15: focused long-form teaching layer; site chrome remains in theme.css. */
+.deep-dive { --ink:#203035; --muted:#52666a; --teal:#147f80; --orange:#bf643e; --purple:#6f59ac; --paper:#fffdf9; max-width:840px; margin:0 auto; color:var(--ink); font-size:17px; line-height:1.86; }
+.deep-dive * { box-sizing:border-box; }
+.deep-dive p, .deep-dive li { color:var(--ink); }
+.deep-dive a { color:#126c73; text-underline-offset:3px; overflow-wrap:anywhere; }
+.deep-dive a:hover { color:#9d512f; }
+.deep-dive .eyebrow { font-size:.81rem; font-weight:800; letter-spacing:.1em; color:var(--teal); margin:0 0 .7rem; }
+.deep-dive h1 { font-size:clamp(1.7rem,3.5vw,2.55rem); line-height:1.3; letter-spacing:-.02em; margin:.2rem 0 1rem; color:#19343a; }
+.deep-dive .dek { font-size:clamp(1rem,2vw,1.2rem); color:#42595e; line-height:1.85; max-width:64ch; }
+.deep-dive .chapter-key { margin:1.65rem 0 2rem; border-left:4px solid var(--teal); padding:.7rem 1.15rem; background:#edf8f6; border-radius:0 10px 10px 0; font-weight:600; }
+.deep-dive .in-article-toc { margin:2rem 0 0; border-top:1px solid #d4e4e1; border-bottom:1px solid #d4e4e1; padding:1rem 0; display:flex; gap:.7rem 1.4rem; flex-wrap:wrap; font-size:.87rem; }
+.deep-dive .in-article-toc a { text-decoration:none; font-weight:600; }
+.deep-dive .dive-section { margin:3.75rem 0; scroll-margin-top:18px; }
+.deep-dive h2 { border:0; padding:0; font-size:clamp(1.42rem,2.7vw,1.8rem); line-height:1.4; color:#1c3f43; margin:0 0 1.25rem; }
+.deep-dive h3 { color:#25464c; font-size:1.12rem; margin:2rem 0 .8rem; }
+.deep-dive .kicker { display:block; color:#ad5635; font-size:.76rem; letter-spacing:.12em; margin-bottom:.3rem; font-weight:800; }
+.deep-dive figure { margin:2rem 0; padding:1.1rem; background:var(--paper); border:1px solid #dbe6e4; border-radius:14px; }
+.deep-dive figure img { width:100%; height:auto; max-width:100%; display:block; }
+.deep-dive figcaption { color:var(--muted); font-size:.88rem; line-height:1.65; margin-top:.8rem; }
+.deep-dive .formula { display:block; margin:1.4rem 0; padding:1rem; background:#f4f8f7; border-radius:10px; overflow-x:auto; max-width:100%; }
+.deep-dive .formula math { font-size:1.14em; white-space:nowrap; }
+.deep-dive .formula:focus-visible, .deep-dive :focus-visible { outline:3px solid #147f80; outline-offset:3px; }
+.deep-dive .demo { background:#f2f8f8; border:1px solid #bbd9d7; border-radius:14px; padding:1.2rem; margin:1.75rem 0; }
+.deep-dive .demo h3 { margin:0 0 .4rem; }
+.deep-dive .demo p { margin:.45rem 0; }
+.deep-dive .choice-row { display:flex; flex-wrap:wrap; gap:.5rem; margin:.8rem 0 1.1rem; }
+.deep-dive .choice-row button { border:1px solid #94b7b4; background:white; color:#184c51; font:inherit; font-weight:650; font-size:.92rem; cursor:pointer; border-radius:999px; min-height:40px; padding:.35rem .85rem; }
+.deep-dive .choice-row button[aria-pressed="true"] { background:#126d70; border-color:#126d70; color:#fff; }
+.deep-dive .demo-result { background:white; padding:.8rem 1rem; border-radius:10px; border-left:4px solid #d06d4d; font-weight:650; }
+.deep-dive .small { font-size:.87rem; color:var(--muted); }
+.deep-dive .note { border-left:4px solid #bd754b; background:#fff6ee; padding:.85rem 1rem; margin:1.5rem 0; border-radius:0 9px 9px 0; }
+.deep-dive .table-scroll { max-width:100%; overflow-x:auto; margin:1.1rem 0 1.4rem; }
+.deep-dive table { min-width:500px; width:100%; border-collapse:collapse; background:white; font-size:.93rem; }
+.deep-dive th { background:#e9f4f1; color:#224b4b; }
+.deep-dive td, .deep-dive th { padding:.7rem .8rem; border-color:#d0e2df; }
+.deep-dive pre { max-width:100%; overflow-x:auto; background:#1f3039; border-radius:10px; padding:1.1rem; color:#f2f7fa; font-size:.85rem; line-height:1.65; }
+.deep-dive code { overflow-wrap:normal; }
+.deep-dive pre code { color:inherit; }
+.deep-dive ol, .deep-dive ul { padding-left:1.15rem; margin:1rem 0 1.4rem; }
+.deep-dive li { margin:.5rem 0; }
+.deep-dive .references { border-top:1px solid #d7e4e1; padding-top:1.4rem; }
+.deep-dive .references li { font-size:.91rem; }
+.deep-dive .pull-quote { font-size:1.06rem; line-height:1.75; font-weight:600; padding:1rem 1.15rem; border-left:5px solid #d06d4d; margin:1.8rem 0; background:#fbf7f1; }
+.skip-to-content { position:absolute; left:-9999px; top:10px; z-index:20; padding:.6rem 1rem; background:#fff; color:#024d50; }
+.skip-to-content:focus { left:10px; }
+@media (max-width:480px) {
+ .main-content { padding:20px 16px; }
+ .deep-dive { font-size:16px; }
+ .deep-dive figure { padding:.55rem; }
+ .deep-dive .dive-section { margin:2.7rem 0; }
+ .deep-dive .demo { padding:.85rem; }
+ .deep-dive .in-article-toc { gap:.6rem .9rem; }
+ .footer-nav { gap:.4rem; flex-wrap:wrap; }
+ .footer-nav a { padding:8px 12px; font-size:.82rem; }
+}
+@media (prefers-reduced-motion: reduce) { .deep-dive *, .deep-dive *::before, .deep-dive *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
+@media print { body { background:#fff!important; padding:0!important; } .sidebar,.footer-nav,.skip-to-content,.deep-dive .demo .choice-row { display:none!important; } .double-border { box-shadow:none!important; border:0!important; } .container { display:block!important; } .deep-dive { max-width:none; } .deep-dive figure, .deep-dive .formula { break-inside:avoid; } .deep-dive a { color:#203035; } }

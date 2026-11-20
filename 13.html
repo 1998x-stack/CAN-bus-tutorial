@@ -115,8 +115,10 @@
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
     </style>
+<link rel="stylesheet" href="assets/olah-chapters-13-15.css">
 </head>
 <body>
+<a class="skip-to-content" href="#content">跳转到正文</a>
 <div class="double-border">
 <div class="container">
     <div class="sidebar">
@@ -155,93 +157,63 @@
         </ul>
     </div>
     <div class="main-content">
-        <h2>第13章 CAN过滤器深入：过滤器模式、过滤器组配置与屏蔽位设计</h2>
-
-<p>各位同学，咱们今天聊点硬核的——CAN过滤器。说实话，很多工程师做了好几年CAN开发，对过滤器的理解还停留在“配几个ID就能收报文”的层面。但实际项目中，过滤器配置不当，轻则丢报文，重则总线负载飙升，甚至导致ECU死机。我当年就吃过这个亏，今天咱们把它彻底讲透。</p>
-
-<h3>13.1 过滤器模式：两种思路，两种命运</h3>
-
-<p>CAN控制器里的过滤器，说白了就是一个“门卫”。它决定哪些报文能进你的邮箱，哪些报文直接扔掉。STM32、S32K这些主流MCU，过滤器模式基本分两种：<strong>标识符列表模式</strong>和<strong>掩码模式</strong>。</p>
-
-<h4>13.1.1 标识符列表模式</h4>
-
-<p>这种模式最简单直接。你给过滤器配一个ID列表，比如{0x123, 0x456, 0x789}。那么只有这三个ID的报文能通过，其他的一律拒收。</p>
-
-<div class="highlight">
-  <p><strong>优点：</strong>精准、无歧义。每个ID都是明确指定的，不会误收。</p>
-  <p><strong>缺点：</strong>数量有限。一个过滤器组通常只能配2-4个ID（取决于芯片）。</p>
-</div>
-
-<p>我在做BMS项目时，主机厂要求只收电池管理相关的几个ID。我就用了列表模式，简单粗暴，调试时一眼就能看出对不对。嗯，这里要注意：列表模式适合“白名单”场景，ID数量少且固定。</p>
-
-<h4>13.1.2 掩码模式</h4>
-
-<p>掩码模式就灵活多了。它用一个掩码来决定ID的哪些位需要精确匹配，哪些位可以忽略。比如你配ID=0x100，掩码=0x7F0，那么0x100到0x10F这16个ID都能通过。</p>
-
-<p>为什么会这样？因为掩码为1的位必须匹配，为0的位可以任意。0x7F0的二进制是0111 1111 0000，低4位是0，所以低4位可以随便变。</p>
-
-<div class="tip">
-  <p><strong>我个人习惯：</strong>掩码模式适合“范围过滤”。比如你要收某个节点发来的所有报文，或者某个功能组的所有报文。但要注意，掩码设计不好会误收无关报文，增加CPU负担。</p>
-</div>
-
-<h3>13.2 过滤器组配置：硬件资源怎么分？</h3>
-
-<p>大多数CAN控制器有多个过滤器组。比如STM32F4有28个，S32K144有32个。每个组可以独立配置模式、ID和掩码。你想想看，这么多组，怎么分配才合理？</p>
-
-<p>我建议按优先级和报文类型来分：</p>
-
-<ul>
-  <li><strong>高优先级报文：</strong>用列表模式，单独占一个组。比如0x001（心跳报文）、0x002（故障报文）。</li>
-  <li><strong>同类型报文：</strong>用掩码模式，一个组覆盖一片。比如所有诊断报文（0x7DF-0x7EF）。</li>
-  <li><strong>广播报文：</strong>如果不想收，直接配一个全掩码为0的组，全部过滤掉。或者干脆不配。</li>
-</ul>
-
-<div class="warning">
-  <p><strong>我曾经踩过的坑：</strong>有个项目，我把所有过滤器组都配成了掩码模式，结果总线上一堆无关报文涌进来，CPU中断响应不过来，导致看门狗复位。后来改成“列表+掩码”混合配置，问题解决。记住：过滤器不是越多越好，而是越精准越好。</p>
-</div>
-
-<h3>13.3 屏蔽位设计：核心中的核心</h3>
-
-<p>屏蔽位设计，说白了就是“哪些位我要管，哪些位我不管”。这直接决定了过滤器的覆盖范围。咱们来看一个实际例子。</p>
-
-<p>假设你要收ID范围为0x200-0x20F的报文。标准ID共11位（0x000-0x7FF）。0x200的二进制是010 0000 0000，0x20F是010 0000 1111。你看，高7位（010 0000）固定，低4位变化。</p>
-
-<p>所以掩码应该设为：高7位为1（必须匹配），低4位为0（忽略）。即掩码=1111 1111 0000 = 0x7F0。ID设为0x200。</p>
-
-<pre><code>// 示例：STM32 HAL库配置
-CAN_FilterTypeDef sFilterConfig;
-
-sFilterConfig.FilterIdHigh = 0x200 &lt;&lt; 5;  // ID左移5位，对齐寄存器
-sFilterConfig.FilterIdLow = 0x0000;
-sFilterConfig.FilterMaskIdHigh = 0x7F0 &lt;&lt; 5;  // 掩码左移5位
-sFilterConfig.FilterMaskIdLow = 0x0000;
-sFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-sFilterConfig.FilterBank = 0;  // 使用过滤器组0
-sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-sFilterConfig.FilterActivation = ENABLE;
-
-HAL_CAN_ConfigFilter(&amp;hcan, &amp;sFilterConfig);</code></pre>
-
-<p>嗯，这里要注意：不同MCU的寄存器位对齐方式不同。STM32是左移5位，有些芯片是左移3位或直接对齐。一定要看参考手册，别想当然。</p>
-
-<h3>13.4 实战技巧：过滤器设计的“黄金法则”</h3>
-
-<p>做了这么多年CAN开发，我总结了几条过滤器设计的经验，分享给大家：</p>
-
-<ol>
-  <li><strong>先画ID分布图。</strong>把总线上所有报文的ID、周期、优先级列出来。看看哪些是必须收的，哪些是可选的，哪些是干扰的。</li>
-  <li><strong>列表模式优先。</strong>能精确匹配的，就别用掩码。减少CPU中断次数，就是减少系统风险。</li>
-  <li><strong>掩码设计要保守。</strong>掩码中为0的位越少，过滤越精准。别图省事配个全0掩码，那等于没过滤。</li>
-  <li><strong>预留备用组。</strong>别把所有过滤器组都用完。留2-3个组给后期调试或功能扩展。我见过太多项目后期加功能发现没过滤器可用的尴尬。</li>
-  <li><strong>测试要覆盖边界。</strong>比如你配了0x100-0x10F，那0x110能不能收到？0x0FF呢？边界测试不能省。</li>
-</ol>
-
-<div class="highlight">
-  <p><strong>核心总结：</strong>CAN过滤器不是“配了就行”，而是“配对了才行”。列表模式保精准，掩码模式保范围。屏蔽位设计是灵魂，1是必须匹配，0是任意。记住这些，你的CAN通信就稳了一半。</p>
-</div>
-
-<p>下一章咱们聊CAN错误处理与总线诊断，那才是真正考验工程师水平的地方。到时候我会分享一个让我通宵三天的总线故障案例，保证让你印象深刻。</p>
+        <main class="deep-dive" id="content"><article>
+<header class="article-header">
+<p class="eyebrow">CHAPTER 13 · bxCAN 接收路径</p>
+<h1>CAN 过滤器：总线上有一百种报文，为什么 MCU 只需要看十种？</h1>
+<p class="dek">总线报文照常广播，接收过滤器却能让 CPU 少处理中断。真正的关键不是“哪个 ID 被挡住”，而是分清 <strong>总线传输、硬件匹配、FIFO 入队</strong> 三个不同阶段。</p>
+<p class="chapter-key">核心模型：匹配的是报文标识符和帧类型等位；硬件过滤减少本节点 FIFO/CPU 负担，<strong>不会减少物理总线上的流量</strong>。</p>
+<nav class="in-article-toc" aria-label="本章导航"><a href="#mechanism">匹配机制</a><a href="#register">bxCAN 实现</a><a href="#experiment">交互实验</a><a href="#verification">边界验证</a><a href="#sources">资料来源</a></nav>
+</header>
+<section class="dive-section" id="mechanism"><span class="kicker">01 / 先看数据流</span><h2>不是“拦住总线”，而是“决定是否写入接收 FIFO”</h2>
+<p>一个节点发送的 CAN 帧会出现在共享物理总线上。其他节点先在物理层接收，再由各自控制器检查帧，只有符合接收过滤规则的报文才交给软件。过滤器配置错误，可能造成<strong>本节点漏收或误收</strong>，但不会导致线路上多传输一帧。</p>
+<figure><img src="assets/ch13-filter.svg" width="840" height="355" alt="三个报文经过本节点接收过滤器：0x200 和 0x20F 通过，0x210 被拒绝，但全部报文仍在 CAN 总线上传输。"><figcaption>图 13-1｜先分清线路上的报文与 FIFO 中的报文。此图仅展示单个掩码过滤器的结果。</figcaption></figure>
+<h3>一条式子解释 16 个 ID 的白名单</h3>
+<p>对 11 位标准标识符，以 <code>目标 ID = 0x200</code>、<code>掩码 = 0x7F0</code> 为例。掩码的 <strong>1 表示必须一致</strong>，0 表示不参与比较；低四位恰好可以变化，因此该规则匹配 <code>0x200–0x20F</code>。</p>
+<div class="formula" tabindex="0" role="group" aria-label="标识符掩码匹配公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo>(</mo><msub><mi>ID</mi><mtext>rx</mtext></msub><mo>∧</mo><mi>M</mi><mo>)</mo><mo>=</mo><mo>(</mo><msub><mi>ID</mi><mtext>cfg</mtext></msub><mo>∧</mo><mi>M</mi><mo>)</mo></mrow></math></div>
+<p>这是位与运算（∧），不是大小比较。想过滤连续区间，必须确认目标 ID 与掩码构成的集合恰好符合需求；掩码并不能表达任何随意指定的数值区间。</p>
+<div class="note"><strong>高频误区：</strong><code>Mask = 0</code> 意味着“所有参与比较的位都不关心”，在掩码模式下通常等于<strong>全接收</strong>，绝不是“全部拒收”。若要拒绝某类帧，应设计不匹配的规则，并核对其他已启用过滤器组；不要建立一个全零掩码组。</div>
+</section>
+<section class="dive-section" id="register"><span class="kicker">02 / 把概念落到寄存器</span><h2>STM32 bxCAN：ID 之外还要看 IDE、RTR</h2>
+<p>以下只针对 <strong>STM32F4 上的 bxCAN、32 位掩码模式、标准数据帧</strong>。FDCAN、S32K FlexCAN、其他 STM32 系列的过滤器组织和寄存器格式并不相同。对 bxCAN 的 32 位布局，标准 ID 占高位字段，<code>StdId &lt;&lt; 5</code> 放入高 16 位；<code>IDE</code> 与 <code>RTR</code> 在低 16 位中有各自比较位。</p>
+<div class="table-scroll"><table><caption>本例设置的比较范围</caption><thead><tr><th>字段</th><th>匹配目标</th><th>掩码意图</th></tr></thead><tbody><tr><td>STDID[10:0]</td><td>0x200</td><td>0x7F0：只忽略低 4 位</td></tr><tr><td>IDE</td><td>0（标准帧）</td><td>必须一致</td></tr><tr><td>RTR</td><td>0（数据帧）</td><td>必须一致</td></tr><tr><td>过滤器输出</td><td>FIFO0</td><td>匹配后入 FIFO，软件仍需及时读取</td></tr></tbody></table></div>
+<pre><code>/* STM32F4 bxCAN / HAL 示例：仅接收 0x200..0x20F 的标准数据帧。
+ * 前提：hcan1 已初始化；本例为 32-bit IDMASK 模式。 */
+CAN_FilterTypeDef f = {0};
+f.FilterBank = 0;
+f.FilterMode = CAN_FILTERMODE_IDMASK;
+f.FilterScale = CAN_FILTERSCALE_32BIT;
+f.FilterIdHigh = (uint16_t)(0x200U &lt;&lt; 5);
+f.FilterIdLow = 0x0000U;          /* IDE=0, RTR=0 */
+f.FilterMaskIdHigh = (uint16_t)(0x7F0U &lt;&lt; 5);
+f.FilterMaskIdLow = 0x0006U;      /* 比较 IDE(bit2) 与 RTR(bit1) */
+f.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+f.FilterActivation = ENABLE;
+/* 双 bxCAN 设备要核对 CAN1/CAN2 的银行分界；此值只是示例。 */
+f.SlaveStartFilterBank = 14;
+if (HAL_CAN_ConfigFilter(&amp;hcan1, &amp;f) != HAL_OK) {
+    Error_Handler();
+}</code></pre>
+<p class="small">注意：<code>FilterMaskIdLow = 0x0006</code> 使扩展帧和远程帧不会因为 ID 其他位巧合而通过；某些 HAL 版本或器件的成员有所差异，使用前应对照目标芯片参考手册与 HAL 头文件。配置过滤器并不替代 <code>HAL_CAN_Start()</code>、FIFO 读取和中断处理。</p>
+<h3>列表还是掩码？先统计资源再决定</h3>
+<p>列表模式适合少量离散 ID；掩码模式适合可用位模式描述的一组 ID。bxCAN 过滤器组可在 16/32 位尺度及列表/掩码模式间配置，容纳数量随模式变化；<strong>不能把某颗 STM32 的组数照搬到所有控制器</strong>。若 CAN1/CAN2 共享过滤器银行，必须按芯片限制分配，防止其中一侧无可用银行。</p>
+</section>
+<section class="dive-section" id="experiment"><span class="kicker">03 / 按一下验证直觉</span><h2>边界 ID 会被放行吗？</h2>
+<p>保持 ID=<code>0x200</code>、MASK=<code>0x7F0</code>、标准数据帧不变，选择不同的接收 ID。可交互结果是上面位运算的确定性计算，不是硬件实测。</p>
+<div class="demo" data-demo="filter"><h3>过滤器匹配模拟</h3><div class="choice-row" data-choices="id" role="group" aria-label="选择报文标识符">
+<button type="button" data-id="511" aria-pressed="false">0x1FF</button><button type="button" data-id="512" aria-pressed="true">0x200</button><button type="button" data-id="527" aria-pressed="false">0x20F</button><button type="button" data-id="528" aria-pressed="false">0x210</button></div>
+<p class="demo-result" data-output aria-live="polite">接收 ID 0x200：通过过滤器，进入指定 FIFO。</p></div>
+</section>
+<section class="dive-section" id="verification"><span class="kicker">04 / 从示例到工程</span><h2>把“匹配”与“可靠收包”分别测试</h2>
+<div class="table-scroll"><table><thead><tr><th>输入（标准数据帧）</th><th>位与结果</th><th>预期</th></tr></thead><tbody><tr><td>0x1FF</td><td>0x1F0</td><td>不匹配</td></tr><tr><td>0x200</td><td>0x200</td><td>匹配</td></tr><tr><td>0x20F</td><td>0x200</td><td>匹配</td></tr><tr><td>0x210</td><td>0x210</td><td>不匹配</td></tr></tbody></table></div>
+<ol><li>先用离线模型覆盖上下边界、IDE、RTR 与其他启用的过滤器组。</li><li>再在真实控制器上记录 FIFO0 入队、溢出标志、ISR 延迟和软件队列丢弃情况。</li><li>最后用外部 CAN 分析仪核对线路实际出现的全部 ID，避免把“总线有报文”误认为“FIFO 必然有报文”。</li></ol>
+<p class="pull-quote">记住一条界线：<strong>过滤器控制接收路径，不控制总线仲裁或发送者的流量。</strong></p>
+</section>
+<section class="dive-section references" id="sources"><span class="kicker">05 / 进一步查证</span><h2>参考资料与适用边界</h2>
+<ul><li><a href="https://www.st.com/resource/en/reference_manual/dm00135183-stm32f446xx-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf">ST RM0390：STM32F446 bxCAN 过滤器布局与寄存器</a>（核对所用芯片版本与章节）</li><li><a href="https://www.st.com/resource/en/reference_manual/dm00127514.pdf">ST STM32F469/F479 参考手册：bxCAN 过滤器银行与模式</a></li><li><a href="https://community.st.com/stm32-mcus-60/using-can-bxcan-in-normal-mode-with-stm32-microcontrollers-part-2-152668">ST Community：bxCAN 常规模式与全接收过滤器示例</a>（社区技术文档，并非取代芯片参考手册）</li></ul>
+<p class="small">示例代码是特定 HAL 的教学片段，不承诺跨芯片直接编译；交互模拟不等同于总线实测。</p>
+</section>
+</article></main>
         <div class="footer-nav">
             <a href="12.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
@@ -251,5 +223,6 @@ HAL_CAN_ConfigFilter(&amp;hcan, &amp;sFilterConfig);</code></pre>
     </div>
 </div>
 </div>
+<script src="assets/olah-chapters-13-15.js"></script>
 </body>
 </html>
