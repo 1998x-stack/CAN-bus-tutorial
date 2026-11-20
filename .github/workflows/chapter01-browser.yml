@@ -22,10 +22,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install Playwright and Chromium
+      - name: Install Playwright and use runner Chrome
         run: |
           python -m pip install playwright==1.56.0
-          python -m playwright install --with-deps chromium
+          command -v google-chrome
       - name: Inspect desktop, tablet, mobile, interaction and print
         run: python tests/browser_chapter01.py
       - name: Upload screenshot and QA report
