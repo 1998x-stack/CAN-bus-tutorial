@@ -1,327 +1,340 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>第6章 CAN控制器硬件</title>
-    <link rel="stylesheet" href="theme.css">
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            padding: 20px;
-        }
-        /* 双边框设计：外边框 + 内阴影 */
-        .double-border {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #ffffff;
-            border: 2px solid #f1c40f;
-            border-radius: 24px;
-            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
-            overflow: hidden;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 0;
-        }
-        .sidebar {
-            background: #fefcf5;
-            border-right: 2px solid #fdebb3;
-            padding: 24px 16px;
-        }
-        .sidebar h3 {
-            font-size: 1.4rem;
-            color: #b45f06;
-            border-left: 5px solid #f39c12;
-            padding-left: 15px;
-            margin-bottom: 25px;
-        }
-        .chapter-list {
-            list-style: none;
-        }
-        .chapter-list li {
-            margin-bottom: 6px;
-        }
-        .chapter-list a {
-            display: block;
-            padding: 8px 12px;
-            text-decoration: none;
-            color: #2c3e50;
-            border-radius: 12px;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .chapter-list a:hover {
-            background: #fdebd0;
-            transform: translateX(3px);
-        }
-        .chapter-list .active {
-            background: #3b82f6;
-            color: white;
-            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
-        }
-        .main-content {
-            padding: 30px 35px;
-            background: white;
-        }
-        .footer-nav {
-            margin-top: 45px;
-            padding-top: 20px;
-            border-top: 2px solid #f0e6d2;
-            display: flex;
-            justify-content: space-between;
-        }
-        .footer-nav a {
-            padding: 8px 24px;
-            background: #f1f5f9;
-            text-decoration: none;
-            color: #1e40af;
-            border-radius: 40px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .footer-nav a:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            color: #64748b;
-            border-top: 1px dashed #e2e8f0;
-            font-size: 0.9rem;
-        }
-        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
-        h3 { color: #2c3e50; margin: 20px 0 10px; }
-        pre {
-            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
-            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
-        }
-        table {
-            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
-        }
-        th, td {
-            border: 1px solid #fcd34d; padding: 10px; text-align: left;
-        }
-        th { background: #fffbeb; }
-        .tip, .warning, .highlight {
-            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
-        }
-        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
-        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
-        .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="CAN 第六章：从控制器和收发器分工到 SJA1000、MCP2515 寄存器与 SPI 指令，结合原创架构图、交互式掩码实验和可运行的编码检查。">
+<title>第 6 章 · CAN 控制器硬件：为什么报文没有走到总线上？</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+:root{--paper:#fffdf9;--ink:#203035;--subtle:#53676d;--teal:#147f80;--blue:#5f83b2;--warm:#c76a47;--line:#d9e6e3}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:#edf5f3;color:var(--ink);margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.82}
+a{color:#116f73;text-underline-offset:3px}a:hover{color:#905627}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+.skip-link{position:absolute;top:-80px;left:15px;background:white;padding:9px 15px;z-index:5}.skip-link:focus{top:8px}
+.layout{max-width:1330px;margin:24px auto;display:grid;grid-template-columns:246px minmax(0,1fr);gap:28px;padding:0 18px;align-items:start}
+.course-nav{position:sticky;top:18px;border:1px solid var(--line);background:#fff;border-radius:15px;padding:18px;max-height:calc(100vh - 36px);overflow-y:auto;font-size:14px;line-height:1.5}
+.course-nav .brand{display:block;font-size:18px;font-weight:750;text-decoration:none;color:#214d4a;margin-bottom:12px}
+.course-nav summary{font-weight:700;cursor:pointer}.course-nav ol{list-style:none;margin:14px 0 0;padding:0}
+.course-nav li{margin:0}.course-nav li a{display:block;padding:5px 7px;border-radius:7px;color:#4c6268;text-decoration:none;font-size:13px}
+.course-nav li a:hover{background:#f3f8f6}.course-nav li a[aria-current]{background:#dff1ed;font-weight:750;color:#09695e}
+.paper{background:var(--paper);border:1px solid #e4e9e6;border-radius:16px;padding:48px clamp(22px,5vw,72px) 60px;min-width:0;box-shadow:0 9px 35px #163f3810}
+article{max-width:820px;margin:0 auto}header{margin:0 0 15px}.eyebrow,.kicker{font-size:13px;letter-spacing:.1em;font-weight:800;color:#a26735}
+.eyebrow{color:var(--teal)}h1{font-size:clamp(33px,4vw,47px);line-height:1.23;letter-spacing:-.025em;color:#193b3b;margin:12px 0 18px}
+.dek{font-size:20px;color:#466166;line-height:1.75;margin:0 0 24px}p{margin:15px 0;line-height:1.85}
+h2{font-size:clamp(24px,2.8vw,31px);line-height:1.35;color:#19433f;border:0;padding:0;margin:8px 0 20px}
+h3{font-size:21px;color:#254e4b;margin:27px 0 9px}strong{color:#1a4240}
+section{margin-top:70px}ol,ul{margin:16px 0 16px 25px;padding:0}li{margin:8px 0}
+.jump{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px}.jump a{border:1px solid #cce2db;padding:5px 12px;border-radius:18px;background:#f6fbf8;text-decoration:none;font-size:14px}
+figure{padding:16px;margin:30px 0;border:1px solid var(--line);border-radius:13px;background:#fff;min-width:0}
+figure img{display:block;width:100%;height:auto;max-width:100%}.figure-scroll{max-width:100%;overflow-x:auto}
+figcaption{font-size:14px;line-height:1.7;color:var(--subtle);margin-top:12px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:26px 0}
+.stat{background:#eef8f4;border-left:3px solid #2b897e;padding:14px;border-radius:7px}
+.stat b{display:block;font-size:20px;line-height:1.3;color:#17645d}.stat span{font-size:13px;line-height:1.6;color:#50656a}
+.callout{border-left:4px solid #d49a4e;background:#fff7e9;padding:13px 19px;margin:25px 0;border-radius:0 9px 9px 0}
+.equation{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#eef7f4;border:1px solid #cee5df;padding:16px 18px;border-radius:9px;margin:20px 0;font-size:16px;line-height:1.8;overflow-wrap:anywhere}
+.table-scroll{max-width:100%;overflow-x:auto;margin:23px 0}
+table{border-collapse:collapse;width:100%;min-width:540px;font-size:15px;background:#fff}
+th,td{padding:12px 13px;text-align:left;vertical-align:top;border:0;border-bottom:1px solid #dce8e3}th{background:#eff7f4;color:#27574f;font-weight:750}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:23px 0}
+.step{background:#fff;border:1px solid var(--line);border-radius:10px;padding:15px}
+.step b{display:block;color:#1c6d65;font-size:16px}.step p{font-size:14px;line-height:1.7;margin:7px 0 0}
+.code-panel{margin:20px 0}pre{margin:0;background:#183438;color:#f1f9f6;padding:20px;border-radius:11px;overflow-x:auto;font-size:14px;line-height:1.68}
+pre code{background:transparent;color:inherit;padding:0}code{font-family:ui-monospace,Consolas,monospace;overflow-wrap:anywhere}
+.lab{background:#fafffd;border:1px solid #c7e2d9;border-radius:15px;padding:22px;margin:30px 0}
+.lab h3{margin:0 0 10px}.lab-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:16px 0}
+.lab label{font-size:13px;line-height:1.5;color:#365d5a;font-weight:700;display:flex;flex-direction:column;gap:5px}
+.lab input,.lab select{font:inherit;font-size:15px;background:#fff;color:#173e3b;border:1px solid #9abdb7;border-radius:8px;padding:7px 8px;min-width:0;width:100%}
+.lab button{font:inherit;color:#fff;background:#166e69;border:1px solid #166e69;border-radius:999px;padding:6px 18px;cursor:pointer}
+.lab button:hover{background:#11564f}
+.lab-result{background:#ebf7f2;padding:12px 15px;border-radius:10px;color:#215b54;line-height:1.7}
+.lab-result b{font-size:19px}.lab .small,.small{font-size:14px;color:#5a706c}
+.question{padding:13px 0;border-bottom:1px solid #dae7e3}.question summary{cursor:pointer;font-weight:700}
+.refs{font-size:15px;overflow-wrap:anywhere}.refs li{padding:3px 0}
+.next{display:flex;justify-content:space-between;gap:13px;flex-wrap:wrap;border-top:1px solid #d1dfd9;margin-top:57px;padding-top:22px;font-size:15px}
+.next a{text-decoration:none;font-weight:750}
+@media(max-width:960px){.layout{display:block;margin:0;padding:0}.course-nav{position:static;max-height:none;border-radius:0;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px}.course-nav .brand{margin:0}.course-nav ol{max-height:230px;overflow-y:auto}.paper{border:0;border-radius:0;padding:32px clamp(18px,4vw,45px) 45px}}
+@media(max-width:550px){.course-nav{flex-wrap:wrap}.course-nav .brand{font-size:15px}.paper{padding:25px 17px 38px}.stat-grid,.steps{grid-template-columns:1fr}.lab{padding:15px}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}section{margin-top:54px}figure{padding:8px}.figure-scroll img{width:720px;min-width:720px;max-width:none}.dek{font-size:18px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+@media print{body{background:white;color:black}.layout{display:block;max-width:none;margin:0;padding:0}.skip-link,.course-nav,.jump,.next,.lab button{display:none!important}.paper{padding:0;border:0;box-shadow:none}.paper article{max-width:none}section{margin-top:34px}figure,.lab,.stat{break-inside:avoid}pre{white-space:pre-wrap;overflow:visible;color:#111;background:#eee}a{color:black}}
+
+.tagline{color:#a46830;font-size:14px;font-weight:700}
+.mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:26px 0}
+.mini-grid>div{background:white;border:1px solid var(--line);border-radius:10px;padding:15px}
+.mini-grid strong{display:block;font-size:17px}
+.pill{display:inline-block;font-size:13px;border:1px solid #c8dfd8;background:#edf7f3;padding:2px 9px;border-radius:20px;margin:5px 5px 0 0}
+.register-list{font-size:15px}
+.register-list dt{font-family:ui-monospace,Consolas,monospace;font-weight:700;color:#165e5c;margin-top:14px}
+.register-list dd{margin:5px 0 10px 0;color:#4a6267}
+.lab-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.controls-row{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.controls-row button{background:#fff;color:#176d64;border:1px solid #8eafa8}
+.controls-row button:hover{background:#e5f4ee}
+.lab-result[data-match="false"]{background:#fff0e9;color:#9a4b2e}
+.lab-result[data-match="invalid"]{background:#fff3de;color:#815b25}
+@media(max-width:650px){.mini-grid{grid-template-columns:1fr}.lab-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
 </head>
 <body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📚 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
-<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
-<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
-<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
-<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
-<li><a href="06.html" class="active">第6章 CAN控制器硬件</a></li>
-<li><a href="07.html" class="">第7章 CAN收发器</a></li>
-<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
-<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
-<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
-<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
-<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
-<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
-<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
-<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
-<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
-<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
-<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
-<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
-<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
-<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
-<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
-<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
-<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
-<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
-<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
-<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
-<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
-<li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
-<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-        <h2>第六章 CAN控制器硬件：常见芯片与寄存器配置</h2>
+<a class="skip-link" href="#content">跳转至正文</a>
+<div class="layout">
+<nav class="course-nav" aria-label="课程导航">
+<a class="brand" href="index.html">CAN 总线 · 30 章</a>
+<details><summary>切换章节</summary><ol><li><a href="01.html">第1章 CAN总线概述</a></li>
+<li><a href="02.html">第2章 CAN协议基础</a></li>
+<li><a href="03.html">第3章 CAN总线仲裁机制</a></li>
+<li><a href="04.html">第4章 CAN总线错误处理</a></li>
+<li><a href="05.html">第5章 CAN总线位时序与同步</a></li>
+<li><a href="06.html" aria-current="page">第6章 CAN控制器硬件</a></li>
+<li><a href="07.html">第7章 CAN收发器</a></li>
+<li><a href="08.html">第8章 STM32 CAN外设</a></li>
+<li><a href="09.html">第9章 STM32 CAN初始化</a></li>
+<li><a href="10.html">第10章 CAN报文发送</a></li>
+<li><a href="11.html">第11章 CAN报文接收</a></li>
+<li><a href="12.html">第12章 CAN中断编程</a></li>
+<li><a href="13.html">第13章 CAN过滤器深入</a></li>
+<li><a href="14.html">第14章 CAN总线网络拓扑</a></li>
+<li><a href="15.html">第15章 CAN总线终端电阻</a></li>
+<li><a href="16.html">第16章 CAN总线电平与差分信号</a></li>
+<li><a href="17.html">第17章 CAN总线通信速率</a></li>
+<li><a href="18.html">第18章 CANopen协议入门</a></li>
+<li><a href="19.html">第19章 CANopen NMT与心跳</a></li>
+<li><a href="20.html">第20章 CANopen SDO通信</a></li>
+<li><a href="21.html">第21章 CANopen PDO通信</a></li>
+<li><a href="22.html">第22章 J1939协议入门</a></li>
+<li><a href="23.html">第23章 J1939多包传输</a></li>
+<li><a href="24.html">第24章 CAN总线测试工具</a></li>
+<li><a href="25.html">第25章 CAN总线调试技巧</a></li>
+<li><a href="26.html">第26章 CAN总线硬件设计</a></li>
+<li><a href="27.html">第27章 CAN总线软件架构</a></li>
+<li><a href="28.html">第28章 CAN总线多节点通信实战</a></li>
+<li><a href="29.html">第29章 CAN总线低功耗设计</a></li>
+<li><a href="30.html">第30章 CAN总线项目实战</a></li></ol></details>
+</nav>
+<main class="paper" id="content"><article>
+<header>
+<div class="eyebrow">CAN 硬件与驱动 · 第六章</div>
+<h1>寄存器写成功了，为什么总线还没有报文？</h1>
+<p class="dek">沿着一帧消息走过 CPU 接口、发送缓冲、位时序逻辑、验收过滤和物理层，理解 SJA1000 与 MCP2515 各自承担的工作。</p>
+<p>你把发送 ID 和数据写进控制器，SPI 示波器也看到了正确的字节，但 CAN 分析仪仍没有任何报文。问题可能不在发送数据，而在<strong>请求发送没有触发、控制器没有切换到正常模式、TXD/RXD 没连到收发器</strong>，或者总线上根本没有另一台能应答的节点。</p>
+<p>上一章解释了“什么时候采样”，本章解释“是谁把数据变成帧，谁把位电平送到线缆上”。示例围绕经典 CAN 的两颗独立控制器：<a href="https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf">NXP SJA1000 数据手册</a>与 <a href="https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf">Microchip MCP2515 数据手册（DS20001801K）</a>。</p>
+<nav class="jump" aria-label="本章目录"><a href="#boundary">信号链</a><a href="#sja">SJA1000 地址复用</a><a href="#mcp">MCP2515 SPI</a><a href="#filter">过滤实验</a><a href="#modes">工作模式</a><a href="#init">初始化</a><a href="#debug">故障定位</a></nav>
+</header>
 
-<p>各位同学，今天我们来聊聊CAN控制器的硬件。说实话，这部分内容在刚入门时容易被忽略——很多人觉得不就是个芯片嘛，接上就能用。但我在项目里吃过不少亏，才明白硬件选型和寄存器配置有多重要。</p>
-
-<h3>6.1 主流CAN控制器芯片概览</h3>
-
-<p>市面上常见的CAN控制器芯片，我接触过的主要有三类：</p>
-
-<ul>
-  <li><strong>独立控制器</strong>：SJA1000、MCP2515</li>
-  <li><strong>集成在MCU内部</strong>：STM32的bxCAN、NXP的FlexCAN</li>
-  <li><strong>带收发器的一体化方案</strong>：TJA1043、SN65HVD230</li>
-</ul>
-
-<p>我个人习惯把独立控制器用在需要灵活扩展的场合。比如有一次做车载网关，MCU自带的CAN接口不够用，我就外挂了两个MCP2515，通过SPI扩展。嗯，这里要注意——SPI的速率会直接影响CAN报文的收发效率，别选太慢的MCU。</p>
-
-<h3>6.2 SJA1000：经典中的经典</h3>
-
-<p>SJA1000是NXP（原Philips）的产品，可以说是CAN控制器的教科书。它支持两种模式：BasicCAN和PeliCAN。BasicCAN是早期标准，现在基本不用了。PeliCAN才是我们常用的，支持11位和29位标识符。</p>
-
-<h4>6.2.1 内部寄存器布局</h4>
-
-<p>SJA1000的寄存器地址从0x00到0x1F，共32个。我把它分成三组：</p>
-
-<table>
-  <tr>
-    <th>地址范围</th>
-    <th>寄存器组</th>
-    <th>功能说明</th>
-  </tr>
-  <tr>
-    <td>0x00 - 0x0F</td>
-    <td>控制与状态</td>
-    <td>模式控制、中断、错误状态</td>
-  </tr>
-  <tr>
-    <td>0x10 - 0x1C</td>
-    <td>验收滤波器</td>
-    <td>报文ID过滤配置</td>
-  </tr>
-  <tr>
-    <td>0x1D - 0x1F</td>
-    <td>发送/接收缓冲</td>
-    <td>报文数据暂存</td>
-  </tr>
-</table>
-
-<p>你想想看，如果验收滤波器没配好，总线上的报文会全部进入接收缓冲，CPU根本处理不过来。我曾经在一个项目中，就因为验收滤波器配置错误，导致CAN总线负载率才30%就丢帧了。</p>
-
-<h4>6.2.2 关键寄存器配置</h4>
-
-<p>配置SJA1000，核心就是几个寄存器：</p>
-
-<pre><code>// 模式寄存器 (MOD) - 地址0x00
-// 进入复位模式才能配置
-MOD = 0x01;  // 复位模式
-
-// 时钟分频寄存器 (CDR) - 地址0x1F
-// 配置CLKOUT输出和CAN模式
-CDR = 0x88;  // PeliCAN模式，CLKOUT关闭
-
-// 总线定时寄存器 (BTR0, BTR1)
-// 决定波特率，这个我后面会细讲
-BTR0 = 0x03;  // SJW=1, BRP=4
-BTR1 = 0x1C;  // TSEG1=7, TSEG2=2, SAM=1
-
-// 中断使能寄存器 (IER) - 地址0x04
-IER = 0x1F;  // 使能所有中断
-
-// 退出复位模式
-MOD = 0x08;  // 正常工作模式
-</code></pre>
-
-<div class="warning">
-  <strong>⚠️ 避坑指南</strong><br>
-  我曾经在配置SJA1000时，忘记先进入复位模式就直接写寄存器，结果芯片死活不工作。查了两天资料才发现——所有配置必须在复位模式下完成，退出复位模式后寄存器就锁定了。
+<section id="boundary" aria-labelledby="boundary-h">
+<span class="kicker">01 · 从总线问题反推器件分工</span>
+<h2 id="boundary-h">收发器不是控制器：它们工作在不同的边界</h2>
+<p><strong>控制器</strong>处理 CAN 报文帧、仲裁、位填充、CRC、确认、错误检测、位时序和接收过滤；<strong>收发器</strong>把控制器输出的逻辑电平转换成 CAN_H 与 CAN_L 的电气信号。SJA1000 和 MCP2515 都属于独立控制器，常见系统必须再接收发器。TJA1043 与 SN65HVD230 是收发器，不是完整的 CAN 协议控制器。<a href="https://www.nxp.com/docs/en/application-note/AN97076.pdf">NXP AN97076 §2.2–3</a></p>
+<figure><div class="figure-scroll" tabindex="0" aria-label="可横向滚动的控制器与收发器连接图"><img src="assets/chapter06-system-boundary.svg" alt="两条链：MCU经并行接口连SJA1000，或经SPI连MCP2515；两种控制器都还需CAN收发器才能连接CAN_H/CAN_L。" width="1100" height="445" loading="lazy"></div><figcaption>图 1 · 看清两条边界：主机到独立控制器（SJA1000 为并行、MCP2515 为 SPI）与控制器到外部收发器（发送/接收逻辑信号）。箭头仅表示概念路径，完整连接还需要供电、时钟、复位、中断与终端匹配。</figcaption></figure>
+<div class="mini-grid">
+<div><strong>SJA1000：CPU 并行接口</strong><p>适合有相应外部总线时序的主机设计；控制器通过地址/数据总线与读写选通访问。PeliCAN 可处理标准与扩展帧，并提供错误诊断能力。</p></div>
+<div><strong>MCP2515：SPI 接口</strong><p>适合通过 SPI 给 MCU 增加经典 CAN 控制器。但 SPI 带宽、事务次数和中断服务时延仍影响系统接收能力；“多个 SPI 控制器”不意味着无限制扩展。</p></div>
 </div>
+<div class="callout"><strong>先问失效发生在哪一层：</strong>若本地寄存器能读写，但 TXCAN/TX0 没发生发送动作，先查控制器模式/发送请求；若 TXCAN 有变化、CAN_H/CAN_L 没变化，优先查收发器与电源接线；若差分波形有报文但反复重发，则检查 ACK 节点、错误计数与位时序。</div>
+</section>
 
-<h3>6.3 MCP2515：SPI接口的灵活之选</h3>
+<section id="sja" aria-labelledby="sja-h">
+<span class="kicker">02 · 把 SJA1000 的“同一个地址”拆开看</span>
+<h2 id="sja-h">SJA1000：不是 32 个地址各自固定一类功能</h2>
+<p><strong>BasicCAN / PeliCAN</strong> 是 SJA1000 的控制器兼容性/功能模式，而不是“正常 / 监听”这种运行模式。CDR.7 选择 PeliCAN；在 PeliCAN 中，<code>MOD.0</code> 用于复位态，<code>MOD.1</code> 用于监听态，<code>MOD.2</code> 是自测试。具体访问控制见 <a href="https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf">SJA1000 §6.4.1–6.4.3、表 10/12</a>。</p>
+<figure><div class="figure-scroll" tabindex="0" aria-label="可横向滚动的SJA1000寄存器复用图"><img src="assets/chapter06-sja1000-map.svg" alt="SJA1000 PeliCAN 0x10到0x17在复位模式为ACR/AMR，在运行模式复用为接收读/发送写缓冲，0x1D至0x1F又是管理寄存器。" width="1060" height="450" loading="lazy"></div><figcaption>图 2 · <strong>0x10–0x17 并非恒定的滤波器区</strong>：PeliCAN 在复位时暴露 ACR0–3、AMR0–3；进入运行态，0x10 起的相同窗口作为 RXB（读）/TXB（写）。0x1D / 0x1E / 0x1F 分别是 RMC、RBSA 和 CDR。见 NXP 表 10。</figcaption></figure>
+<div class="table-scroll"><table><thead><tr><th>关键地址（PeliCAN）</th><th>寄存器</th><th>需要记住的行为</th></tr></thead><tbody>
+<tr><td><code>0x00</code></td><td>MOD</td><td>RM、LOM、STM、AFM、SM 是独立标志位，不能用一个通用枚举替换</td></tr>
+<tr><td><code>0x01 / 0x02</code></td><td>CMR / SR</td><td>向 CMR 请求发送/释放 RXB；从 SR 观察状态</td></tr>
+<tr><td><code>0x03 / 0x04</code></td><td>IR / IER</td><td>中断来源与使能；只“打开中断”不会自动发送帧</td></tr>
+<tr><td><code>0x06 / 0x07</code></td><td>BTR0 / BTR1</td><td>复位态下配置位时序；运行态只读</td></tr>
+<tr><td><code>0x10–0x17</code></td><td>ACR/AMR 或 TXB/RXB</td><td>由复位态、读写方向及帧类型决定</td></tr>
+<tr><td><code>0x1D / 0x1E / 0x1F</code></td><td>RMC / RBSA / CDR</td><td>接收计数、接收起点和时钟/模式；不是末尾三个“报文数据寄存器”</td></tr>
+</tbody></table></div>
+<h3>一个容易算错的 BTR0 / BTR1 示例</h3>
+<p>原来常见的误解是把 SJA1000 的 <code>BRP</code> 当成 STM32 bxCAN 的直接分频值。SJA1000 的 <code>BTR0[5:0]</code> 存的是 <strong>BRP−1</strong>，且每个 TQ 由外部振荡器经过一个额外的 2 倍因素得到。以振荡器 16 MHz、BRP 实际值 1、TSEG1=13、TSEG2=2、SJW=1、单采样为例：</p>
+<div class="equation">TQ = 2 × BRP / fXTAL = 2 × 1 / 16 MHz = 125 ns<br>bitrate = fXTAL / [2 × BRP × (1 + TSEG1 + TSEG2)] = 500 kbit/s<br>sample = (1 + 13) / 16 = 87.5%<br><strong>BTR0 = 0x00，BTR1 = 0x1C（SAM=0）</strong></div>
+<p>其中 <code>BTR1=0x1C</code> 是 <code>(TSEG2−1)&lt;&lt;4 | (TSEG1−1)</code>。此前把 <code>BTR0=0x03</code> 说成与这组数相同，会在 16 MHz 时得到错误速率。参见 <a href="https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf">SJA1000 §6.5.1–6.5.2</a>。</p>
+<h3>滤波器的一个反直觉约定</h3>
+<p>SJA1000 的<strong>验收掩码 AMR 中 1 表示不比较（don't care），0 表示比较</strong>。所以“全部比较”是掩码位全 0，而不是全 1。PeliCAN 的 AFM=1 使用单个 32 位过滤视图、AFM=0 使用两个 16 位视图；字段组合与标准/扩展帧有关。<a href="https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf">数据手册 §6.4.15</a></p>
+</section>
 
-<p>MCP2515是Microchip的产品，通过SPI接口与MCU通信。它的优势很明显：不占用MCU的CAN外设资源，想扩展几个就扩展几个。</p>
+<section id="mcp" aria-labelledby="mcp-h">
+<span class="kicker">03 · 再沿着 MCP2515 的 SPI 请求走</span>
+<h2 id="mcp-h">MCP2515：SPI 发了一个字节，并不等于总线上发了一帧</h2>
+<p>MCP2515 通过 SPI 访问寄存器与消息缓冲，内部具有 <strong>3 个发送缓冲区（TXB0–2）、2 个接收缓冲区（RXB0–1）、6 个验收过滤器（RXF0–5）与 2 个掩码（RXM0–1）</strong>。其中 RXF0–1 / RXM0 对应 RXB0，RXF2–5 / RXM1 对应 RXB1。RXB0 的 rollover 至 RXB1 需满足专门的配置和缓冲条件，不是始终发生。<a href="https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf">数据手册 §3–4</a></p>
+<figure><div class="figure-scroll" tabindex="0" aria-label="可横向滚动的MCP2515内部消息流图"><img src="assets/chapter06-mcp2515-path.svg" alt="MCU经SPI访问MCP2515，三个TX缓冲把消息送到CAN引擎；收到的消息经过验收过滤后进入两个RX缓冲，CAN引擎还需通过外部收发器接总线。" width="1060" height="456" loading="lazy"></div><figcaption>图 3 · TXB 与 RXB 是缓冲区，不是 CAN_H/CAN_L 接口。接收帧经过协议控制及验收过滤才能进入 RXB；后续由主机通过 SPI 读取。结构和过滤器归属据 MCP2515 §3–4 绘制。</figcaption></figure>
+<h3>不是“五条 SPI 指令”：按指令字节识别事务</h3>
+<div class="table-scroll"><table><thead><tr><th>指令</th><th>首字节</th><th>它真正做什么</th></tr></thead><tbody>
+<tr><td>RESET</td><td><code>0xC0</code></td><td>将芯片复位到默认寄存器值和配置模式；<strong>不是 0x05</strong></td></tr>
+<tr><td>READ / WRITE</td><td><code>0x03 / 0x02</code></td><td>读写寄存器，还需要地址与数据阶段</td></tr>
+<tr><td>BIT MODIFY</td><td><code>0x05</code></td><td>按掩码修改支持此操作的寄存器位</td></tr>
+<tr><td>LOAD TX BUFFER</td><td><code>0x40</code> 家族</td><td>向选定 TXB 的指定起始位置装载帧字段</td></tr>
+<tr><td>RTS</td><td><code>0x80</code> 家族</td><td>请求指定 TXB 开始发送；<strong>不是读接收缓冲</strong></td></tr>
+<tr><td>READ RX BUFFER</td><td><code>0x90</code> 家族</td><td>直接读指定 RXB 的消息字段</td></tr>
+<tr><td>READ STATUS / RX STATUS</td><td><code>0xA0 / 0xB0</code></td><td>快速查询发送、接收状态</td></tr>
+</tbody></table></div>
+<p class="small">指令集合来自 <a href="https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf">Microchip 表 12-1（第 67 页）</a>。SPI 的 <code>CS</code> 必须在每条事务期间维持低电平；新的命令需要重新结束并开始事务。推荐先使用受支持的 SPI mode 0,0 或 1,1 核对波形。</p>
+<h3>模式切换要请求，也要确认</h3>
+<p><code>CANCTRL</code> 地址 <code>0x0F</code> 的 <code>REQOP[7:5]</code> 表示<strong>请求模式</strong>；<code>CANSTAT</code> 地址 <code>0x0E</code> 的 <code>OPMOD[7:5]</code> 才表示<strong>实际当前模式</strong>。例如请求配置模式时可发送 <code>05 0F E0 80</code> 这四个 SPI 字节，然后读回 CANSTAT 检查是否真的变成 <code>100</code>。不能把“CANCTRL 写了 0x00”当成状态确认。<a href="https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf">MCP2515 §10、表 10-1/10-2</a></p>
+<div class="code-panel"><pre><code>// MCP2515 SPI 事务片段；每一行是一笔独立的 CS 低电平事务
+uint8_t reset[]  = {0xC0};                 // RESET -> Configuration
+uint8_t reqcfg[] = {0x05, 0x0F, 0xE0, 0x80}; // BIT MODIFY CANCTRL.REQOP = 100
+uint8_t reqnorm[]= {0x05, 0x0F, 0xE0, 0x00}; // REQOP = 000
+uint8_t rdmode[] = {0x03, 0x0E, 0x00};      // READ CANSTAT，最后字节读回值
 
-<h4>6.3.1 SPI通信协议</h4>
+// 伪代码：spi_transfer() 需自行适配 MCU SPI HAL 和 CS 控制
+// spi_transfer(reset); ... 写 CNF3/2/1 + 过滤器 ...
+// spi_transfer(reqnorm);
+// 轮询 CANSTAT 的 (value &amp; 0xE0) == 0x00，并设置超时
+// 然后装入 TXBn 和发 RTS，检查 TXnIF / 错误状态。</code></pre></div>
+<div class="callout"><strong>避免误读 0x123：</strong>标准 11 位 ID 的 SIDH/SIDL 高低位不是按字节直接抄入。正确拆分是 <code>SIDH = ID &gt;&gt; 3</code>、<code>SIDL = (ID &amp; 7) &lt;&lt; 5</code>；因此 ID=0x123 对应 <code>SIDH=0x24</code>、<code>SIDL=0x60</code>（标准格式，EXIDE=0）。必须同时考虑具体过滤器或 TX 缓冲的帧类型位。<a href="https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf">MCP2515 §3–4 SIDH/SIDL</a></div>
+</section>
 
-<p>MCP2515的SPI指令很简单，就5条：</p>
-
-<ul>
-  <li><strong>0x02</strong>：写数据到寄存器</li>
-  <li><strong>0x03</strong>：从寄存器读数据</li>
-  <li><strong>0x05</strong>：复位芯片</li>
-  <li><strong>0x40</strong>：加载发送缓冲</li>
-  <li><strong>0x80</strong>：读取接收缓冲</li>
-</ul>
-
-<p>我建议你把这5条指令背下来，调试时经常要用到。有一次我在现场排查问题，示波器抓SPI波形，一眼就看出MCU发的指令是0x02还是0x03，省了不少时间。</p>
-
-<h4>6.3.2 内部寄存器结构</h4>
-
-<p>MCP2515的寄存器比SJA1000多，地址从0x00到0xFF。但核心的也就那么几个：</p>
-
-<pre><code>// 配置CAN控制寄存器 (CANCTRL) - 地址0x0F
-// 模式选择：0x00=正常, 0x20=监听, 0x40=环回
-CANCTRL = 0x00;  // 正常模式
-
-// 配置中断使能 (CANINTE) - 地址0x2B
-CANINTE = 0x07;  // 使能发送、接收、错误中断
-
-// 配置验收滤波器 (RXF0SIDH) - 地址0x00
-// 设置接收ID为0x123
-RXF0SIDH = 0x12;
-RXF0SIDL = 0x30;  // 注意：标准ID的高3位在低字节
-
-// 配置屏蔽寄存器 (RXM0SIDH) - 地址0x20
-// 全匹配，不屏蔽任何位
-RXM0SIDH = 0xFF;
-RXM0SIDL = 0xE0;
-</code></pre>
-
-<div class="tip">
-  <strong>💡 个人经验</strong><br>
-  MCP2515的验收滤波器配置比SJA1000灵活，但容易搞混。我的习惯是：先配屏蔽寄存器（决定哪些位要比较），再配验收寄存器（决定比较的值）。顺序反了，滤波器可能不生效。
+<section id="filter" aria-labelledby="filter-h">
+<span class="kicker">04 · 动手体验最容易反过来的设置</span>
+<h2 id="filter-h">同样一串掩码，在两颗芯片上为什么含义相反？</h2>
+<p>对一个纯 <strong>11 位标准 ID</strong> 的抽象比较，MCP2515 是 <code>mask=1 → 必须比较</code>；SJA1000 AMR 是 <code>mask=0 → 必须比较</code>。这不是语法风格区别，而是硬件验收规则不同。下面让滤波目标始终是 <code>0x123</code>，试着传入 <code>0x12A</code>。</p>
+<div class="equation">MCP2515：匹配 ⇔ ((RX_ID XOR FILTER_ID) AND MASK) = 0<br>SJA1000：匹配 ⇔ ((RX_ID XOR FILTER_ID) AND (~AMR &amp; 0x7FF)) = 0</div>
+<div class="lab" id="filter-lab">
+<h3>11 位标识符掩码实验</h3>
+<div class="lab-grid">
+<label for="device">控制器<select id="device"><option value="mcp2515">MCP2515</option><option value="sja1000">SJA1000</option></select></label>
+<label for="filter-id">目标 ID（hex）<input id="filter-id" type="text" value="0x123" spellcheck="false"></label>
+<label for="mask">掩码（hex）<input id="mask" type="text" value="0x7FF" spellcheck="false"></label>
+<label for="received">接收 ID（hex）<input id="received" type="text" value="0x123" spellcheck="false"></label>
 </div>
+<div class="controls-row"><button id="test-other" type="button">接收 ID 改成 0x12A</button><button id="ignore-low" type="button">忽略低 4 位</button><button id="reset-demo" type="button">恢复精确比较</button></div>
+<p id="filter-result" role="status" aria-live="polite" class="lab-result" data-match="true">匹配：0x123 与目标 0x123 一致；MCP2515 掩码 0x7FF 表示全部比较。</p>
+<p class="small">本实验只对 11 位 ID 做位运算，不模拟 SJA1000 单/双过滤布局，也不模拟 MCP2515 的 EXIDE、扩展帧、标准帧数据字节过滤、RXM/RXB 接收模式或 rollover。它不是完整的芯片寄存器仿真。</p>
+</div>
+<div class="table-scroll"><table><thead><tr><th>芯片</th><th>全比较掩码（11 位抽象）</th><th>忽略低 4 位</th><th>用于 0x123 的 ID 高位字节</th></tr></thead><tbody>
+<tr><td>MCP2515</td><td><code>0x7FF</code></td><td><code>0x7F0</code></td><td><code>SIDH=0x24, SIDL=0x60</code></td></tr>
+<tr><td>SJA1000</td><td><code>0x000</code></td><td><code>0x00F</code></td><td>依 PeliCAN 单/双过滤模式与帧格式映射</td></tr>
+</tbody></table></div>
+<p>注意 MCP2515 的实际标准帧验收可涉及数据字节过滤；而 SJA1000 的 ACR/AMR 也依单/双过滤模式及帧字段排列。上述“11 位抽象掩码”帮助理解极性，<strong>不能直接当成一组完整的硬件寄存器写入方案</strong>。参见 <a href="https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf">MCP2515 表 4-2</a> 与 <a href="https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf">SJA1000 §6.4.15</a>。</p>
+</section>
 
-<h3>6.4 工作模式详解</h3>
+<section id="modes" aria-labelledby="modes-h">
+<span class="kicker">05 · 名字相似不代表寄存器一致</span>
+<h2 id="modes-h">两颗控制器的工作状态不要混成一个枚举</h2>
+<p>MCP2515 的 <code>REQOP[2:0]</code> 有五种请求值；SJA1000 PeliCAN 则用 MOD 的多个标志位组合工作状态。比如 SJA1000 的自测试 <strong>不是</strong> MCP2515 的内部 Loopback 的同义替代：SJA1000 测试使用自接收请求，细节和物理输出行为应单独按手册确认。</p>
+<div class="table-scroll"><table><thead><tr><th>用途</th><th>MCP2515 的 REQOP[2:0]</th><th>SJA1000 PeliCAN</th></tr></thead><tbody>
+<tr><td>正常收发</td><td><code>000</code>（CANCTRL 对应高位 <code>0x00</code>）</td><td><code>MOD.RM=0</code>，并清除 LOM/STM 等不期望标志</td></tr>
+<tr><td>配置 / 复位</td><td><code>100</code>（<code>0x80</code>）</td><td><code>MOD.RM=1</code>（<code>0x01</code>）</td></tr>
+<tr><td>监听</td><td><code>011</code>（<code>0x60</code>）</td><td><code>MOD.LOM=1</code>（<code>0x02</code>）</td></tr>
+<tr><td>内部回环 / 自测试</td><td><code>010</code>（<code>0x40</code>）内部回环</td><td><code>MOD.STM=1</code> 配合自接收请求；语义不同</td></tr>
+<tr><td>睡眠</td><td><code>001</code>（<code>0x20</code>）</td><td><code>MOD.SM=1</code>，需满足入睡条件</td></tr>
+</tbody></table></div>
+<p><strong>监听模式的物理行为很重要。</strong>MCP2515 Listen-Only 不发 ACK 或错误帧；MCP2515 Loopback 在内部传递 TX→RX，不会证明外部收发器或 CAN_H/CAN_L 正常。睡眠后唤醒也不意味着可以立即发送：需等待振荡器稳定及确认恢复后的模式。<a href="https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf">MCP2515 §10.2–10.5</a></p>
+</section>
 
-<p>不管是SJA1000还是MCP2515，工作模式都差不多。我总结为四种：</p>
-
-<h4>6.4.1 正常模式</h4>
-<p>这是最常用的模式。控制器正常收发报文，参与总线仲裁。说白了，就是车在路上正常跑的状态。</p>
-
-<h4>6.4.2 只听模式</h4>
-<p>只接收不发送。我在做总线监听工具时经常用这个模式。它不会干扰总线，特别适合排查问题。</p>
-
-<h4>6.4.3 环回模式</h4>
-<p>自己发自己收，不经过总线。这个模式用来测试控制器本身是否正常。我记得有一次，客户说CAN发不出去，我切到环回模式一测，发现控制器本身没问题，是收发器坏了。</p>
-
-<h4>6.4.4 休眠模式</h4>
-<p>低功耗模式，用于车载设备的省电设计。唤醒方式有两种：总线活动和外部中断。</p>
-
-<h3>6.5 实战：初始化流程</h3>
-
-<p>最后，我给出一个通用的初始化流程，SJA1000和MCP2515都适用：</p>
-
+<section id="init" aria-labelledby="init-h">
+<span class="kicker">06 · 让初始化顺序变成可验证状态</span>
+<h2 id="init-h">可靠初始化不是“复位 → 写寄存器 → 发送”，而是每步都读回</h2>
+<div class="steps">
+<div class="step"><b>① 供电、时钟与接口</b><p>确认振荡器实物频率、引脚时序、SPI 模式或并行总线，以及收发器 TX/RX 的连通性。</p></div>
+<div class="step"><b>② 进入可配置状态</b><p>MCP2515 可用 SPI RESET <code>0xC0</code>；SJA1000 进入复位模式，选择 PeliCAN 并验证 RM。</p></div>
+<div class="step"><b>③ 配置后核对</b><p>写位时序、过滤器、中断和外设接口；确认模式转换，必要时读回寄存器，带超时判断。</p></div>
+</div>
+<h3>SJA1000 的示意初始化顺序</h3>
+<div class="code-panel"><pre><code>// 硬件相关伪代码：bus_write/bus_read 是 CPU 并行总线驱动
+bus_write(0x00, 0x01);   // 请求复位模式（BasicCAN CR.0 / PeliCAN MOD.0）
+/* 确认设备进入复位状态；实际硬件启动流程依复位时序 */
+bus_write(0x1F, 0x88);   // CDR：进入 PeliCAN；禁用 CLKOUT（示例）
+bus_write(0x00, 0x01);   // PeliCAN MOD.RM=1
+bus_write(0x06, 0x00);   // BTR0：16MHz，BRP=1，SJW=1
+bus_write(0x07, 0x1C);   // BTR1：TSEG1=13，TSEG2=2，SAM=0
+/* 0x08 OCR 输出驱动、ACR/AMR 过滤器按具体收发器/业务配置 */
+/* 0x04 IER 中断选项要与 ISR 行为一致 */
+bus_write(0x00, 0x00);   // 清 RM/LOM/STM/SM 等，回到工作状态
+/* 用 SR 和错误诊断寄存器验证状态；发送前先写TXB再请求发送 */</code></pre></div>
+<h3>MCP2515 的示意初始化顺序</h3>
 <ol>
-  <li><strong>硬件复位</strong>：拉低复位引脚至少5μs</li>
-  <li><strong>进入配置模式</strong>：设置模式寄存器</li>
-  <li><strong>配置波特率</strong>：设置BTR0/BTR1或CNF1/CNF2/CNF3</li>
-  <li><strong>配置验收滤波器</strong>：设置接收ID和屏蔽位</li>
-  <li><strong>配置中断</strong>：使能需要的中断源</li>
-  <li><strong>退出配置模式</strong>：进入正常模式</li>
-  <li><strong>验证通信</strong>：发送一个测试报文，检查是否收到</li>
+<li>检查电源、晶振、SPI 模式、CS 电平与 RESET 接线；发送独立的 <code>0xC0</code> 事务，读回 <code>CANSTAT.OPMOD=100</code>。</li>
+<li>根据真实振荡器和目标速率计算 <code>CNF1 / CNF2 / CNF3</code>，然后写入；不能把上一章 bxCAN 的分频寄存器值直接搬到 MCP2515。</li>
+<li>配置 <code>RXFn / RXMn</code>、<code>RXBnCTRL</code>、<code>CANINTE</code>，留意 EXIDE、过滤器归属与溢出标志。</li>
+<li>用 <code>BIT MODIFY 05 0F E0 00</code> 请求正常模式，并轮询 CANSTAT 的 <code>OPMOD=000</code>，设置合理超时。</li>
+<li>装载 TXBn、发相应的 RTS；检查 <code>TXREQ</code>、<code>TXnIF</code>、<code>TEC/REC</code>，并使用至少一台正常工作的对端节点确认 ACK 与接收。</li>
 </ol>
+<div class="callout"><strong>没有所有控制器通用的“复位引脚必须拉低 5 μs”。</strong>例如 MCP2515 数据手册 §9 明确说明硬复位和 SPI RESET 的作用及电气参数；SJA1000 也有独立的复位与 CPU 接口要求。具体复位宽度应逐芯片、逐供电条件查电气表，而不是套一个经验数字。</div>
+<p>仓库提供 <a href="examples/can_chapter06_checks.py">可运行的寄存器编码脚本</a>：计算 SJA1000 的 BTR0/BTR1、MCP2515 的 11 位 ID 拆分，并生成模式请求的 SPI 字节。运行 <code>python -m examples.can_chapter06_checks</code> 查看；这<strong>不是</strong>可直接在某块开发板上调用的硬件驱动。</p>
+</section>
 
-<div class="highlight">
-  <strong>🔑 核心要点</strong><br>
-  初始化顺序不能乱。我曾经跳过硬件复位，直接写寄存器，结果芯片状态不确定，折腾了一下午。记住：复位→配置→验证，三步走，稳得很。
-</div>
-
-<p>好了，关于CAN控制器硬件就讲到这里。下一章我们聊聊CAN收发器——那个把数字信号变成差分信号的家伙。说实话，收发器选型比控制器还讲究，到时候我给你们讲讲我踩过的坑。</p>
-        <div class="footer-nav">
-            <a href="05.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="07.html">下一章 →</a>
-        </div>
-        
-    </div>
-</div>
-</div>
+<section id="debug" aria-labelledby="debug-h">
+<span class="kicker">07 · 工程排查顺序</span>
+<h2 id="debug-h">从“SPI 有波形”走到“整网报文可靠”</h2>
+<ol>
+<li><strong>寄存器可访问？</strong>MCP2515 读回 CANSTAT / CANCTRL；SJA1000 检查并行总线读写和复位态。错误的 CS 时序或主机总线选通会导致看似写成功却无效。</li>
+<li><strong>运行模式正确？</strong>配置/监听/环回/休眠状态可能不发总线报文；请求状态与实际状态需要分开检查。</li>
+<li><strong>发送缓冲就绪？</strong>帧格式、DLC、ID 编码、TXREQ/RTS/CMR 是否正确？单步定位消息有没有进入仲裁。</li>
+<li><strong>物理输出完整？</strong>控制器 TX 输出、收发器供电/使能、CAN_H/CAN_L、两端终端电阻与共地/共模要求是否满足？</li>
+<li><strong>有 ACK 节点？</strong>单台正常模式节点独自发报文无法从总线获得其他接收节点的 ACK；内部回环通过不代表外部总线畅通。</li>
+<li><strong>接收路径饱和？</strong>检查 RXBn 溢出、接收 FIFO 是否释放、过滤器归属和主机读取延迟。过滤器不是无限缓存能力。</li>
+</ol>
+<p>总结：<strong>从 CPU 到 CAN_H/CAN_L 有两条技术边界</strong>，寄存器映射与 SPI 指令又是两套不同的接口模型。先把模型分清，再追踪一个发送请求的状态变化，才能让驱动调试变成一条可重复的诊断路径。</p>
+<h3>资料与适用边界</h3>
+<ol class="refs">
+<li><a href="https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf">NXP / Philips · SJA1000 Stand-alone CAN Controller</a>：§6.4 PeliCAN、表 10/12、§6.5 BTR0/BTR1、CDR。</li>
+<li><a href="https://www.nxp.com/docs/en/application-note/AN97076.pdf">NXP AN97076 · SJA1000 Stand-alone CAN Controller</a>：CPU 接口、初始化、滤波与收发流程。</li>
+<li><a href="https://ww1.microchip.com/downloads/en/DeviceDoc/MCP2515-Family-Data-Sheet-DS20001801K.pdf">Microchip · MCP2515 Family Data Sheet DS20001801K</a>：§3–4 TX/RX/过滤器、§9 复位、§10 模式、§12 SPI 指令表。</li>
+</ol>
+<p class="small">范围：经典 CAN；指定器件的寄存器与抽象的 11 位 ID 实验。CAN FD、具体 PCB 布局/EMC、Linux 驱动、硬件时序实测及芯片勘误需另行验证。</p>
+</section>
+<nav class="next" aria-label="章节导航"><a href="05.html">← 第 5 章 · 位时序与同步</a><a href="index.html">返回总目录</a><a href="07.html">第 7 章 · 收发器 →</a></nav>
+</article></main></div>
+<script>
+(function () {
+  'use strict';
+  var device = document.getElementById('device');
+  var target = document.getElementById('filter-id');
+  var mask = document.getElementById('mask');
+  var received = document.getElementById('received');
+  var result = document.getElementById('filter-result');
+  function parseHex(el) {
+    var raw = el.value.trim();
+    if (!/^(?:0x)?[0-9a-f]{1,3}$/i.test(raw)) return null;
+    var parsed = parseInt(raw.replace(/^0x/i, ''), 16);
+    return parsed >= 0 && parsed <= 0x7FF ? parsed : null;
+  }
+  function h(value) { return '0x' + value.toString(16).toUpperCase().padStart(3, '0'); }
+  function render() {
+    var a = parseHex(target), b = parseHex(mask), c = parseHex(received);
+    if (a === null || b === null || c === null) {
+      result.dataset.match = 'invalid';
+      result.textContent = '请输入 0x000–0x7FF 的 11 位十六进制 ID 和掩码。';
+      return;
+    }
+    var isMcp = device.value === 'mcp2515';
+    var compareMask = isMcp ? b : (~b & 0x7FF);
+    var ok = (((a ^ c) & compareMask) === 0);
+    var name = isMcp ? 'MCP2515' : 'SJA1000';
+    result.dataset.match = String(ok);
+    result.textContent = (ok ? '匹配' : '不匹配') + '：接收 ' + h(c) +
+      '，目标 ' + h(a) + '，掩码 ' + h(b) +
+      '。' + name + ' 的有效比较位是 ' + h(compareMask) +
+      '（' + (isMcp ? '掩码1=比较' : '掩码0=比较') + '）。' +
+      (isMcp ? '目标 ID 对应 SIDH=' + h(a >> 3).replace('0x0','0x') +
+      '、SIDL=' + h((a & 7) << 5).replace('0x0','0x') + '（EXIDE=0）。' : '');
+  }
+  [target, mask, received].forEach(function (el) { el.addEventListener('input', render); });
+  device.addEventListener('change', function () {
+    mask.value = device.value === 'mcp2515' ? '0x7FF' : '0x000';
+    render();
+  });
+  document.getElementById('test-other').addEventListener('click', function () {
+    received.value = '0x12A';
+    render();
+  });
+  document.getElementById('ignore-low').addEventListener('click', function () {
+    mask.value = device.value === 'mcp2515' ? '0x7F0' : '0x00F';
+    render();
+  });
+  document.getElementById('reset-demo').addEventListener('click', function () {
+    target.value = '0x123';
+    received.value = '0x123';
+    mask.value = device.value === 'mcp2515' ? '0x7FF' : '0x000';
+    render();
+  });
+  render();
+}());
+</script>
 </body>
 </html>
