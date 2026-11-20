@@ -4,6 +4,15 @@
 <figure><img src="assets/chapter08-bxcan-flow.svg" width="960" height="306" alt="CPU和APB1连接bxCAN发送邮箱与接收FIFO，再经协议核心到TXD和RXD，最后连接外部收发器"><figcaption>图 8-1：协议控制器与物理层分工。三个发送邮箱、两个深度为三的接收 FIFO 是 bxCAN 常见资源；过滤器组数取决于具体芯片。</figcaption></figure>
 <div class="callout"><strong>型号边界：</strong>本章代码特指 STM32F103 常规型号 + STM32F10x 标准外设库（SPL）。STM32F105/F107 连接型产品可提供双 CAN、共享 28 个过滤器组；普通 STM32F103 常见为 14 组。STM32F103 的 APB1/PCLK1 最大额定频率为 36MHz；其它 STM32 系列可能采用 FDCAN，不能套用 bxCAN 寄存器和 API。</div></section>
 <section id="clock"><h2>为什么同一份位时序配置，换块板就失效？</h2><p>在 STM32F103 上，CAN1 位时间来自 <strong>APB1 的 PCLK1</strong>，而不是直接来自 CPU 主频。只有 PCLK1、预分频 BRP、BS1 和 BS2 全部确定，波特率才有确定值；SJW 影响允许的重同步跳转，不加入位时间总量。</p><div class="math" role="group" aria-label="bxCAN波特率与采样点公式" tabindex="0"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>f</mi><mtext>bit</mtext></msub><mo>=</mo><mfrac><msub><mi>f</mi><mtext>PCLK1</mtext></msub><mrow><mi>BRP</mi><mo>×</mo><mo>(</mo><mn>1</mn><mo>+</mo><mi>BS1</mi><mo>+</mo><mi>BS2</mi><mo>)</mo></mrow></mfrac></mrow></math></div><div class="math" role="group" aria-label="采样点百分比公式" tabindex="0"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>Sample point</mtext><mo>=</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mi>BS1</mi></mrow><mrow><mn>1</mn><mo>+</mo><mi>BS1</mi><mo>+</mo><mi>BS2</mi></mrow></mfrac><mo>×</mo><mn>100</mn><mo>%</mo></mrow></math></div>
+<div class="code-wrap"><pre><code>// STM32F103 SPL：与上方数学公式完全对应
+CAN_InitTypeDef can;
+CAN_StructInit(&amp;can);
+can.CAN_SJW = CAN_SJW_1tq;
+can.CAN_BS1 = CAN_BS1_14tq;
+can.CAN_BS2 = CAN_BS2_3tq;
+can.CAN_Prescaler = 4;
+// 36 MHz / (4 * 18) = 500 kbit/s；SJW 不加入分母
+</code></pre></div>
 <figure><img src="assets/chapter08-timing.svg" width="960" height="260" alt="18个时间量子分成1个SYNC、14个BS1和3个BS2，采样点位于第15个量子后即83.33百分比"><figcaption>图 8-2：PCLK1 = 36MHz、BRP = 4、BS1 = 14、BS2 = 3 时，每位 18 tq，500 kbit/s，采样点 15/18 = 83.33%。这是可复算的配置，不保证适用于任意总线长度。</figcaption></figure>
 <div class="interactive"><h3>交互计算：改动 PCLK1 或位段会怎样？</h3><div class="controls"><label for="pclk">PCLK1/MHz <select id="pclk"><option value="36">36</option><option value="24">24</option><option value="18">18</option></select></label><label for="brp">BRP <input id="brp" type="number" min="1" max="1024" step="1" value="4"></label><label for="bs1">BS1 <input id="bs1" type="number" min="1" max="16" step="1" value="14"></label><label for="bs2">BS2 <input id="bs2" type="number" min="1" max="8" step="1" value="3"></label><label for="sjw">SJW <input id="sjw" type="number" min="1" max="4" step="1" value="1"></label></div><p class="readout" role="status" aria-live="polite" id="timing-result">500.000 kbit/s · 18 tq/bit · 采样点 83.33%</p><p class="fine">基于整数 tq 模型；还需要满足节点时钟误差、收发器传播延迟和网络拓扑裕量。</p></div></section>
 <section id="pins"><h2>示波器上看不到 TXD：先确认 GPIO 是哪个引脚</h2><p>STM32F103 的 CAN1 默认常见映射为 <strong>PA11/RX、PA12/TX</strong>。若板子接在 PB8/RX、PB9/TX，需要同时使能 AFIO 时钟并配置 CAN1 重映射。F1 的 GPIO 初始化方式不等同于 F4 的 Alternate Function 寄存器配置。</p>
