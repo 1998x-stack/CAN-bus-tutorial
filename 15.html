@@ -115,8 +115,10 @@
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
     </style>
+<link rel="stylesheet" href="assets/olah-chapters-13-15.css">
 </head>
 <body>
+<a class="skip-to-content" href="#content">跳转到正文</a>
 <div class="double-border">
 <div class="container">
     <div class="sidebar">
@@ -155,106 +157,50 @@
         </ul>
     </div>
     <div class="main-content">
-        <h2>第15章 CAN总线终端电阻：终端电阻作用、120Ω电阻选择、电阻放置位置、常见错误</h2>
-
-<p>好，咱们今天聊聊终端电阻。这玩意儿看着不起眼，就两个小电阻，但我在实际项目中见过太多因为终端电阻出问题导致的通信故障。说白了，终端电阻是CAN总线稳定工作的基石，搞不好它，整个网络都可能瘫痪。</p>
-
-<h3>15.1 终端电阻到底有什么用？</h3>
-
-<p>终端电阻的核心作用，我总结为两点：<strong>阻抗匹配</strong>和<strong>信号反射消除</strong>。</p>
-
-<p>你想想看，CAN总线上的信号是以差分电压形式传输的。当信号从发送节点出发，沿着总线跑到末端时，如果末端没有匹配的电阻，信号就会像撞到墙一样反弹回来。这个反弹的信号会和后续的信号叠加，造成波形畸变。畸变严重了，接收节点就判断不出正确的电平，误码率飙升。</p>
-
-<p>另一个作用你可能不太注意——<strong>保证显性电平的驱动能力</strong>。CAN总线在隐性状态时，CAN_H和CAN_L都是2.5V。发送显性位时，发送器把CAN_H拉高到3.5V，CAN_L拉低到1.5V，产生2V的差分电压。这个电压是靠终端电阻形成回路才能稳定建立的。没有终端电阻，显性电平的驱动电流就没法形成完整的回路，电压差可能达不到接收器要求的阈值。</p>
-
-<div class="highlight">
-  <p><strong>核心要点：</strong>终端电阻不是可有可无的，它是CAN总线物理层的必备元件。没有它，总线要么通信不稳定，要么根本没法工作。</p>
-</div>
-
-<h3>15.2 为什么偏偏是120Ω？</h3>
-
-<p>这个问题我经常被问到。为什么是120Ω，不是100Ω，也不是150Ω？</p>
-
-<p>答案其实和电缆的特性阻抗有关。CAN总线常用的双绞线，其特性阻抗大约在120Ω左右。你想想看，传输线理论告诉我们，当终端电阻等于电缆的特性阻抗时，信号反射最小。所以120Ω这个值，是经过长期实践验证的标准值。</p>
-
-<p>我在项目中遇到过有人用100Ω电阻代替，结果总线长度超过50米后，通信就开始丢包。换回120Ω后问题立刻消失。嗯，这里要注意，<strong>120Ω不是随便选的，它是和电缆特性阻抗匹配的结果</strong>。</p>
-
-<p>另外，两个终端电阻并联后的等效电阻是60Ω。这个60Ω正好是CAN总线在显性状态下的负载电阻。发送器驱动显性位时，需要克服这个60Ω的负载产生2V的差分电压，驱动电流大约是33mA。这个电流值对CAN收发器来说是合理的，既能保证信号质量，又不会过载。</p>
-
-<table>
-  <tr>
-    <th>参数</th>
-    <th>数值</th>
-    <th>说明</th>
-  </tr>
-  <tr>
-    <td>单个终端电阻</td>
-    <td>120Ω</td>
-    <td>匹配双绞线特性阻抗</td>
-  </tr>
-  <tr>
-    <td>并联等效电阻</td>
-    <td>60Ω</td>
-    <td>两个120Ω并联</td>
-  </tr>
-  <tr>
-    <td>显性差分电压</td>
-    <td>2V</td>
-    <td>CAN_H 3.5V - CAN_L 1.5V</td>
-  </tr>
-  <tr>
-    <td>显性驱动电流</td>
-    <td>约33mA</td>
-    <td>2V / 60Ω</td>
-  </tr>
-</table>
-
-<h3>15.3 电阻应该放在哪里？</h3>
-
-<p>这个问题看似简单，但很多人会搞错。终端电阻必须放在<strong>总线的两个最远端</strong>。也就是说，一条CAN总线只有两个终端节点需要接120Ω电阻，其他中间节点绝对不能接。</p>
-
-<p>为什么会这样？因为终端电阻的作用是吸收信号能量，防止反射。如果电阻放在中间位置，信号从发送节点跑到电阻处就被吸收了，但电阻后面的总线末端仍然没有匹配，反射依然存在。所以，<strong>只有总线物理拓扑的两个端点才需要终端电阻</strong>。</p>
-
-<p>我个人的习惯是，在设计阶段就明确标注出哪两个节点是终端节点。对于星型拓扑或者多分支结构，终端电阻的放置要特别小心。我记得有一次，一个同事把终端电阻放在了分支节点的末端，而不是主干总线的末端，结果总线上的信号反射得一塌糊涂。</p>
-
-<div class="tip">
-  <p><strong>实战技巧：</strong>如果你不确定哪个节点是终端节点，可以用万用表测量CAN_H和CAN_L之间的电阻。在总线断电的情况下，正常的总线两端电阻应该是60Ω（两个120Ω并联）。如果测到120Ω，说明只有一个终端电阻；如果测到0Ω或无穷大，说明终端电阻配置有问题。</p>
-</div>
-
-<h3>15.4 常见错误与避坑指南</h3>
-
-<p>做CAN总线开发这些年，我见过太多终端电阻相关的坑。下面这几个是最常见的，你一定要注意。</p>
-
-<h4>错误一：多个节点都接了终端电阻</h4>
-<p>有些新手觉得每个节点都接个120Ω更保险，结果总线上并联了三个、四个甚至更多120Ω电阻。等效电阻变成了40Ω、30Ω甚至更低。这时候显性驱动电流会变大，收发器可能过热，信号幅值也会下降。我曾经见过一个项目，总线上接了6个终端电阻，等效电阻只有20Ω，收发器直接烧了。</p>
-
-<h4>错误二：终端电阻放在中间节点</h4>
-<p>这个前面说过了，终端电阻必须放在总线两端。放在中间节点，总线末端仍然没有匹配，反射问题依然存在。我建议你在布线时，把终端节点放在物理拓扑的最远端，不要图方便随便找个节点接上。</p>
-
-<h4>错误三：使用普通电阻代替</h4>
-<p>120Ω电阻看起来普通，但CAN总线对电阻的精度和功率有要求。一般建议使用<strong>1%精度、1/4W或1/2W</strong>的金属膜电阻。普通碳膜电阻的温度稳定性差，在高温环境下阻值可能漂移，影响匹配效果。我在一个车载项目中就遇到过，夏天高温时通信偶尔出错，排查到最后发现是终端电阻温度漂移导致的。</p>
-
-<h4>错误四：忽略线缆特性阻抗</h4>
-<p>虽然标准CAN总线用120Ω，但如果你用的线缆特性阻抗不是120Ω，那终端电阻也要相应调整。比如有些特殊应用使用100Ω或150Ω的线缆，终端电阻就要跟着变。不过这种情况很少见，绝大多数标准CAN应用都是120Ω。</p>
-
-<div class="warning">
-  <p><strong>警告：</strong>千万不要在总线带电的情况下插拔终端电阻模块。带电操作可能产生瞬态高压，损坏CAN收发器。我有个同事就因为这个原因，一口气烧了三个TJA1050，教训深刻。</p>
-</div>
-
-<h3>15.5 如何快速检测终端电阻？</h3>
-
-<p>最后分享一个实用技巧。在调试现场，我经常用万用表快速判断终端电阻配置是否正确。</p>
-
+        <main class="deep-dive" id="content"><article>
+<header class="article-header">
+<p class="eyebrow">CHAPTER 15 · 差分端接与诊断</p>
+<h1>CAN 终端电阻：万用表读到 60 Ω，就一定接对了吗？</h1>
+<p class="dek">两个 120 Ω 并联是 60 Ω，听起来很容易。但电阻值正确只证明一种<strong>静态电气关系</strong>，并不能证明电阻位于主干两端，更不能替代高速波形检查。</p>
+<p class="chapter-key">关键区别：<strong>阻抗匹配</strong>关注行波在物理末端的反射，<strong>断电电阻测量</strong>关注直流并联通路；它们不是同一个测试。</p>
+<nav class="in-article-toc" aria-label="本章导航"><a href="#physical">端接机制</a><a href="#calculation">阻抗与功率</a><a href="#experiment">电阻实验</a><a href="#diagnosis">故障排查</a><a href="#sources">资料来源</a></nav>
+</header>
+<section class="dive-section" id="physical"><span class="kicker">01 / 从物理位置开始</span><h2>120 Ω 是接在 CAN_H 与 CAN_L 之间，不是接在某根线与地之间</h2>
+<p>普通高速 CAN 使用差分双绞线，常见特性阻抗约为 120 Ω。在线型主干的两个<strong>物理末端</strong>，分别跨 CAN_H 与 CAN_L 放置一个与线缆阻抗接近的端接网络。这样可减小末端反射；中间节点通常不应再附加同样的终端负载。</p>
+<figure><img src="assets/ch15-termination.svg" width="840" height="340" alt="CAN_H与CAN_L两条线的物理最左端和最右端各跨接一只120欧姆电阻，中间节点未端接；断电理论等效为60欧姆。"><figcaption>图 15-1｜上图表示普通高速 CAN 线型主干。实际板卡可能使用等效为 120 Ω 的分裂端接，但其物理末端位置原则不变。</figcaption></figure>
+<p>分裂端接（split termination）可把一个 120 Ω 等效端接分成串联的两只约 60 Ω 电阻，中点按参考设计通过电容接到合适的参考地，用于改善共模噪声表现；并非任何板都必须采用，器件与 EMC 规范优先。</p>
+</section>
+<section class="dive-section" id="calculation"><span class="kicker">02 / 两个问题，两种公式</span><h2>反射系数看阻抗；万用表看直流并联</h2>
+<p>对一段特性阻抗 <code>Z₀</code> 的线缆，末端负载为 <code>Rₗ</code> 时，理想传输线的电压反射系数为：</p>
+<div class="formula" tabindex="0" role="group" aria-label="电压反射系数"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>Γ</mi><mo>=</mo><mfrac><mrow><msub><mi>R</mi><mi>L</mi></msub><mo>−</mo><msub><mi>Z</mi><mn>0</mn></msub></mrow><mrow><msub><mi>R</mi><mi>L</mi></msub><mo>+</mo><msub><mi>Z</mi><mn>0</mn></msub></mrow></mfrac></mrow></math></div>
+<p>当 <code>Rₗ = Z₀ = 120 Ω</code> 时，理论上 <code>Γ = 0</code>；开路近似 <code>+1</code>，短路近似 <code>−1</code>。这是理想末端模型，连接器、支路、器件电容与非理想边沿还会造成反射。</p>
+<p>网络完全断电、没有其他显著并联直流通路时，两个跨线的 120 Ω 终端在电阻档下是并联关系：</p>
+<div class="formula" tabindex="0" role="group" aria-label="两个120欧姆电阻的并联等效"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>R</mi><mtext>eq</mtext></msub><mo>=</mo><mfrac><mrow><mn>120</mn><mo>×</mo><mn>120</mn></mrow><mrow><mn>120</mn><mo>+</mo><mn>120</mn></mrow></mfrac><mo>=</mo><mn>60</mn><mtext> Ω</mtext></mrow></math></div>
+<p>显性差分电压若以 <code>2 V</code> 作教学假设，并假定每个端接两端电压都是 2 V，则单只 120 Ω 电阻耗散约 <code>P = V²/R = 4/120 ≈ 0.033 W</code>。这<strong>不是</strong>器件选型的额定功率要求：还应考虑故障、瞬态、电阻温升、环境与器件手册的限值。</p>
+<div class="note"><strong>实验边界：</strong>不是所有 CAN 物理层都采用两只离散 120 Ω；低速容错 CAN、车用特殊拓扑与某些板卡可能采用不同端接。请根据所用收发器与整车/设备规范判断，而不是拿这张图当作普适硬件标准。</div>
+</section>
+<section class="dive-section" id="experiment"><span class="kicker">03 / 用数量建立直觉</span><h2>多装一只终端，直流等效会变多少？</h2>
+<p>下面假设每只都是 <code>120 Ω</code> 且全部直接并联在 CAN_H/CAN_L 之间，不计收发器或保护器件内部电路。选择数量，检查理想直流读数。</p>
+<div class="demo" data-demo="termination"><h3>终端数量与等效电阻</h3><div class="choice-row" data-choices="count" role="group" aria-label="选择跨线终端电阻数量">
+<button type="button" data-count="0" aria-pressed="false">0 个</button><button type="button" data-count="1" aria-pressed="false">1 个</button><button type="button" data-count="2" aria-pressed="true">2 个</button><button type="button" data-count="3" aria-pressed="false">3 个</button></div>
+<p class="demo-result" data-output aria-live="polite">2 个 120 Ω 并联：理想等效 60 Ω。常见正常断电测量值约为 60 Ω。</p></div>
+<div class="table-scroll"><table><caption>理想 120 Ω 并联模型；不能单独定位故障</caption><thead><tr><th>跨线 120 Ω 数量</th><th>理想测量值</th><th>需要进一步排查的情况</th></tr></thead><tbody>
+<tr><td>0</td><td>开路（∞ Ω）</td><td>也可能是测点与总线断线</td></tr><tr><td>1</td><td>120 Ω</td><td>遗漏或断开一端，也可能有隐藏网络</td></tr><tr><td>2</td><td>60 Ω</td><td>值正确仍可能放错位置</td></tr><tr><td>3</td><td>40 Ω</td><td>多接了终端，或存在其他并联负载</td></tr></tbody></table></div>
+</section>
+<section class="dive-section" id="diagnosis"><span class="kicker">04 / 从 60 Ω 走到可靠链路</span><h2>正确的测试顺序：断电 → 电阻 → 位置 → 波形</h2>
 <ol>
-  <li><strong>断电测量</strong>：断开所有节点的电源，用万用表电阻档测量CAN_H和CAN_L之间的电阻。</li>
-  <li><strong>正常值</strong>：如果总线两端都接了120Ω电阻，测量值应该是60Ω左右。</li>
-  <li><strong>异常值</strong>：如果测量到120Ω，说明只有一个终端电阻；如果测量到40Ω或更小，说明有多个终端电阻；如果测量到无穷大，说明没有终端电阻。</li>
-  <li><strong>分段排查</strong>：如果总线很长，可以分段测量，逐步缩小故障范围。</li>
+<li><strong>完全断电再用电阻档：</strong>按设备安全流程隔离所有节点与可能存在的外部电源，确认适合断电测量后，在 CAN_H 与 CAN_L 之间读值。不要对带电总线直接使用欧姆档。</li>
+<li><strong>估算并联数量：</strong>约 60 Ω 常与两只 120 Ω 一致，约 120 Ω 可能少一只，约 40 Ω 可能多一只；低至近 0 Ω 优先排除短路，近无穷大优先排除断线。数值不能唯一定位原因。</li>
+<li><strong>核对物理末端：</strong>沿实际线束检查两个端接位置与隐藏的板载电阻/跳线，避免两个终端都安装在中间节点。</li>
+<li><strong>上电后看差分波形：</strong>用合适的差分探头或安全测量方法在最远节点观察振铃、过冲、显性与隐性判决裕量，并结合 CAN 控制器错误计数、重发和负载率判断。</li>
 </ol>
-
-<p>这个方法我用了十几年，简单有效。你想想看，一个万用表就能搞定的事，何必搞得那么复杂？</p>
-
-<p>好了，关于终端电阻的内容就这些。记住，120Ω不是随便选的，位置必须放在两端，数量只能是两个。搞清楚了这些，你的CAN总线物理层就稳了一大半。</p>
+<p class="pull-quote">60 Ω 是很有用的<strong>快速筛查</strong>，却不是“布线和端接都正确”的最终判据。</p>
+</section>
+<section class="dive-section references" id="sources"><span class="kicker">05 / 设计与验证依据</span><h2>参考资料</h2>
+<ul><li><a href="https://www.ti.com/tool/TIDA-01238">Texas Instruments：可配置 CAN 总线终端参考设计</a>（两端端接与物理布线）</li><li><a href="https://www.ti.com/document-viewer/lit/html/SLLA555/GUID-B6EFC304-6CF0-429D-A913-0E138E894DF3">Texas Instruments：CAN 总线与 120 Ω 端接说明</a></li><li><a href="https://www.ti.com/document-viewer/ja-jp/lit/html/SSZTAM0">Texas Instruments：标准与分裂端接波形示例</a>（分裂端接需按具体器件参考设计实现）</li></ul>
+<p class="small">反射系数、并联等效与耗散功率是理想模型的推导；示例不构成具体硬件故障的诊断结论。</p>
+</section>
+</article></main>
         <div class="footer-nav">
             <a href="14.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
@@ -264,5 +210,6 @@
     </div>
 </div>
 </div>
+<script src="assets/olah-chapters-13-15.js"></script>
 </body>
 </html>
