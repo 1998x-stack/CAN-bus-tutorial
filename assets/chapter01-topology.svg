@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 310" role="img" aria-labelledby="topology-title topology-desc">
+<title id="topology-title">高速 CAN 线型拓扑及两端终端电阻</title>
+<desc id="topology-desc">CAN_H 与 CAN_L 沿主干线布置，主干最左端与最右端各用一只120欧姆电阻连接两条线；三个节点用短支线连接，主干中间不再接终端电阻。</desc>
+<rect x="6" y="8" width="788" height="292" rx="17" fill="#f3faf8" stroke="#b0d6cf"/>
+<text x="27" y="42" font-family="Arial,sans-serif" font-size="21" fill="#194f51" font-weight="700">高速 CAN：主干两端匹配</text>
+<path d="M78 133 H722" stroke="#007f86" stroke-width="6" stroke-linecap="round"/><path d="M78 180 H722" stroke="#d37e40" stroke-width="6" stroke-linecap="round"/>
+<text x="390" y="118" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" fill="#096d73">CAN_H</text>
+<text x="390" y="203" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" fill="#a35a27">CAN_L</text>
+<g fill="none" stroke="#465d63" stroke-width="2.5"><path d="M78 133 V147 M78 165 V180 M722 133 V147 M722 165 V180"/></g>
+<g fill="#fff" stroke="#67565b" stroke-width="2"><rect x="60" y="147" width="36" height="18" rx="3"/><rect x="704" y="147" width="36" height="18" rx="3"/></g>
+<g font-family="Arial,sans-serif" font-size="19" fill="#30434b" text-anchor="middle"><text x="78" y="220">120 Ω</text><text x="722" y="220">120 Ω</text></g>
+<g stroke="#34847b" stroke-width="2.5"><path d="M235 133 V86 M235 180 V184"/><path d="M402 133 V86 M402 180 V184"/><path d="M569 133 V86 M569 180 V184"/></g>
+<g fill="#fff" stroke="#4f948d" stroke-width="2"><rect x="189" y="57" width="92" height="29" rx="7"/><rect x="356" y="57" width="92" height="29" rx="7"/><rect x="523" y="57" width="92" height="29" rx="7"/></g>
+<g font-family="Arial,sans-serif" font-size="16" fill="#285f59" text-anchor="middle"><text x="235" y="77">节点 A</text><text x="402" y="77">节点 B</text><text x="569" y="77">节点 C</text></g>
+<rect x="202" y="240" width="395" height="39" rx="9" fill="#fff" stroke="#abd1ca"/>
+<text x="399" y="265" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" fill="#2b5350">断电测 H–L：120 Ω ∥ 120 Ω = 60 Ω</text>
+</svg>

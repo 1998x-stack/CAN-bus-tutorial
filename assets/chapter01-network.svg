@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 350" role="img" aria-labelledby="network-title network-desc">
+<title id="network-title">分散布线与 CAN 共享总线对比</title><desc id="network-desc">左边是多个独立的点到点信号连接，右边是三个控制器经 CAN 收发器共享 CAN_H 和 CAN_L 两条信号线。图示不包含供电、地线或其它车辆线束。</desc>
+<rect x="8" y="12" width="375" height="320" rx="18" fill="#f4f7fb" stroke="#b8c7d8"/>
+<rect x="417" y="12" width="375" height="320" rx="18" fill="#eef9f6" stroke="#9dccc1"/>
+<text x="30" y="47" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#244057">多组点对点信号</text>
+<text x="439" y="47" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#17675b">共享总线：发布与接收</text>
+<rect x="135" y="80" width="118" height="50" rx="10" fill="#fff" stroke="#59718b" stroke-width="2"/>
+<text x="194" y="112" text-anchor="middle" font-family="Arial,sans-serif" font-size="19" fill="#203035">主控单元</text>
+<g stroke="#b66c55" stroke-width="4" fill="none"><path d="M162 130 L70 215"/><path d="M194 130 L194 215"/><path d="M226 130 L319 215"/></g>
+<g fill="#fff" stroke="#718ba1" stroke-width="2"><rect x="24" y="215" width="95" height="56" rx="10"/><rect x="146" y="215" width="95" height="56" rx="10"/><rect x="271" y="215" width="95" height="56" rx="10"/></g>
+<g fill="#254259" font-family="Arial,sans-serif" font-size="17" text-anchor="middle"><text x="71" y="249">节点 A</text><text x="193" y="249">节点 B</text><text x="319" y="249">节点 C</text></g>
+<text x="30" y="308" font-family="Arial,sans-serif" font-size="16" fill="#586b76">示意：信号连接随需求增加</text>
+<path d="M447 200 H761" stroke="#087e83" stroke-width="7" stroke-linecap="round"/><path d="M447 222 H761" stroke="#d5884c" stroke-width="7" stroke-linecap="round"/>
+<text x="452" y="188" font-family="Arial,sans-serif" font-size="16" fill="#086b70">CAN_H</text><text x="452" y="248" font-family="Arial,sans-serif" font-size="16" fill="#9a581f">CAN_L</text>
+<g stroke="#397a73" stroke-width="3"><path d="M507 152 V200 M507 222 V262"/><path d="M606 152 V200 M606 222 V262"/><path d="M705 152 V200 M705 222 V262"/></g>
+<g fill="#fff" stroke="#49928a" stroke-width="2"><rect x="460" y="83" width="94" height="69" rx="10"/><rect x="559" y="83" width="94" height="69" rx="10"/><rect x="658" y="83" width="94" height="69" rx="10"/></g>
+<g fill="#185d58" font-family="Arial,sans-serif" font-size="16" text-anchor="middle"><text x="507" y="110">ECU A</text><text x="507" y="134">收发器</text><text x="606" y="110">ECU B</text><text x="606" y="134">收发器</text><text x="705" y="110">ECU C</text><text x="705" y="134">收发器</text></g>
+<text x="446" y="308" font-family="Arial,sans-serif" font-size="16" fill="#4a6867">仅表示共享通信线，非全车线束</text>
+</svg>
