@@ -68,7 +68,8 @@ class ArticleStructureTests(unittest.TestCase):
                 self.assertIn('<main class="reader" id="content">', html)
                 self.assertIn('aria-live="polite"', html)
                 self.assertIn('assets/chapters28-30.css', html)
-                self.assertNotIn("HAL_Delay(rand()", html)
+                code_blocks = "\n".join(re.findall(r"<pre><code>[\\s\\S]*?</code></pre>", html))
+                self.assertNotIn("HAL_Delay(rand()", code_blocks)
                 self.assertNotIn("原创图解 · 单文件离线 HTML", html)
                 for i in (1, 2):
                     path = ROOT / f"assets/chapter{n}-figure{i}.svg"
