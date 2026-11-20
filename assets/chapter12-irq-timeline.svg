@@ -1,0 +1,15 @@
+<svg style="font-family:system-ui,-apple-system,Segoe UI,sans-serif" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 292" role="img" aria-labelledby="irq-title irq-desc">
+<title id="irq-title">CAN 接收中断与主循环的时间线</title>
+<desc id="irq-desc">硬件收帧写 FIFO 触发中断挂起；CPU 可能等待高优先级 ISR，随后进入 CAN ISR 搬运报文并退出；主循环稍后才解析数据。</desc>
+<defs><marker id="irq-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" stroke="#357771" stroke-width="1.5"/></marker></defs>
+<g font-size="14" fill="#315a5c"><text x="12" y="57">CAN 硬件</text><text x="12" y="127">CPU / NVIC</text><text x="12" y="215">主循环</text></g>
+<path d="M105 61 H762 M105 132 H762 M105 222 H762" stroke="#d4e3de" stroke-width="2"/>
+<rect x="121" y="43" width="133" height="36" rx="7" fill="#dff2e8" stroke="#77b6a7"/><text x="187" y="66" text-anchor="middle" font-size="14" fill="#1b655e">完整帧 → FIFO</text>
+<path d="M254 80 V131" stroke="#be8f5d" stroke-dasharray="5 4" stroke-width="2"/>
+<rect x="255" y="115" width="145" height="35" rx="6" fill="#fff2e5" stroke="#dfa975"/><text x="327" y="137" font-size="13" text-anchor="middle" fill="#915c2d">等待响应 / 可能抢占</text>
+<rect x="401" y="107" width="171" height="51" rx="8" fill="#e9e8fb" stroke="#a5a1d9"/><text x="486" y="126" font-size="14" text-anchor="middle" fill="#4d4882">CAN ISR</text><text x="486" y="146" font-size="12" text-anchor="middle" fill="#4d4882">读 FIFO · 快速入队</text>
+<path d="M570 159 V220" stroke="#357771" stroke-width="2.3" stroke-dasharray="5 4" marker-end="url(#irq-arrow)"/>
+<rect x="590" y="202" width="161" height="40" rx="8" fill="#e1f1f1" stroke="#8fbcb8"/><text x="671" y="227" font-size="14" text-anchor="middle" fill="#285e64">应用解析 / 超时判断</text>
+<text x="351" y="180" text-anchor="middle" font-size="13" fill="#7d623b">中断延迟</text><text x="486" y="181" text-anchor="middle" font-size="13" fill="#585187">ISR 时间</text><text x="665" y="264" text-anchor="middle" font-size="13" fill="#557076">排队与消费延迟</text>
+<path d="M115 277 H760" stroke="#357771" stroke-width="1.8" marker-end="url(#irq-arrow)"/><text x="438" y="289" text-anchor="middle" font-size="12" fill="#557076">时间向右 →</text>
+</svg>
