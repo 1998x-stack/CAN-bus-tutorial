@@ -1,0 +1,45 @@
+name: Homepage browser QA
+on:
+  push:
+    paths:
+      - "index.html"
+      - "courses.json"
+      - "assets/css/home.css"
+      - "assets/js/home.js"
+      - "assets/chapter01-network.svg"
+      - "tests/test_homepage.py"
+      - "tests/browser_homepage.py"
+      - ".github/workflows/homepage-qa.yml"
+  pull_request:
+    paths:
+      - "index.html"
+      - "courses.json"
+      - "assets/css/home.css"
+      - "assets/js/home.js"
+      - "assets/chapter01-network.svg"
+      - "tests/test_homepage.py"
+      - "tests/browser_homepage.py"
+      - ".github/workflows/homepage-qa.yml"
+jobs:
+  home-browser:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Playwright
+        run: |
+          python -m pip install playwright==1.56.0
+          command -v google-chrome
+      - name: Homepage browser checks
+        run: python tests/browser_homepage.py
+      - name: Upload homepage screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-browser-qa
+          path: reports/homepage/
+          if-no-files-found: ignore

@@ -1,380 +1,70 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>课程目录</title>
-    <link rel="stylesheet" href="theme.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(145deg, #f9fcf5 0%, #e8f3e8 100%);
-            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', system-ui, -apple-system, sans-serif;
-            padding: 2rem 1.5rem 1rem;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .container {
-            display: block;
-            max-width: 1400px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.70);
-            backdrop-filter: blur(2px);
-            border-radius: 48px 48px 32px 32px;
-            padding: 2rem 2rem 1.5rem;
-            box-shadow: 0 20px 40px rgba(90, 140, 100, 0.15), 0 8px 20px rgba(0, 30, 20, 0.08);
-            border: 1px solid rgba(255, 245, 200, 0.5);
-        }
-
-        .header {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: baseline;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            border-bottom: 4px solid #f7d44a;
-            padding-bottom: 0.75rem;
-        }
-
-        .header h1 {
-            font-size: 2.4rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #2b7a4b, #3f9e6b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 2px 8px rgba(60, 140, 80, 0.12);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .header h1 .emoji {
-            font-size: 2.2rem;
-            filter: drop-shadow(0 2px 4px rgba(255, 200, 50, 0.3));
-        }
-
-        .header .sub {
-            font-size: 1rem;
-            background: #fef7e0;
-            padding: 0.3rem 1.2rem;
-            border-radius: 40px;
-            color: #3f6b4a;
-            font-weight: 600;
-            border: 1px solid #f3d98a;
-            box-shadow: 0 2px 6px rgba(200, 160, 50, 0.1);
-            white-space: nowrap;
-        }
-
-        .course-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.2rem;
-            margin: 1.8rem 0 1.2rem;
-        }
-
-        .card {
-            background: #ffffff;
-            border-radius: 28px;
-            padding: 1rem 1.2rem 1rem 1.2rem;
-            box-shadow: 0 6px 14px rgba(70, 120, 80, 0.08), 0 2px 6px rgba(0, 0, 0, 0.02);
-            transition: all 0.2s ease;
-            border: 1px solid rgba(210, 230, 200, 0.5);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            backdrop-filter: blur(2px);
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 14px 24px rgba(70, 140, 90, 0.15), 0 4px 12px rgba(40, 100, 60, 0.05);
-            border-color: #b8d9b0;
-            background: #fefefc;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: baseline;
-            gap: 0.4rem;
-            margin-bottom: 0.4rem;
-            flex-wrap: wrap;
-        }
-
-        .chapter-num {
-            font-size: 1.1rem;
-            font-weight: 700;
-            background: #f5d142;
-            color: #2a5a3a;
-            padding: 0 0.6rem;
-            border-radius: 40px;
-            line-height: 1.6;
-            display: inline-block;
-            box-shadow: inset 0 -2px 0 #dbb42c;
-            letter-spacing: 0.3px;
-            min-width: 2.2rem;
-            text-align: center;
-        }
-
-        .card-title {
-            font-size: 1.2rem;
-            font-weight: 650;
-            color: #1f4d33;
-            letter-spacing: -0.3px;
-            line-height: 1.3;
-            flex: 1;
-        }
-
-        .topic-list {
-            list-style: none;
-            margin-top: 0.3rem;
-            padding-left: 0.2rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.2rem 0.6rem;
-        }
-
-        .topic-list li {
-            font-size: 0.8rem;
-            color: #2d543a;
-            background: #f1f9ee;
-            padding: 0.1rem 0.7rem 0.2rem 1.2rem;
-            border-radius: 30px;
-            line-height: 1.6;
-            position: relative;
-            border: 1px solid #dcebd4;
-            box-shadow: inset 0 1px 2px white;
-        }
-
-        .topic-list li::before {
-            content: "⚡";
-            position: absolute;
-            left: 4px;
-            top: 0px;
-            font-size: 0.7rem;
-            color: #e5b13b;
-        }
-
-        .card-footer {
-            margin-top: 0.6rem;
-            display: flex;
-            justify-content: flex-end;
-            border-top: 1px dashed #d4e8d0;
-            padding-top: 0.5rem;
-        }
-
-        .card-footer a {
-            background: #b7d8b0;
-            color: #1f452b;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 0.2rem 1.2rem;
-            border-radius: 40px;
-            transition: 0.15s;
-            border: 1px solid #8fb88a;
-            box-shadow: 0 2px 4px rgba(60, 120, 60, 0.1);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .card-footer a::after {
-            content: "→";
-            font-size: 1rem;
-            transition: transform 0.1s;
-        }
-
-        .card-footer a:hover {
-            background: #f7d44a;
-            border-color: #dbb42c;
-            color: #1f3d28;
-            box-shadow: 0 4px 8px rgba(200, 160, 40, 0.2);
-            transform: scale(1.02);
-        }
-
-        .card-footer a:active {
-            transform: scale(0.96);
-        }
-
-        .footer {
-            margin-top: 2.5rem;
-            text-align: center;
-            font-size: 1rem;
-            color: #3b6b47;
-            background: #f2fcee;
-            padding: 0.8rem 2rem;
-            border-radius: 60px;
-            display: inline-block;
-            border: 1px solid #c6dfbe;
-            box-shadow: 0 2px 8px rgba(80, 130, 70, 0.08);
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            backdrop-filter: blur(2px);
-        }
-
-        .footer span {
-            background: #f9eec1;
-            padding: 0.1rem 0.8rem;
-            border-radius: 30px;
-            margin: 0 4px;
-        }
-
-        .footer .wechat {
-            font-weight: 700;
-            color: #1f5a33;
-        }
-
-        @media (max-width: 640px) {
-            body { padding: 1rem 0.8rem; }
-            .container { padding: 1.2rem 1rem; border-radius: 32px; }
-            .header h1 { font-size: 1.8rem; }
-            .header .sub { font-size: 0.75rem; padding: 0.2rem 0.8rem; }
-            .course-grid { grid-template-columns: 1fr; gap: 1rem; }
-            .card-title { font-size: 1.05rem; }
-            .topic-list li { font-size: 0.7rem; }
-        }
-
-        @media (min-width: 768px) and (max-width: 1024px) {
-            .course-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        .container::before {
-            content: "";
-            display: block;
-            height: 6px;
-            width: 120px;
-            background: linear-gradient(90deg, #f7d44a, #7fc47c, #4aa0b0, #f7b07a);
-            border-radius: 10px;
-            margin-bottom: 0.2rem;
-        }
-
-        /* Alternate chapter badge colors */
-        .card:nth-child(6n+1) .chapter-num { background: #f7b07a; color: #3d2e1a; }
-        .card:nth-child(6n+2) .chapter-num { background: #a7d4a0; color: #1f452b; }
-        .card:nth-child(6n+3) .chapter-num { background: #f5d44a; color: #2f4d2a; }
-        .card:nth-child(6n+4) .chapter-num { background: #b3d9e8; color: #1a3f4a; }
-        .card:nth-child(6n+5) .chapter-num { background: #f7c6c6; color: #5a2e2e; }
-        .card:nth-child(6n) .chapter-num { background: #c4b3e0; color: #2f2a4a; }
-
-        .state-msg {
-            text-align: center;
-            padding: 3rem;
-            color: #5f7f66;
-            font-size: 1.1rem;
-        }
-        .state-msg.error {
-            color: #b91c1c;
-            background: #fef2f2;
-            border-radius: 20px;
-            margin: 1rem 0;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#112c30">
+<meta name="description" content="30章中文CAN总线教程：从差分信号、仲裁和位时序到STM32 bxCAN、CANopen、J1939和工程调试。循序渐进的学习路线、知识点搜索与本地学习进度。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="CAN 总线教程｜30章从原理到工程实践">
+<meta property="og:description" content="30章 · 6阶段 · 图解与可复算实验，从经典CAN走向工程实践。">
+<meta property="og:url" content="https://1998x-stack.github.io/CAN-bus-tutorial/">
+<link rel="canonical" href="https://1998x-stack.github.io/CAN-bus-tutorial/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23112c30'/%3E%3Cpath d='M12 22h40M12 42h40' stroke='%2355d6b2' stroke-width='5' stroke-linecap='round'/%3E%3Ccircle cx='22' cy='22' r='6' fill='%23ffda90'/%3E%3Ccircle cx='42' cy='42' r='6' fill='%23ffda90'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/home.css">
+<script src="assets/js/home.js" defer></script>
+<title>CAN 总线教程｜30 章从原理到工程实践</title>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1><span class="emoji"></span><span class="title-text"></span></h1>
-        <div class="sub"></div>
+<a href="#main" class="skip-link">跳转到正文</a>
+<header class="site-header"><div class="shell header-inner">
+  <a class="brand" href="./" aria-label="CAN 总线教程首页"><span class="brand-icon" aria-hidden="true">≋</span><span>CAN<span class="slash">/</span>BUS<small>LEARNING LAB</small></span></a>
+  <nav class="main-nav" aria-label="主导航"><a href="#roadmap">学习路线</a><a href="#chapters">全部章节</a><a href="#about">关于项目</a></nav>
+  <a class="github-link" href="https://github.com/1998x-stack/CAN-bus-tutorial" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+</div></header>
+<main id="main">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="shell hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow hero-tag"><span class="dot" aria-hidden="true"></span> 中文 · 公开课程 · 系统化学习</p>
+        <h1 id="hero-title">读懂总线上的<br><em>每一个 0 和 1</em></h1>
+        <p class="hero-lead">从 CAN_H / CAN_L 的差分信号，到仲裁、位时序、STM32 驱动、CANopen 与 J1939。沿着一条清晰的路线，把协议原理变成可调试的工程能力。</p>
+        <div class="hero-actions"><a class="button primary" href="01.html">从第 01 章开始 <span aria-hidden="true">↗</span></a><a class="button secondary" href="#roadmap">查看学习路线 <span aria-hidden="true">↓</span></a></div>
+        <div class="hero-stats"><div><strong id="heroChapterCount">30</strong><span>系统课程章节</span></div><div><strong id="heroStageCount">6</strong><span>学习阶段</span></div><div><strong>0</strong><span>构建依赖</span></div></div>
+      </div>
+      <div class="hero-visual">
+        <div class="visual-top"><span><i class="dot" aria-hidden="true"></i> SIGNAL / 001</span><span>CLASSIC CAN</span></div>
+        <div class="diagram"><p>一个共享总线，多个独立节点</p><img src="assets/chapter01-network.svg" alt="CAN网络结构示意：多个控制节点连接在共享总线上" width="720" height="320"></div>
+        <div class="visual-bottom"><span>CAN_H <b aria-hidden="true">━━━━</b> CAN_L</span><span>差分信号 · 非破坏性仲裁</span></div>
+      </div>
     </div>
+  </section>
 
-    <div id="cardContainer" class="course-grid"></div>
-
-    <div style="text-align:center;">
-        <div class="footer"></div>
+  <section class="section shell" aria-labelledby="start-title"><div class="section-heading"><div><p class="eyebrow">START HERE / 学习入口</p><h2 id="start-title">选择你的起点</h2></div><p>无需一次看完，从你的目标开始探索。</p></div>
+    <div class="quick-grid">
+      <a class="quick-card" href="01.html"><span class="quick-step">01 / 新手入门</span><span class="quick-arrow" aria-hidden="true">↗</span><h3>先理解协议与信号</h3><p>从帧格式、显性与隐性，到无损仲裁和错误处理。</p><span class="quick-cta">进入基础章节 →</span></a>
+      <a class="quick-card" href="08.html"><span class="quick-step">02 / 嵌入式开发</span><span class="quick-arrow" aria-hidden="true">↗</span><h3>在 STM32 上跑通 CAN</h3><p>bxCAN、初始化、过滤器、报文收发与中断。</p><span class="quick-cta">进入开发章节 →</span></a>
+      <a class="quick-card" href="25.html"><span class="quick-step">03 / 工程排障</span><span class="quick-arrow" aria-hidden="true">↗</span><h3>让总线问题可定位</h3><p>抓包、负载分析、硬件设计和系统级排障。</p><span class="quick-cta">进入调试章节 →</span></a>
     </div>
-</div>
+  </section>
 
-<script>
-    (function() {
-        var container = document.getElementById('cardContainer');
-        var emojiEl = document.querySelector('.header .emoji');
-        var titleEl = document.querySelector('.header .title-text');
-        var subEl = document.querySelector('.header .sub');
-        var footerEl = document.querySelector('.footer');
+  <section class="section roadmap" id="roadmap" aria-labelledby="roadmap-title"><div class="shell"><div class="section-heading"><div><p class="eyebrow">LEARNING PATH / 学习路线</p><h2 id="roadmap-title">六个阶段，完整知识地图</h2></div><p>按照知识依赖建立联系，从信号走向系统。</p></div><div id="stageGrid" class="stage-grid"><p class="loading">加载学习路线中…</p></div></div></section>
 
-        function showError(msg) {
-            container.innerHTML = '<div class="state-msg error">' + msg + '</div>';
-        }
-
-        fetch('courses.json')
-            .then(function(res) {
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                return res.json();
-            })
-            .then(function(data) {
-                document.title = data.title + ' · 课程目录';
-                emojiEl.textContent = data.emoji;
-                titleEl.textContent = data.title;
-                subEl.textContent = data.subtitle;
-                footerEl.innerHTML = '<span>' + data.chapterCount + '章</span> 实战体系 · 从入门到精通';
-
-                if (!data.chapters || data.chapters.length === 0) {
-                    showError('暂无课程数据');
-                    return;
-                }
-
-                container.innerHTML = '';
-                data.chapters.forEach(function(course) {
-                    var card = document.createElement('div');
-                    card.className = 'card';
-
-                    var headerDiv = document.createElement('div');
-                    headerDiv.className = 'card-header';
-
-                    var numSpan = document.createElement('span');
-                    numSpan.className = 'chapter-num';
-                    numSpan.textContent = course.num;
-
-                    var titleSpan = document.createElement('span');
-                    titleSpan.className = 'card-title';
-                    titleSpan.textContent = course.title;
-
-                    headerDiv.appendChild(numSpan);
-                    headerDiv.appendChild(titleSpan);
-                    card.appendChild(headerDiv);
-
-                    if (course.topics && course.topics.length > 0) {
-                        var topicUl = document.createElement('ul');
-                        topicUl.className = 'topic-list';
-                        course.topics.forEach(function(topic) {
-                            var li = document.createElement('li');
-                            li.textContent = topic;
-                            topicUl.appendChild(li);
-                        });
-                        card.appendChild(topicUl);
-                    }
-
-                    var footerDiv = document.createElement('div');
-                    footerDiv.className = 'card-footer';
-                    var link = document.createElement('a');
-                    link.href = course.file;
-                    link.textContent = '开始学习 ';
-                    footerDiv.appendChild(link);
-                    card.appendChild(footerDiv);
-
-                    container.appendChild(card);
-                });
-            })
-            .catch(function(err) {
-                showError('课程数据加载失败: ' + err.message + '。请刷新页面重试。');
-            });
-    })();
-</script>
-
-<noscript>
-    <div style="background:#fcf0d9; padding:1rem; border-radius:20px; text-align:center; color:#92400e;">
-        请启用 JavaScript 以浏览课程目录。
+  <section class="section shell catalog" id="chapters" aria-labelledby="chapters-title">
+    <div class="section-heading catalog-heading">
+      <div><p class="eyebrow">COURSE LIBRARY / 完整目录</p><h2 id="chapters-title">30 章，随时开始</h2></div>
+      <div class="progress-box"><div class="progress-top"><span>我的学习标记 <small>仅存储在本机浏览器</small></span><strong id="progressText">0 / 30</strong></div><div class="progress-track" id="progressTrack" role="progressbar" aria-label="标记完成的章节数" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0"><span id="progressFill"></span></div><a id="continueLink" href="01.html" class="continue-link" hidden>继续上次阅读 →</a></div>
     </div>
-</noscript>
+    <div class="search-box"><label for="chapterSearch"><span aria-hidden="true">⌕</span><span class="sr-only">搜索课程章节</span></label><input id="chapterSearch" type="search" autocomplete="off" placeholder="搜索章节、知识点或编号，如 仲裁 / CANopen / 08"><span class="keyboard-hint" aria-hidden="true">/</span></div>
+    <div class="filter-row" id="filterBar" role="group" aria-label="章节阶段筛选"><button type="button" class="filter active" data-filter="all" aria-pressed="true">全部章节</button></div>
+    <div class="catalog-info"><p id="resultCount" role="status" aria-live="polite">正在加载章节…</p><p>点击「标记已学」记录进度</p></div>
+    <div id="chapterGrid" class="chapter-grid"><p class="loading">正在加载章节目录…</p></div>
+    <div id="emptyState" class="empty-state" hidden><strong>没有找到匹配章节</strong><p>换个关键词，或清除当前筛选条件。</p><button type="button" class="button outlined" id="resetFilters">显示全部章节</button></div>
+  </section>
+
+  <section class="section about" id="about" aria-labelledby="about-title"><div class="shell about-grid"><div><p class="eyebrow">BUILT FOR LEARNING / 项目介绍</p><h2 id="about-title">不止告诉你是什么，<br>还说明为什么。</h2><p>课程包含协议图解、推导、可复算的示例及常见工程故障的排查思路。配套 Python 参考模型与自动化回归测试，便于核对关键公式和字段编码。</p><div class="about-links"><a href="https://github.com/1998x-stack/CAN-bus-tutorial#readme" target="_blank" rel="noopener noreferrer">项目 README ↗</a><a href="https://github.com/1998x-stack/CAN-bus-tutorial/blob/main/docs/P0_VERIFICATION.md" target="_blank" rel="noopener noreferrer">技术勘误与验证说明 ↗</a></div></div><aside class="note-card"><span class="note-icon" aria-hidden="true">※</span><h3>工程验证边界</h3><p>示例用于理解协议与离线校验，不是硬件合规或安全认证。投用实际设备前，应结合芯片手册、收发器规格和网络条件完成交叉编译、接线、抓包与实机验证。</p><span class="note-footer">REFERENCE FIRST · VERIFY ON HARDWARE</span></aside></div></section>
+</main>
+<footer class="site-footer"><div class="shell footer-inner"><strong>CAN/BUS <span>· 从原理到工程实践</span></strong><span>30 章中文公开课程 · <a href="https://github.com/1998x-stack/CAN-bus-tutorial">查看源代码 ↗</a></span><a href="#main">返回顶部 ↑</a></div></footer>
+<noscript><div class="noscript">目录搜索需要 JavaScript；你仍可直接阅读 <a href="01.html">01 基础</a> · <a href="08.html">08 STM32</a> · <a href="18.html">18 CANopen</a> · <a href="25.html">25 调试</a>，或在 <a href="https://github.com/1998x-stack/CAN-bus-tutorial/blob/main/README.md">README</a> 查看完整章节。</div></noscript>
 </body>
 </html>

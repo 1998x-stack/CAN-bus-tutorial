@@ -1,0 +1,19 @@
+# Python / test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Browser QA generated artifacts
+reports/
+playwright-report/
+test-results/
+
+# Local editor / operating system
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

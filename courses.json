@@ -303,5 +303,49 @@
       ],
       "file": "30.html"
     }
+  ],
+  "stages": [
+    {
+      "id": "fundamentals",
+      "title": "协议与信号基础",
+      "start": 1,
+      "end": 5,
+      "description": "先建立帧结构、总线仲裁、错误处理与位时序的直觉。"
+    },
+    {
+      "id": "embedded",
+      "title": "控制器与 STM32",
+      "start": 6,
+      "end": 12,
+      "description": "从收发器和 bxCAN 开始，完成初始化、收发与中断。"
+    },
+    {
+      "id": "physical",
+      "title": "物理层与网络设计",
+      "start": 13,
+      "end": 17,
+      "description": "掌握过滤器、拓扑、终端电阻、差分电平与速率。"
+    },
+    {
+      "id": "canopen",
+      "title": "CANopen 协议栈",
+      "start": 18,
+      "end": 21,
+      "description": "理解对象字典、NMT、心跳、SDO 与 PDO。"
+    },
+    {
+      "id": "j1939",
+      "title": "J1939 与测试工具",
+      "start": 22,
+      "end": 24,
+      "description": "进入高层协议、长报文传输及总线测试工具。"
+    },
+    {
+      "id": "engineering",
+      "title": "调试与项目实践",
+      "start": 25,
+      "end": 30,
+      "description": "将排障、硬件、软件架构、低功耗与项目集成串联。"
+    }
   ]
 }
