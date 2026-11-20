@@ -1,0 +1,17 @@
+<svg style="font-family:system-ui,-apple-system,Segoe UI,sans-serif" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 790 290" role="img" aria-labelledby="rx-title rx-desc">
+<title id="rx-title">bxCAN 的接收数据路径</title>
+<desc id="rx-desc">帧经过硬件验收过滤，分流到 FIFO0 或 FIFO1；CPU 从 FIFO 读出并释放邮箱，搬进软件队列后由任务按时效性处理。</desc>
+<defs><marker id="rx-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" stroke="#337e79" fill="none" stroke-width="1.5"/></marker></defs>
+<rect x="12" y="103" width="105" height="65" rx="9" fill="#e1f4f0" stroke="#7db3a6"/><text x="64" y="127" text-anchor="middle" font-size="16" fill="#185d5a">CAN 总线</text><text x="64" y="148" text-anchor="middle" font-size="12" fill="#185d5a">完整有效帧</text>
+<path d="M118 135 H161" stroke="#337e79" stroke-width="2.4" marker-end="url(#rx-arrow)"/>
+<rect x="167" y="103" width="117" height="65" rx="9" fill="#fff2e0" stroke="#d9a66c"/><text x="225" y="127" text-anchor="middle" font-size="16" fill="#875b27">硬件过滤器</text><text x="225" y="148" text-anchor="middle" font-size="12" fill="#875b27">ID / IDE / RTR</text>
+<path d="M285 135 H320 V78 H354 M320 135 V198 H354" stroke="#337e79" fill="none" stroke-width="2.4" marker-end="url(#rx-arrow)"/>
+<rect x="360" y="40" width="140" height="77" rx="9" fill="#f0edfa" stroke="#a9a0cf"/><rect x="360" y="161" width="140" height="77" rx="9" fill="#f0edfa" stroke="#a9a0cf"/>
+<g fill="#484075" font-size="14" text-anchor="middle"><text x="430" y="64">FIFO 0 · 3 帧</text><text x="430" y="84" font-size="12">FMP0: 0..3</text><text x="430" y="104" font-size="12">FOVR0: 溢出</text><text x="430" y="185">FIFO 1 · 3 帧</text><text x="430" y="205" font-size="12">FMP1: 0..3</text><text x="430" y="225" font-size="12">按过滤器分配</text></g>
+<path d="M501 78 H541 V135 H565 M501 199 H541 V135" stroke="#337e79" fill="none" stroke-width="2.4" marker-end="url(#rx-arrow)"/>
+<rect x="570" y="103" width="99" height="65" rx="9" fill="#e0f4ee" stroke="#80b8a8"/><text x="619" y="128" font-size="15" text-anchor="middle" fill="#1f645e">RX ISR</text><text x="619" y="149" font-size="12" text-anchor="middle" fill="#1f645e">读取 + 释放</text>
+<path d="M670 135 H696" stroke="#337e79" stroke-width="2.4" marker-end="url(#rx-arrow)"/>
+<rect x="700" y="103" width="81" height="65" rx="9" fill="#fdf3e4" stroke="#d7ad76"/><text x="740" y="127" font-size="14" text-anchor="middle" fill="#8d612d">软件队列</text><text x="740" y="148" font-size="12" text-anchor="middle" fill="#8d612d">业务消费</text>
+<text x="391" y="17" font-size="13" fill="#516a70" text-anchor="middle">每个 FIFO 都只有 3 个槽；不是无限缓冲</text>
+<text x="391" y="272" font-size="13" fill="#516a70" text-anchor="middle">过滤决定去哪里；FMP 非零时需及时读取并释放；应用还需检查数据年龄</text>
+</svg>
