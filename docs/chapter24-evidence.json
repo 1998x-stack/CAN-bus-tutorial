@@ -1,0 +1,52 @@
+{
+  "chapter": 24,
+  "method": "Public documentation cross-check. Educational derived examples are not SAE conformance certificates.",
+  "scope": "Classic CAN / J1939-21 unless otherwise stated.",
+  "claims": [
+    {
+      "id": "pcan",
+      "claim": "PCAN-View supports filtering, recording and manual/periodic transmit",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://www.peak-system.com/support/software-information/software/pcan-view/",
+      "locator": "Software functions / filter options",
+      "notes": "Specific features depend on software and hardware revisions."
+    },
+    {
+      "id": "socketcan",
+      "claim": "SocketCAN bitrates and can-utils socket filtering differ from vendor UI",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://www.kernel.org/doc/html/latest/networking/can.html",
+      "locator": "SocketCAN / raw socket filters",
+      "notes": "Example commands are illustrative, not hardware conformance tests."
+    },
+    {
+      "id": "no_single_wire",
+      "claim": "TJA1040 cannot be treated as single-wire CAN transceiver",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://community.nxp.com/t5/Other-NXP-Products/Can-I-use-TJA1040-to-communicate-with-a-Single-Wire-CAN-device/m-p/1078111",
+      "locator": "NXP technical answer",
+      "notes": "Single-wire CAN needs dedicated transceiver."
+    },
+    {
+      "id": "termination",
+      "claim": "Two 120-ohm termination resistors in parallel yield 60-ohm equivalent",
+      "kind": "calculation",
+      "status": "derived",
+      "source_url": "https://www.kernel.org/doc/html/latest/networking/can.html",
+      "locator": "Hardware/bus context",
+      "notes": "Pure resistor calculation, does not cover powered or complex networks."
+    },
+    {
+      "id": "voltages",
+      "claim": "3.5V CAN_H /1.5V CAN_L /2V differential are schematic typical numbers",
+      "kind": "figure",
+      "status": "illustrative",
+      "source_url": "https://www.peak-system.com/support/software-information/software/pcan-view/",
+      "locator": "Not a numerical source for transceiver limits",
+      "notes": "A conceptual drawing only; check measured limits in the transceiver datasheet."
+    }
+  ]
+}
