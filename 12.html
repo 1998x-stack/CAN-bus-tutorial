@@ -183,7 +183,7 @@
 <rect x="590" y="202" width="161" height="40" rx="8" fill="#e1f1f1" stroke="#8fbcb8"/><text x="671" y="227" font-size="14" text-anchor="middle" fill="#285e64">应用解析 / 超时判断</text>
 <text x="351" y="180" text-anchor="middle" font-size="13" fill="#7d623b">中断延迟</text><text x="486" y="181" text-anchor="middle" font-size="13" fill="#585187">ISR 时间</text><text x="665" y="264" text-anchor="middle" font-size="13" fill="#557076">排队与消费延迟</text>
 <path d="M115 277 H760" stroke="#357771" stroke-width="1.8" marker-end="url(#irq-arrow)"/><text x="438" y="289" text-anchor="middle" font-size="12" fill="#557076">时间向右 →</text>
-</svg></div><figcaption>图 12-1：软件通常关注的“CAN 中断延迟”只是从 FIFO 待处理到 ISR 开始的一段；对控制业务更重要的是从有效报文进入到最终使用的全链路时限。</figcaption></figure>
+</svg></div><figcaption>图 12-1：软件通常关注的“CAN 中断延迟”只是从 FIFO 待处理到 ISR 开始的一段；对控制业务更重要的是从有效报文进入到最终使用的全链路时限。 <a href="assets/chapter12-irq-timeline.svg">单独查看图 12-1</a></figcaption></figure>
 <div class="callout"><p><strong>要优化的是截止期限，不是某个孤立函数的耗时。</strong> 如果应用线程积压，ISR 再快也无法保证信号新鲜。</p></div>
 </section>
 
