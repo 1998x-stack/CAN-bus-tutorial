@@ -1,325 +1,61 @@
-
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>第29章 CAN总线低功耗设计</title>
-    <link rel="stylesheet" href="theme.css">
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            padding: 20px;
-        }
-        /* 双边框设计：外边框 + 内阴影 */
-        .double-border {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #ffffff;
-            border: 2px solid #f1c40f;
-            border-radius: 24px;
-            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
-            overflow: hidden;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 0;
-        }
-        .sidebar {
-            background: #fefcf5;
-            border-right: 2px solid #fdebb3;
-            padding: 24px 16px;
-        }
-        .sidebar h3 {
-            font-size: 1.4rem;
-            color: #b45f06;
-            border-left: 5px solid #f39c12;
-            padding-left: 15px;
-            margin-bottom: 25px;
-        }
-        .chapter-list {
-            list-style: none;
-        }
-        .chapter-list li {
-            margin-bottom: 6px;
-        }
-        .chapter-list a {
-            display: block;
-            padding: 8px 12px;
-            text-decoration: none;
-            color: #2c3e50;
-            border-radius: 12px;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .chapter-list a:hover {
-            background: #fdebd0;
-            transform: translateX(3px);
-        }
-        .chapter-list .active {
-            background: #3b82f6;
-            color: white;
-            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
-        }
-        .main-content {
-            padding: 30px 35px;
-            background: white;
-        }
-        .footer-nav {
-            margin-top: 45px;
-            padding-top: 20px;
-            border-top: 2px solid #f0e6d2;
-            display: flex;
-            justify-content: space-between;
-        }
-        .footer-nav a {
-            padding: 8px 24px;
-            background: #f1f5f9;
-            text-decoration: none;
-            color: #1e40af;
-            border-radius: 40px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .footer-nav a:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            color: #64748b;
-            border-top: 1px dashed #e2e8f0;
-            font-size: 0.9rem;
-        }
-        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
-        h3 { color: #2c3e50; margin: 20px 0 10px; }
-        pre {
-            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
-            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
-        }
-        table {
-            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
-        }
-        th, td {
-            border: 1px solid #fcd34d; padding: 10px; text-align: left;
-        }
-        th { background: #fffbeb; }
-        .tip, .warning, .highlight {
-            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
-        }
-        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
-        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
-        .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📚 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
-<li><a href="02.html" class="">第2章 CAN协议基础</a></li>
-<li><a href="03.html" class="">第3章 CAN总线仲裁机制</a></li>
-<li><a href="04.html" class="">第4章 CAN总线错误处理</a></li>
-<li><a href="05.html" class="">第5章 CAN总线位时序与同步</a></li>
-<li><a href="06.html" class="">第6章 CAN控制器硬件</a></li>
-<li><a href="07.html" class="">第7章 CAN收发器</a></li>
-<li><a href="08.html" class="">第8章 STM32 CAN外设</a></li>
-<li><a href="09.html" class="">第9章 STM32 CAN初始化</a></li>
-<li><a href="10.html" class="">第10章 CAN报文发送</a></li>
-<li><a href="11.html" class="">第11章 CAN报文接收</a></li>
-<li><a href="12.html" class="">第12章 CAN中断编程</a></li>
-<li><a href="13.html" class="">第13章 CAN过滤器深入</a></li>
-<li><a href="14.html" class="">第14章 CAN总线网络拓扑</a></li>
-<li><a href="15.html" class="">第15章 CAN总线终端电阻</a></li>
-<li><a href="16.html" class="">第16章 CAN总线电平与差分信号</a></li>
-<li><a href="17.html" class="">第17章 CAN总线通信速率</a></li>
-<li><a href="18.html" class="">第18章 CANopen协议入门</a></li>
-<li><a href="19.html" class="">第19章 CANopen NMT与心跳</a></li>
-<li><a href="20.html" class="">第20章 CANopen SDO通信</a></li>
-<li><a href="21.html" class="">第21章 CANopen PDO通信</a></li>
-<li><a href="22.html" class="">第22章 J1939协议入门</a></li>
-<li><a href="23.html" class="">第23章 J1939多包传输</a></li>
-<li><a href="24.html" class="">第24章 CAN总线测试工具</a></li>
-<li><a href="25.html" class="">第25章 CAN总线调试技巧</a></li>
-<li><a href="26.html" class="">第26章 CAN总线硬件设计</a></li>
-<li><a href="27.html" class="">第27章 CAN总线软件架构</a></li>
-<li><a href="28.html" class="">第28章 CAN总线多节点通信实战</a></li>
-<li><a href="29.html" class="active">第29章 CAN总线低功耗设计</a></li>
-<li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-        <h2>第29章 CAN总线低功耗设计：休眠唤醒机制、局部网络、选择性唤醒</h2>
-
-<p>各位工程师朋友，今天我们来聊聊CAN总线低功耗设计。说实话，这个主题在传统CAN总线教学中经常被一笔带过，但在实际项目中——尤其是车载电子领域——这恰恰是决定产品成败的关键环节之一。</p>
-
-<p>我最早接触CAN低功耗设计是在做车身控制模块（BCM）的时候。当时有个项目，客户要求静态电流小于100微安，但CAN节点一上电就吃掉几十毫安。嗯，那段时间我几乎把CAN控制器的数据手册翻烂了，才真正搞明白休眠唤醒的门道。</p>
-
-<h3>29.1 为什么需要低功耗设计？</h3>
-
-<p>先问大家一个问题：一辆停在地下车库的汽车，它的电子系统在干什么？</p>
-
-<p>答案是——大部分模块都在睡觉，但有一部分必须保持警觉。比如遥控钥匙接收器、防盗系统、胎压监测模块。这些模块如果一直全速运行，电瓶撑不过一周。</p>
-
-<p>说白了，CAN总线低功耗设计的核心目标就两个：</p>
-<ul>
-  <li><strong>降低静态功耗</strong>：让不工作的节点进入休眠模式</li>
-  <li><strong>保证实时响应</strong>：需要通信时能快速唤醒</li>
-</ul>
-
-<p>我在项目中遇到过最极端的情况：某款车型的网关模块，休眠电流要求小于50微安，但唤醒时间必须小于100毫秒。这两个指标放在一起，设计难度直接翻倍。</p>
-
-<h3>29.2 休眠唤醒机制</h3>
-
-<p>CAN节点的休眠唤醒，说白了就是让收发器和控制器在「工作」和「睡眠」两个状态之间切换。这里有个关键器件——CAN收发器，它通常负责检测总线活动并触发唤醒。</p>
-
-<h4>29.2.1 标准休眠流程</h4>
-
-<p>一个典型的CAN节点进入休眠的步骤是这样的：</p>
-<ol>
-  <li>MCU检测到总线空闲超过设定时间（比如5秒）</li>
-  <li>MCU通过SPI或GPIO通知CAN控制器进入休眠模式</li>
-  <li>CAN控制器将收发器切换到低功耗状态</li>
-  <li>收发器关闭大部分内部电路，只保留唤醒检测逻辑</li>
-</ol>
-
-<p>这里有个坑，我踩过好几次——<strong>休眠前必须确保所有待发送报文已经发送完毕</strong>。否则，你刚睡下，总线上的报文还没发完，节点就被自己残留的报文唤醒了。嗯，这就是所谓的「假唤醒」。</p>
-
-<div class="warning">
-  <strong>避坑指南</strong>：我曾经在一个项目中，因为休眠时序没处理好，导致节点每30秒自动唤醒一次。排查了两天才发现，是CAN控制器进入休眠前，发送缓冲区的报文没有清空。解决方案很简单：在休眠指令前加一个50ms的延时，确保总线事务完成。
-</div>
-
-<h4>29.2.2 唤醒机制</h4>
-
-<p>CAN总线的唤醒方式主要有三种：</p>
-
-<table>
-  <tr>
-    <th>唤醒方式</th>
-    <th>原理</th>
-    <th>典型应用</th>
-  </tr>
-  <tr>
-    <td>总线活动唤醒</td>
-    <td>检测到CAN总线上的显性电平</td>
-    <td>通用唤醒，所有节点响应</td>
-  </tr>
-  <tr>
-    <td>特定报文唤醒</td>
-    <td>匹配特定ID或数据内容</td>
-    <td>选择性唤醒，局部网络</td>
-  </tr>
-  <tr>
-    <td>本地唤醒</td>
-    <td>外部引脚触发（如车门开关）</td>
-    <td>本地事件触发</td>
-  </tr>
-</table>
-
-<p>我个人习惯把唤醒机制分成两类：<strong>硬唤醒</strong>和<strong>软唤醒</strong>。硬唤醒是收发器直接检测总线电平变化，不需要MCU参与；软唤醒则需要MCU解析报文内容，判断是否应该唤醒。软唤醒功耗更低，但响应时间更长。</p>
-
-<h3>29.3 局部网络（Partial Networking）</h3>
-
-<p>局部网络，英文叫Partial Networking，是ISO 11898-6标准中定义的概念。你想想看，一辆车上可能有几十个CAN节点，但大部分时间只有少数几个在工作。比如你开车门时，只需要点亮车内灯、解锁门锁，没必要唤醒发动机ECU吧？</p>
-
-<p>局部网络的核心思想就是：<strong>只唤醒需要通信的节点，其他节点继续睡觉</strong>。</p>
-
-<h4>29.3.1 局部网络的工作原理</h4>
-
-<p>实现局部网络，需要CAN收发器支持<strong>选择性唤醒</strong>功能。这种收发器内部有一个报文过滤引擎，可以在不唤醒MCU的情况下，直接解析CAN报文中的特定字段。</p>
-
-<p>我记得第一次用支持局部网络的收发器（TJA1145），感觉就像打开了新世界的大门。以前做网关设计，一个报文过来，所有节点都得醒过来看看是不是找自己的。现在好了，收发器自己就能判断——「这报文跟我没关系，继续睡」。</p>
-
-<div class="highlight">
-  <p><strong>关键点</strong>：局部网络依赖CAN收发器的硬件过滤能力。MCU可以深度睡眠，收发器负责监听总线。只有匹配到预设的唤醒模式，收发器才会拉高唤醒引脚，叫醒MCU。</p>
-</div>
-
-<h4>29.3.2 局部网络的配置示例</h4>
-
-<p>以NXP的TJA1145为例，配置局部网络唤醒的代码片段如下：</p>
-
-<pre><code>// 配置TJA1145的唤醒模式
-// 目标：只响应ID为0x123的报文
-
-void configure_partial_networking(void) {
-    // 1. 进入配置模式
-    tja1145_write_reg(REG_MODE, 0x02);  // 配置模式
-    
-    // 2. 设置唤醒ID过滤器
-    tja1145_write_reg(REG_WAKE_ID_H, 0x01);  // ID高字节
-    tja1145_write_reg(REG_WAKE_ID_L, 0x23);  // ID低字节
-    
-    // 3. 设置唤醒掩码（只匹配ID，不匹配数据）
-    tja1145_write_reg(REG_WAKE_MASK, 0xFF);  // 全匹配
-    
-    // 4. 使能选择性唤醒
-    tja1145_write_reg(REG_CONTROL, 0x10);  // 使能选择性唤醒
-    
-    // 5. 进入休眠模式
-    tja1145_write_reg(REG_MODE, 0x01);  // 休眠模式
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="CAN总线第29章：分离电源域、普通唤醒与Partial Networking，平均电流计算"><title>第29章 CAN总线低功耗设计 · CAN总线从入门到精通</title><link rel="stylesheet" href="assets/chapters28-30.css"></head><body><a href="#content" class="skip">跳转正文</a><div class="layout"><nav class="sidebar" aria-label="课程目录"><strong>CAN 总线 · 30 章</strong><details><summary>展开完整课程目录</summary><ol><li><a href="01.html" >01 · CAN总线概述</a></li><li><a href="02.html" >02 · CAN协议基础</a></li><li><a href="03.html" >03 · CAN总线仲裁机制</a></li><li><a href="04.html" >04 · CAN总线错误处理</a></li><li><a href="05.html" >05 · CAN总线位时序与同步</a></li><li><a href="06.html" >06 · CAN控制器硬件</a></li><li><a href="07.html" >07 · CAN收发器</a></li><li><a href="08.html" >08 · STM32 CAN外设</a></li><li><a href="09.html" >09 · STM32 CAN初始化</a></li><li><a href="10.html" >10 · CAN报文发送</a></li><li><a href="11.html" >11 · CAN报文接收</a></li><li><a href="12.html" >12 · CAN中断编程</a></li><li><a href="13.html" >13 · CAN过滤器深入</a></li><li><a href="14.html" >14 · CAN总线网络拓扑</a></li><li><a href="15.html" >15 · CAN总线终端电阻</a></li><li><a href="16.html" >16 · CAN总线电平与差分信号</a></li><li><a href="17.html" >17 · CAN总线通信速率</a></li><li><a href="18.html" >18 · CANopen协议入门</a></li><li><a href="19.html" >19 · CANopen NMT与心跳</a></li><li><a href="20.html" >20 · CANopen SDO通信</a></li><li><a href="21.html" >21 · CANopen PDO通信</a></li><li><a href="22.html" >22 · J1939协议入门</a></li><li><a href="23.html" >23 · J1939多包传输</a></li><li><a href="24.html" >24 · CAN总线测试工具</a></li><li><a href="25.html" >25 · CAN总线调试技巧</a></li><li><a href="26.html" >26 · CAN总线硬件设计</a></li><li><a href="27.html" >27 · CAN总线软件架构</a></li><li><a href="28.html" >28 · CAN总线多节点通信实战</a></li><li><a href="29.html" aria-current="page">29 · CAN总线低功耗设计</a></li><li><a href="30.html" >30 · CAN总线项目实战</a></li></ol></details></nav><main class="reader" id="content"><article>
+<header><p class="eyebrow">第 29 章 · 低功耗与网络管理</p><h1>节点睡着了，谁还在听 CAN 总线？</h1><p class="lead">汽车熄火之后，若每一条报文都唤醒所有 ECU，休眠电流就失去意义。本章从电源域出发，分清普通总线唤醒和硬件选择性唤醒，最后用占空比而非“芯片很省电”估算整机电流。</p></header>
+<nav class="mini-toc" aria-label="本章目录"><a href="#power-domains">电源域</a><a href="#state">休眠状态机</a><a href="#pn">选择性唤醒</a><a href="#budget">功耗计算器</a><a href="#design">配置与测试</a><a href="#sources">资料</a></nav>
+<section id="power-domains"><h2>29.1 MCU 睡了，并不代表收发器也睡了</h2><p>一个 CAN 节点通常有多个电源域：MCU、CAN 控制器、外部收发器、电源管理芯片、传感器和外部电平网络。低功耗目标必须以<strong>整板、实际供电路径</strong>定义，不能仅引用 MCU 的 Stop 模式典型电流。</p>
+<figure class="figure"><svg viewBox="0 0 760 245" role="img" aria-labelledby="c29-t1 c29-d1"><title id="c29-t1">CAN 低功耗节点电源域划分</title><desc id="c29-d1">MCU及其CAN控制器可以断时钟或低功耗；可保持供电的收发器局部唤醒逻辑监视总线，事件经中断和电源管理唤醒MCU。</desc><rect width="760" height="245" rx="14" fill="#f6f8f4"/>
+<text x="22" y="34" class="diagram-title">电源域：谁仍有电，谁才能识别唤醒</text>
+<rect x="25" y="68" width="196" height="117" rx="14" fill="#e6eee8" stroke="#88a99f" stroke-width="2"/><text x="123" y="107" text-anchor="middle" class="diagram-label">MCU + CAN 控制器</text><text x="123" y="143" text-anchor="middle" class="diagram-note">可进入 Stop / Sleep</text>
+<rect x="286" y="68" width="192" height="117" rx="14" fill="#e4f4f1" stroke="#087f82" stroke-width="2"/><text x="382" y="105" text-anchor="middle" class="diagram-label">CAN 收发器</text><text x="382" y="135" text-anchor="middle" class="diagram-note">低功耗监视逻辑</text><text x="382" y="154" text-anchor="middle" class="diagram-note">保持供电</text>
+<rect x="542" y="79" width="192" height="95" rx="14" fill="#fceee4" stroke="#c76843" stroke-width="2"/><text x="638" y="122" text-anchor="middle" class="diagram-label">CAN_H / CAN_L</text><text x="638" y="147" text-anchor="middle" class="diagram-note">网络活动</text>
+<path d="M542 126H480" stroke="#c76843" stroke-width="3"/><path d="M286 126H221" stroke="#087f82" stroke-width="3"/><path d="M230 119l-9 7 9 7 M489 119l-9 7 9 7" fill="none" stroke="#087f82" stroke-width="2"/>
+<text x="252" y="101" text-anchor="middle" class="diagram-note">唤醒</text><text x="511" y="101" text-anchor="middle" class="diagram-note">监听</text><text x="382" y="212" text-anchor="middle" class="diagram-note">还需计入稳压器静态电流、上拉/下拉和漏电</text></svg><figcaption>图 29-1：低功耗模式不是一个按钮，而是电源域与唤醒路径的共同设计。不同型号的收发器由 GPIO、SPI 或电源管理器进入低功耗，不能套用相同寄存器值。</figcaption></figure><div class="insight"><strong>先做电流账本：</strong>逐项列出工作、待机、休眠、唤醒瞬态的消耗，并明确测量位置（电池输入端/板上稳压输出端）。如果保留外部调试器、USB 转串口、LED，测得的很可能不是产品休眠电流。</div></section>
+<section id="state"><h2>29.2 正确的睡眠流程是一台状态机</h2><p>“空闲 5 秒就睡”只是应用策略，不是所有 CAN 节点的协议要求。休眠前需要禁止新业务、等待关键事务完成或明确放弃，清理中断与队列，配置好唤醒路径，再由 MCU/控制器/收发器分别进入适配的低功耗态。</p>
+<figure class="figure"><svg viewBox="0 0 760 258" role="img" aria-labelledby="c29-t2 c29-d2"><title id="c29-t2">节点睡眠唤醒状态机</title><desc id="c29-d2">运行态经准备态进入睡眠态，符合唤醒条件后进入恢复态，通过时钟与CAN重新初始化回到运行态；超时或错误进入诊断。</desc><rect width="760" height="258" rx="14" fill="#f6f8f4"/>
+<g stroke-width="2"><rect x="20" y="78" width="132" height="69" rx="12" fill="#e1f3ed" stroke="#087f82"/><rect x="211" y="78" width="132" height="69" rx="12" fill="#fce9dc" stroke="#c76843"/><rect x="402" y="78" width="132" height="69" rx="12" fill="#eee6fb" stroke="#7560ae"/><rect x="598" y="78" width="142" height="69" rx="12" fill="#e1f3ed" stroke="#087f82"/></g>
+<g class="diagram-label" text-anchor="middle"><text x="86" y="119">运行</text><text x="277" y="119">准备休眠</text><text x="468" y="119">睡眠/监听</text><text x="669" y="119">恢复与验收</text></g>
+<g stroke="#44676a" stroke-width="2.5" fill="none"><path d="M152 113H211 M343 113H402 M534 113H598"/><path d="M205 107l6 6-6 6 M396 107l6 6-6 6 M592 107l6 6-6 6"/><path d="M671 147v77H85V147"/><path d="M79 155l6-8 6 8"/></g>
+<g text-anchor="middle" class="diagram-note"><text x="181" y="93">空闲策略</text><text x="374" y="93">配置完成</text><text x="568" y="93">有效唤醒</text><text x="380" y="214">恢复时钟 → CAN 控制器/过滤器 → 业务就绪 → 恢复处理</text><text x="380" y="238">失败时记录故障，不要盲目反复入睡</text></g></svg><figcaption>图 29-2：软件状态机示意。休眠前退出进行中的诊断/升级事务；唤醒之后，第一条唤醒帧可能只是触发器，应用层需有后续握手或重发机制。</figcaption></figure>
+<ol class="steps"><li><strong>请求低功耗：</strong>应用同意停发；核实需要完成的 TX，并处理超时而非永远阻塞。</li><li><strong>配置收发器：</strong>若要选择性唤醒，先写入并读回 ID、掩码、帧格式、数据比较等器件支持的参数。</li><li><strong>配置 MCU 与 CAN：</strong>根据 STM32 家族与板卡设计配置 CAN 控制器睡眠请求、EXTI/唤醒源、外设时钟、电源模式。</li><li><strong>验证恢复：</strong>由事件唤醒后，重新使能必要时钟、确认收发器恢复正常通信、重建业务状态；处理总线关闭/故障状态。</li></ol></section>
+<section id="pn"><h2>29.3 普通唤醒与 Partial Networking 并不是同一回事</h2><p>支持普通总线唤醒的收发器可以识别定义好的<strong>唤醒模式（wake-up pattern）</strong>，例如符合器件/ISO 要求的显性—隐性—显性序列；这不同于“出现任意一个显性位立即唤醒”。Partial Networking（PN）通过支持该功能的收发器硬件检测有效的<strong>唤醒帧 WUF</strong>，常见匹配项目包括帧标识符、掩码、DLC/数据字段。CRC 等帧有效性检查也可能影响是否唤醒；具体条件务必查目标器件手册。</p>
+<table><thead><tr><th>模式</th><th>谁在睡眠时筛选</th><th>无关报文</th><th>约束</th></tr></thead><tbody><tr><td>普通总线唤醒</td><td>收发器唤醒模式检测逻辑</td><td>满足有效唤醒模式即可触发</td><td>不能仅靠 MCU 软件过滤阻止其被叫醒</td></tr><tr><td>选择性唤醒 PN</td><td>收发器的低功耗帧检测逻辑</td><td>与 WUF 条件不匹配时保持低功耗</td><td>需专用硬件、正确配置及对噪声/错误帧的验证</td></tr><tr><td>MCU 软件过滤</td><td>MCU 恢复后判断报文</td><td>可能已造成唤醒电流尖峰</td><td>无法替代硬件 PN</td></tr></tbody></table>
+<div class="tool"><h3>交互：同一帧会不会叫醒该节点？</h3><div class="field-grid"><label for="wake-mode">收发器唤醒模式<select id="wake-mode"><option value="pn">PN · 只接受配置的 WUF</option><option value="normal">普通模式 · 有效唤醒模式</option></select></label><label for="wake-id">被监视的帧 ID（11 位，十六进制）<input id="wake-id" type="text" value="0x321" inputmode="text"></label></div><p class="small">教学模型假定帧格式、DLC、CRC 及电气唤醒时序都有效，PN 配置为精确匹配 <code>0x321</code>；真实器件的配置字段更复杂。</p><p class="result" id="wake-result" role="status" aria-live="polite">PN：0x321 匹配 → 唤醒</p><button type="button" id="wake-match">模拟收到 0x321</button><button type="button" id="wake-other">模拟收到 0x120</button></div>
+<div class="caution">NXP TJA1145、TJA1145A 与 TJA1445 不是完全同一个器件，不应直接移植寄存器地址、默认值或诊断标志。这里不提供未经原厂表格核验的 <code>REG_WAKE_ID</code> 虚构代码。</div></section>
+<section id="budget"><h2>29.4 静态电流要考虑唤醒频率</h2><p>一个节点即使休眠时只流过几十微安，只要频繁醒来就可能超出整机平均电流预算。将电流在每种状态中的时间加权，才适合评估电池寿命。</p>
+<div class="math-scroll" tabindex="0" aria-label="平均电流公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>I</mi><mtext>avg</mtext></msub><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>D</mi><mo>)</mo><msub><mi>I</mi><mtext>sleep</mtext></msub><mo>+</mo><mi>D</mi><msub><mi>I</mi><mtext>active</mtext></msub></math></div>
+<p class="small">D 为处于活动态的时间比例；电流单位必须统一。此模型未展开唤醒过渡、发送瞬态、电源转换效率和其他电源域。</p>
+<div class="tool"><h3>平均电流预算器</h3><div class="field-grid"><label for="isleep">休眠时整板电流（μA）<input id="isleep" type="number" min="0" max="1000000" step="1" value="50"></label><label for="iactive">活动时整板电流（mA）<input id="iactive" type="number" min="0" max="1000" step="0.1" value="20"></label><label for="duty">活动占空比（%）<input id="duty" type="number" min="0" max="100" step="0.1" value="1"></label></div><p class="result" id="power-result" role="status" aria-live="polite">平均电流 <strong>249.5 μA</strong>（0.2495 mA）</p><p class="small">默认算例：50 μA × 99% + 20,000 μA × 1% = 249.5 μA。频繁误唤醒会改变占空比。</p></div></section>
+<section id="design"><h2>29.5 将寄存器写入变成“可审计的配置契约”</h2><p>下面是<strong>器件无关的接口伪代码</strong>，不是可直接编译的 TJA1145 驱动。把每一项映射到选定器件的官方数据手册寄存器表，并对写后读回、错误状态及掉电保留行为测试。</p>
+<pre><code>// Pseudocode — vendor-specific SPI/GPIO and MCU power HAL to be supplied.
+bool prepare_sleep(void) {
+    if (!application_quiesce_with_timeout()) return false;
+    if (!tx_completion_or_policy_resolved()) return false;
+    if (!transceiver_configure_pn_wuf(0x321, 0x7FF)) return false;
+    if (!transceiver_readback_and_verify()) return false;
+    if (!arm_transceiver_wake_irq()) return false;
+    if (!request_can_controller_sleep()) return false;
+    return transceiver_enter_supported_low_power_mode();
+}
+void on_wake_event(void) {
+    restore_clock_and_power_domains();
+    transceiver_enter_normal_mode();
+    reinitialize_can_and_filters_if_required();
+    record_and_clear_wake_reason_per_datasheet();
+    application_resynchronize_and_resume();
 }</code></pre>
-
-<div class="tip">
-  <strong>小技巧</strong>：配置局部网络时，建议先用手动唤醒测试一下过滤逻辑是否正确。我曾经因为ID字节顺序搞反了，导致节点死活唤不醒。后来发现是CAN ID的高低位映射问题——不同厂家的收发器，ID寄存器的排列方式可能不一样。
-</div>
-
-<h3>29.4 选择性唤醒（Selective Wake）</h3>
-
-<p>选择性唤醒是局部网络的具体实现技术。说白了，就是让CAN收发器具备「挑食」的能力——只对特定的报文做出反应。</p>
-
-<h4>29.4.1 选择性唤醒的过滤机制</h4>
-
-<p>选择性唤醒的过滤通常支持以下几种模式：</p>
-<ul>
-  <li><strong>ID过滤</strong>：只匹配特定的CAN ID</li>
-  <li><strong>数据过滤</strong>：匹配报文数据中的特定字节</li>
-  <li><strong>组合过滤</strong>：ID + 数据联合匹配</li>
-  <li><strong>范围过滤</strong>：匹配ID在某个范围内的报文</li>
-</ul>
-
-<p>我在做OBD诊断模块时，就用了选择性唤醒。诊断模块平时深度休眠，只有收到诊断请求报文（ID 0x7DF）时才唤醒。这样既保证了诊断功能可用，又把静态电流控制在10微安以内。</p>
-
-<h4>29.4.2 选择性唤醒的时序要求</h4>
-
-<p>这里有个容易被忽略的问题——<strong>唤醒延迟</strong>。收发器检测到匹配报文后，需要一定时间才能把MCU唤醒。这个时间包括：</p>
-<ol>
-  <li>收发器内部报文解析时间（约50-100微秒）</li>
-  <li>唤醒引脚电平建立时间（约10微秒）</li>
-  <li>MCU从深度睡眠中恢复的时间（几百微秒到几毫秒不等）</li>
-</ol>
-
-<p>你想想看，如果MCU唤醒时间太长，可能会错过后续的报文。所以，<strong>选择性唤醒通常用于非实时性要求不高的场景</strong>。对于需要快速响应的报文（比如安全气囊触发），还是得用硬唤醒。</p>
-
-<div class="warning">
-  <strong>注意</strong>：我曾经在一个项目中，因为MCU的唤醒时间太长（约5ms），导致选择性唤醒后第一个报文总是丢失。解决方案有两个：一是优化MCU的唤醒流程，缩短恢复时间；二是在发送端增加重传机制，确保报文可靠到达。
-</div>
-
-<h3>29.5 低功耗设计的实战建议</h3>
-
-<p>最后，我总结几条实战经验，供大家参考：</p>
-
-<ul>
-  <li><strong>选型很重要</strong>：支持局部网络的收发器（如TJA1145、TJA115x）比普通收发器贵几块钱，但能省下大量功耗。如果项目对静态电流有严格要求，这笔钱值得花。</li>
-  <li><strong>休眠前做好善后</strong>：关闭所有外设、保存关键数据、清空发送缓冲区。我习惯在休眠前加一个「准备休眠」的状态机，确保所有事务都处理完毕。</li>
-  <li><strong>测试唤醒可靠性</strong>：在实验室里模拟各种唤醒场景——正常唤醒、误唤醒、连续唤醒。我曾经发现一个bug：节点被唤醒后，如果总线突然空闲，它会再次进入休眠，导致通信中断。解决方案是增加一个「最小唤醒时间」的定时器。</li>
-  <li><strong>注意EMC影响</strong>：休眠状态下，CAN收发器的输入阻抗会变化，可能影响总线共模电压。如果设计不当，休眠节点反而会干扰总线通信。建议在收发器的CANH/CANL引脚上加共模扼流圈。</li>
-</ul>
-
-<p>好了，关于CAN总线低功耗设计，今天就聊到这里。下一章我们会讲CAN FD——高速CAN的升级版。说实话，CAN FD的物理层和传统CAN有不少差异，到时候我们再细聊。</p>
-        <div class="footer-nav">
-            <a href="28.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="30.html">下一章 →</a>
-        </div>
-        
-    </div>
-</div>
-</div>
-</body>
-</html>
+<p>测试矩阵至少包括：正确 WUF、不匹配的有效帧、错误 CRC/噪声、连续报文、休眠期间电源瞬断、本地唤醒、总线故障、唤醒后首帧丢失。让电流探头同步记录唤醒事件与电流曲线；根据具体器件及系统安全需求决定是否允许因总线异常退出 PN 模式。</p><div class="insight"><strong>工程结论：</strong>低功耗的验收条件要同时包括 <em>最坏休眠电流、平均电流、误唤醒率、有效唤醒延迟、恢复后首个有效业务响应</em>。仅有收发器睡眠典型值不是系统合格证明。</div></section>
+<section id="sources"><h2>29.6 技术来源与适用边界</h2><ol class="refs"><li><a href="https://www.nxp.com/products/TJA1145">NXP TJA1145 产品资料</a>：具有低功耗与 Partial Networking 能力，设备版本影响规格。</li><li><a href="https://www.nxp.com/products/interfaces/can-transceivers/can-with-flexible-data-rate/high-speed-can-transceiver-with-partial-networking-can-fd-data-rates-up-to-5-mbit-s:TJA1145A">NXP TJA1145A 产品资料</a>：不同版本的功能与 ISO 实现需逐项核查。</li><li><a href="https://docs.nxp.com/bundle/TJA1445/page/topics/CAN_WUF.html">NXP TJA1445：Wake-up Frame</a>：WUF 与匹配概念说明，不用于替代 TJA1145 寄存器表。</li><li><a href="https://github.com/STMicroelectronics/stm32f1xx-hal-driver/blob/master/Inc/stm32f1xx_hal_can.h">ST bxCAN HAL API</a>：控制器睡眠请求/唤醒接口，不包括外置收发器的完整电源控制。</li></ol></section><footer class="chapter-footer"><a href="28.html">← 第28章</a><a href="index.html">返回总目录</a><a href="30.html">第30章 →</a></footer></article></main></div><script>
+(function(){
+"use strict";
+let lastId=0x321;
+const mode=document.getElementById("wake-mode"),input=document.getElementById("wake-id"),result=document.getElementById("wake-result");
+function drawWake(){const s=input.value.trim();const id=/^0x[0-9a-f]{1,3}$/i.test(s)?parseInt(s,16):NaN;if(!Number.isInteger(id)||id<0||id>0x7FF){result.textContent="请输入 0x000–0x7FF 的标准帧 ID。";return;}
+const ok=mode.value==="normal"||id===0x321;
+result.textContent=(mode.value==="pn"?"PN":"普通唤醒")+"：0x"+id.toString(16).toUpperCase().padStart(3,"0")+(ok?" → 唤醒 MCU":" → 保持休眠（未匹配配置的 WUF）");}
+document.getElementById("wake-match").addEventListener("click",()=>{lastId=0x321;input.value="0x321";drawWake();});
+document.getElementById("wake-other").addEventListener("click",()=>{lastId=0x120;input.value="0x120";drawWake();});
+mode.addEventListener("change",drawWake);input.addEventListener("input",drawWake);drawWake();
+const fields=["isleep","iactive","duty"],power=document.getElementById("power-result");
+function update(){const v=fields.map(x=>Number(document.getElementById(x).value));if(v.some(x=>!Number.isFinite(x)||x<0)||v[2]>100){power.textContent="请输入有效的非负电流，以及 0–100% 的占空比。";return;}const u=v[0]*(1-v[2]/100)+v[1]*1000*v[2]/100;power.innerHTML="平均电流 <strong>"+u.toFixed(1)+" μA</strong>（"+(u/1000).toFixed(4)+" mA）";}
+fields.forEach(x=>document.getElementById(x).addEventListener("input",update));update();
+})();
+</script></body></html>
