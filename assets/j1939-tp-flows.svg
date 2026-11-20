@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 350" role="img" aria-labelledby="tp23-title tp23-desc" data-export="j1939-tp-flows.svg">
+<title id="tp23-title">J1939 BAM 与 RTS/CTS 消息时序对比</title>
+<desc id="tp23-desc">左边 BAM 从发送方广播 BAM 和 TP.DT，广播接收者不回 ACK；右边 CMDT 从发送方 RTS 开始，接收方 CTS 回应，发送方发数据，最后接收方回 EOM ACK。</desc>
+<g font-family="system-ui,sans-serif" fill="#1e3c47" font-size="17" text-anchor="middle">
+ <text x="215" y="26" font-weight="700">BAM · 广播，无确认</text><text x="650" y="26" font-weight="700">CMDT · 定向，有流控</text>
+ <line x1="87" y1="69" x2="87" y2="320" stroke="#9eb7b7" stroke-dasharray="5 5"/><line x1="342" y1="69" x2="342" y2="320" stroke="#9eb7b7" stroke-dasharray="5 5"/>
+ <line x1="523" y1="69" x2="523" y2="320" stroke="#9eb7b7" stroke-dasharray="5 5"/><line x1="778" y1="69" x2="778" y2="320" stroke="#9eb7b7" stroke-dasharray="5 5"/>
+ <text x="87" y="58" font-size="15">发送方</text><text x="342" y="58" font-size="15">所有接收者</text><text x="523" y="58" font-size="15">发送方</text><text x="778" y="58" font-size="15">目标接收者</text>
+ <g stroke-width="3" fill="none">
+  <path d="M87 103 H333" stroke="#147f80"/><path d="M323 97 L333 103 L323 109" stroke="#147f80"/>
+  <path d="M87 165 H333" stroke="#d06d4d"/><path d="M323 159 L333 165 L323 171" stroke="#d06d4d"/>
+  <path d="M87 227 H333" stroke="#d06d4d"/><path d="M323 221 L333 227 L323 233" stroke="#d06d4d"/>
+  <path d="M523 103 H769" stroke="#147f80"/><path d="M759 97 L769 103 L759 109" stroke="#147f80"/>
+  <path d="M778 155 H532" stroke="#7461ba"/><path d="M542 149 L532 155 L542 161" stroke="#7461ba"/>
+  <path d="M523 211 H769" stroke="#d06d4d"/><path d="M759 205 L769 211 L759 217" stroke="#d06d4d"/>
+  <path d="M778 271 H532" stroke="#7461ba"/><path d="M542 265 L532 271 L542 277" stroke="#7461ba"/>
+ </g>
+ <g font-size="16">
+  <text x="215" y="94">BAM</text><text x="215" y="155">DT #1</text><text x="215" y="217">DT #2…#N</text><text x="215" y="294" fill="#526c70">没有 EOM ACK</text>
+  <text x="650" y="94">RTS</text><text x="650" y="146">CTS</text><text x="650" y="202">DT #1…#N</text><text x="650" y="262">EOM ACK</text>
+  <text x="650" y="322" font-size="14">可能多轮 CTS ↔ DT</text>
+ </g>
+</g>
+</svg>
