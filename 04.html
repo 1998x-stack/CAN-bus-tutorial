@@ -130,7 +130,7 @@ details.question{border-bottom:1px solid #dce6e2;padding:12px 0}
 <section id="overview" aria-labelledby="overview-title"><span class="kicker">01 · 先看到全貌</span>
 <h2 id="overview-title">检测、通知、限制故障：其实是三件不同的事</h2>
 <p>一个正常通信的 CAN 控制器会检查总线位和帧结构；若发现协议错误，就按自身错误状态发送相应的错误标志。其他节点可能因此发现当前帧无效，发送器通常会根据工作模式重新尝试。与此同时，每个控制器用自己的发送错误计数 <strong>TEC</strong> 与接收错误计数 <strong>REC</strong> 追踪故障影响，避免反复出错的节点长期破坏整个网络。<a href="https://kvaser.com/lesson/can-error-handling/">Kvaser · CAN Error Handling</a></p>
-<figure><img src="assets/chapter04-detection-map.svg" width="960" height="400" loading="lazy" alt="从 CAN 帧中的位、填充、CRC、固定格式与 ACK 分支汇总到错误检测，再指向错误标志和 TEC/REC 故障限制。"><figcaption>图 1 · 五类检测手段回答“出了什么问题”，错误标志回答“如何对其他控制器发信号”，TEC/REC 与节点状态回答“反复出错的节点还能怎样参与总线”。它们不是五种不同的节点状态。</figcaption></figure>
+<figure class="figure-scroll"><img src="assets/chapter04-detection-map.svg" width="960" height="400" loading="lazy" alt="从 CAN 帧中的位、填充、CRC、固定格式与 ACK 分支汇总到错误检测，再指向错误标志和 TEC/REC 故障限制。"><figcaption>图 1 · 五类检测手段回答“出了什么问题”，错误标志回答“如何对其他控制器发信号”，TEC/REC 与节点状态回答“反复出错的节点还能怎样参与总线”。它们不是五种不同的节点状态。</figcaption></figure>
 <p>CAN 的逐位仲裁失败是正常优先级退让，<strong>不是这里的位错误</strong>。第三章解释了仲裁，本章讨论的是另一个机制：实际传输或接收过程违反协议检查条件。<a href="03.html">复习第三章的非破坏性仲裁</a>。</p>
 </section>
 <section id="errors" aria-labelledby="errors-title"><span class="kicker">02 · 沿着报文检查五个关口</span>
@@ -160,7 +160,7 @@ details.question{border-bottom:1px solid #dce6e2;padding:12px 0}
 <section id="error-flags" aria-labelledby="flags-title"><span class="kicker">03 · 错误如何被其他节点注意到</span>
 <h2 id="flags-title">主动错误标志和被动错误标志，为何相差一个电平？</h2>
 <p><strong>错误主动（Error Active）</strong>节点检测到错误时，会发送由六个显性位组成的主动错误标志。它违反正常帧的填充或固定格式规则，因此可使其他节点注意到当前报文异常。<strong>错误被动（Error Passive）</strong>节点只能发送六个隐性位组成的被动错误标志，其本身通常不会强制覆盖正在发送的帧。</p>
-<figure><img src="assets/chapter04-error-flags.svg" width="940" height="360" loading="lazy" alt="比较六个显性0的主动错误标志与六个隐性1的被动错误标志，并画出后续八位隐性错误界定符。"><figcaption>图 2 · 图中显示<strong>单个节点的名义错误标志</strong>：主动 6×0、被动 6×1，之后是错误界定符 8×1。真实总线上多个节点的错误标志可能叠加，实际可见的显性区间不一定只有 6 bit。</figcaption></figure>
+<figure class="figure-scroll"><img src="assets/chapter04-error-flags.svg" width="940" height="360" loading="lazy" alt="比较六个显性0的主动错误标志与六个隐性1的被动错误标志，并画出后续八位隐性错误界定符。"><figcaption>图 2 · 图中显示<strong>单个节点的名义错误标志</strong>：主动 6×0、被动 6×1，之后是错误界定符 8×1。真实总线上多个节点的错误标志可能叠加，实际可见的显性区间不一定只有 6 bit。</figcaption></figure>
 <p>被动错误状态并不是“节点不再发现错误”，也不是“无法收发”。它仍可参与正常通信，只是对其他节点的干扰能力受到限制；在需要它重新发起发送时，还受额外的 <strong>Suspend Transmission</strong> 等间隔规则约束。<a href="https://www.port.de/cgi-bin/CAN/CanFaqErrors">CAN FAQ · Error Confinement</a></p>
 <p>发送的错误标志加上 <strong>8 个隐性的错误界定符</strong>只是名义结构；错误标志在总线上相互叠加、等待总线重新回到隐性以及帧间间歇都会影响实际时间。不能把每次错误都精确简化为固定 14 bit 的总线开销。</p>
 </section>
@@ -186,7 +186,7 @@ assert crc15_can("1") == 0x4599</code></pre>
 <section id="states" aria-labelledby="states-title"><span class="kicker">05 · 错误不能无限传染</span>
 <h2 id="states-title">TEC、REC 到了多少，才会进入错误被动或 Bus-Off？</h2>
 <p>每个 CAN 控制器都维护发送错误计数（TEC）和接收错误计数（REC）。这两个值共同决定错误主动 / 错误被动状态，但<strong>Bus-Off 只由 TEC 的门槛触发</strong>。有关门槛可参见 <a href="https://onlinedocs.microchip.com/oxy/GUID-0C0B825F-9C9F-446F-AFDD-2324B355B920-en-US-12/GUID-EF89A342-C3A3-4AFD-82E5-DF9BC1C77759.html">Microchip 控制器说明</a>。</p>
-<figure><img src="assets/chapter04-state-machine.svg" width="940" height="400" loading="lazy" alt="CAN错误主动状态满足TEC和REC小于128；错误被动状态满足TEC或REC至少128且TEC不超过255；TEC达到256进入Bus-Off。恢复需观察128组11个连续隐性位并满足控制器恢复流程。"><figcaption>图 3 · <strong>Error Active</strong>：TEC、REC 均不超过 127；<strong>Error Passive</strong>：TEC 或 REC 至少 128 且 TEC 尚未达到 256；<strong>Bus-Off</strong>：TEC 至少 256。图中的箭头示意门槛变化，不代表所有错误事件都有相同的计数增量。</figcaption></figure>
+<figure class="figure-scroll"><img src="assets/chapter04-state-machine.svg" width="940" height="400" loading="lazy" alt="CAN错误主动状态满足TEC和REC小于128；错误被动状态满足TEC或REC至少128且TEC不超过255；TEC达到256进入Bus-Off。恢复需观察128组11个连续隐性位并满足控制器恢复流程。"><figcaption>图 3 · <strong>Error Active</strong>：TEC、REC 均不超过 127；<strong>Error Passive</strong>：TEC 或 REC 至少 128 且 TEC 尚未达到 256；<strong>Bus-Off</strong>：TEC 至少 256。图中的箭头示意门槛变化，不代表所有错误事件都有相同的计数增量。</figcaption></figure>
 <div class="table-scroll"><table><thead><tr><th>状态</th><th>计数条件</th><th>节点能力</th></tr></thead><tbody>
 <tr><td>Error Active</td><td><code>TEC &lt; 128</code> 且 <code>REC &lt; 128</code></td><td>正常参与总线；检测到错误可发送主动错误标志</td></tr>
 <tr><td>Error Passive</td><td><code>TEC &lt; 256</code> 且（<code>TEC ≥ 128</code> 或 <code>REC ≥ 128</code>）</td><td>仍可收发，但只能发被动错误标志，发送启动受额外等待规则约束</td></tr>
