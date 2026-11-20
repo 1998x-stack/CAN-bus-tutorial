@@ -1,0 +1,111 @@
+{
+  "title": "CAN tutorial chapters 28–30 — evidence ledger",
+  "source_policy": "Vendor/documentation sources for normative behavior; all numeric traffic/current examples are derived teaching assumptions, not measurements.",
+  "chapters": {
+    "28": {
+      "scope": "Classical CAN 11-bit data frames with 0–8 bytes, STM32F1 bxCAN example, private protocol not CANopen",
+      "claims": [
+        {
+          "id": "nondestructive-arbitration",
+          "kind": "verified",
+          "statement": "CAN's bitwise priority arbitration lets lower-priority senders wait rather than corrupting the winning arbitration frame",
+          "source": "https://www.analog.com/en/resources/app-notes/an-1123.html",
+          "locator": "Arbitration / CAN Protocol"
+        },
+        {
+          "id": "frame-base-length",
+          "kind": "derived",
+          "statement": "With intermission and without bit stuffing, a standard Classical CAN data frame takes 47+8*DLC bits, or 111 bits with DLC 8",
+          "source": "https://www.analog.com/en/resources/app-notes/an-1123.html",
+          "locator": "Classical CAN standard data frame fields; bit counts shown in 28.3"
+        },
+        {
+          "id": "bus-load",
+          "kind": "derived",
+          "statement": "8 nodes × 50 frames/s × assumed 130 bits/frame at 500 kbit/s = 10.4% estimated payload traffic bus occupancy",
+          "locator": "examples/can_chapters28_30_reference.py:estimated_bus_load_pct; tests/test_chapters28_30.py"
+        },
+        {
+          "id": "canopen-note",
+          "kind": "verified",
+          "statement": "CANopen heartbeat and SYNC have a predefined connection-set context; a raw project cannot silently reuse their semantics",
+          "source": "https://canopennode.github.io/CANopenNode/md_example_2DS301__profile.html",
+          "locator": "0x1005, 0x1017 entries"
+        }
+      ]
+    },
+    "29": {
+      "scope": "Transceiver low-power behavior is part-specific; PN example only models standard 11-bit WUF ID matching",
+      "claims": [
+        {
+          "id": "pn-hardware",
+          "kind": "verified",
+          "statement": "Selective wake-up/partial networking requires supporting transceiver hardware",
+          "source": "https://www.nxp.com/products/TJA1145",
+          "locator": "Features / Partial Networking"
+        },
+        {
+          "id": "wake-pattern",
+          "kind": "verified",
+          "statement": "Normal CAN wake-up pattern differs from valid wake-up frame matching",
+          "source": "https://docs.nxp.com/bundle/TJA1445/page/topics/CAN_WUF.html",
+          "locator": "Wake-up frame concept; exact implementation varies by part"
+        },
+        {
+          "id": "power-average",
+          "kind": "derived",
+          "statement": "50 uA sleep and 20 mA active at 1% duty gives 249.5 uA time-weighted average",
+          "locator": "examples/can_chapters28_30_reference.py:average_current_ua; tests/test_chapters28_30.py"
+        },
+        {
+          "id": "pseudocode-status",
+          "kind": "illustrative",
+          "statement": "sleep/wake hooks in chapter are abstract and not verified TJA1145 register addresses",
+          "locator": "29.html §29.5"
+        }
+      ]
+    },
+    "30": {
+      "scope": "STM32F103 bxCAN nominal bitrate example with PCLK1=36 MHz; Linux SocketCAN host as example; not hardware certification",
+      "claims": [
+        {
+          "id": "hal-api",
+          "kind": "verified",
+          "statement": "HAL_CAN_AddTxMessage enqueues into transmit mailbox; other APIs handle completion, errors and sleep",
+          "source": "https://github.com/STMicroelectronics/stm32f1xx-hal-driver/blob/master/Inc/stm32f1xx_hal_can.h",
+          "locator": "HAL CAN exported functions"
+        },
+        {
+          "id": "bit-timing",
+          "kind": "derived",
+          "statement": "36MHz/[4*(1+14+3)] = 500kbit/s, sample point 15/18 = 83.33%",
+          "locator": "30.html §30.3; P0 reference chapter05"
+        },
+        {
+          "id": "socketcan",
+          "kind": "verified",
+          "statement": "python-can uses can.Bus(channel='can0', interface='socketcan') for SocketCAN",
+          "source": "https://python-can.readthedocs.io/en/stable/interfaces/socketcan.html",
+          "locator": "SocketCAN interface examples"
+        },
+        {
+          "id": "wire-vector",
+          "kind": "derived",
+          "statement": "Little-endian <hHHBB example -1234/2500/1450/7/1 yields 2E FB C4 09 AA 05 07 01",
+          "locator": "examples/can_chapters28_30_reference.py:pack_sample; tests/test_chapters28_30.py"
+        },
+        {
+          "id": "adc-safety",
+          "kind": "engineering-note",
+          "statement": "Do not assume 0–5 V sensors can directly connect to a 3.3 V-class STM32 ADC without proper signal conditioning",
+          "locator": "30.html §30.3; device datasheet and board schematic must be consulted"
+        }
+      ]
+    }
+  },
+  "verification": {
+    "static_reference": "python -m unittest discover -s tests -v",
+    "browser": "python tests/browser_chapters28_30.py (requires playwright and Chrome/Chromium)",
+    "status": "pending CI execution; no hardware validation claimed"
+  }
+}

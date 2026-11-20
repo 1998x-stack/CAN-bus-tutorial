@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="c28-t1 c28-d1" viewBox="0 0 760 286"><style>text{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}.diagram-label{font-size:16px;fill:#213f48;font-weight:650}.diagram-note{font-size:12px;fill:#536a71}.diagram-title{font-size:19px;fill:#204b52;font-weight:700}</style><title id="c28-t1">八节点 CAN 线型总线</title><desc id="c28-d1">CAN_H 与 CAN_L 两条主干线，两端各 120 欧姆终端，八个节点通过短支线接入，接收端共享帧。</desc>
+<rect x="4" y="5" width="752" height="274" rx="14" fill="#f6f8f4"/>
+<text x="22" y="33" class="diagram-title">共用物理总线 · 双端终端</text>
+<line x1="78" y1="110" x2="682" y2="110" stroke="#087f82" stroke-width="5"/><line x1="78" y1="132" x2="682" y2="132" stroke="#c76843" stroke-width="5"/>
+<text x="18" y="110" class="diagram-note">CAN_H</text><text x="18" y="135" class="diagram-note">CAN_L</text>
+<path d="M78 110 h-18 v22 h18 M682 110 h18 v22 h-18" fill="none" stroke="#8a6b25" stroke-width="3"/><text x="47" y="153" class="diagram-note">120Ω</text><text x="672" y="153" class="diagram-note">120Ω</text>
+<g fill="#e8f2ee" stroke="#719f9a" stroke-width="1.5">
+<rect x="80" y="190" width="67" height="53" rx="8"/><rect x="157" y="190" width="67" height="53" rx="8"/><rect x="234" y="190" width="67" height="53" rx="8"/><rect x="311" y="190" width="67" height="53" rx="8"/><rect x="388" y="190" width="67" height="53" rx="8"/><rect x="465" y="190" width="67" height="53" rx="8"/><rect x="542" y="190" width="67" height="53" rx="8"/><rect x="619" y="190" width="67" height="53" rx="8"/>
+</g><g stroke="#719f9a" stroke-width="2"><path d="M113 132v58 M190 132v58 M267 132v58 M344 132v58 M421 132v58 M498 132v58 M575 132v58 M652 132v58"/></g>
+<g text-anchor="middle" class="diagram-label"><text x="113" y="221">N1</text><text x="190" y="221">N2</text><text x="267" y="221">N3</text><text x="344" y="221">N4</text><text x="421" y="221">N5</text><text x="498" y="221">N6</text><text x="575" y="221">N7</text><text x="652" y="221">N8</text></g>
+<text x="380" y="265" class="diagram-note" text-anchor="middle">短支线 · 相同标称位速率 · 合理的共模/接地设计</text></svg>

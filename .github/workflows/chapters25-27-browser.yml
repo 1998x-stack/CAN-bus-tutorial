@@ -1,0 +1,49 @@
+name: CAN Chapters 25-27 visual and interaction QA
+on:
+  push:
+    paths:
+      - "25.html"
+      - "26.html"
+      - "27.html"
+      - "assets/olah-ch25-*.svg"
+      - "assets/olah-ch26-*.svg"
+      - "assets/olah-ch27-*.svg"
+      - "examples/can_ch27_pipeline.c"
+      - "tests/test_olah_25_27.py"
+      - "tests/browser_chapters_25_27.py"
+      - ".github/workflows/chapters25-27-browser.yml"
+  pull_request:
+    paths:
+      - "25.html"
+      - "26.html"
+      - "27.html"
+      - "assets/olah-ch25-*.svg"
+      - "assets/olah-ch26-*.svg"
+      - "assets/olah-ch27-*.svg"
+      - "tests/test_olah_25_27.py"
+      - "tests/browser_chapters_25_27.py"
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Static and C tests
+        run: python -m unittest discover -s tests -p 'test_olah_25_27.py' -v
+      - name: Install Chromium
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Browser and interaction QA
+        run: python tests/browser_chapters_25_27.py
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: can-chapters25-27-browser
+          path: qa/chapter25-27/*.png
+          if-no-files-found: ignore
