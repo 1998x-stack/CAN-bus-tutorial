@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 430" role="img" aria-labelledby="t d">
+<title id="t">推荐的线型主干和不宜直接照搬的被动星型对比</title><desc id="d">上半部分是一条主干，两端各一个120欧姆终端，中间节点通过短分支连接。下半部分是四支长分支汇聚的被动星型，中心有多处分叉，存在阻抗突变和反射风险，不能简单在所有末端添加终端电阻。</desc>
+<rect width="840" height="430" rx="16" fill="#fffdf9"/>
+<text x="34" y="38" font-size="22" font-weight="700" fill="#21464b">同样四个节点，连接方法决定波形质量</text>
+<text x="34" y="77" font-size="17" font-weight="700" fill="#147f80">A · 线型主干（推荐起点）</text>
+<path d="M108 130H720" stroke="#147f80" stroke-width="8" stroke-linecap="round"/>
+<g fill="#fff" stroke="#147f80" stroke-width="3"><rect x="78" y="111" width="60" height="38" rx="8"/><rect x="691" y="111" width="60" height="38" rx="8"/></g>
+<g font-size="13" fill="#1d575a" text-anchor="middle"><text x="108" y="136">120 Ω</text><text x="721" y="136">120 Ω</text></g>
+<g stroke="#147f80" stroke-width="3"><path d="M242 131V170 M398 131V170 M554 131V170"/></g>
+<g fill="#def2f0" stroke="#147f80"><rect x="206" y="170" width="72" height="42" rx="9"/><rect x="362" y="170" width="72" height="42" rx="9"/><rect x="518" y="170" width="72" height="42" rx="9"/></g>
+<g font-size="15" fill="#1d575a" text-anchor="middle"><text x="242" y="197">节点 1</text><text x="398" y="197">节点 2</text><text x="554" y="197">节点 3</text></g>
+<text x="34" y="244" font-size="15" fill="#4d7075">主干两端端接；中间节点不额外端接，分支尽量短</text>
+<path d="M34 266H806" stroke="#d8e3df" stroke-width="1"/>
+<text x="34" y="296" font-size="17" font-weight="700" fill="#ae603d">B · 被动星型（反射风险）</text>
+<circle cx="421" cy="350" r="17" fill="#f6d5c2" stroke="#c2744d" stroke-width="3"/>
+<g stroke="#c2744d" stroke-width="5" fill="none" stroke-linecap="round"><path d="M421 333L421 303 M405 350H235 M438 350H608 M421 367V395"/></g>
+<g fill="#fff0e7" stroke="#d06d4d"><rect x="386" y="294" width="70" height="31" rx="7"/><rect x="166" y="335" width="70" height="31" rx="7"/><rect x="608" y="335" width="70" height="31" rx="7"/><rect x="386" y="392" width="70" height="30" rx="7"/></g>
+<g fill="#975334" font-size="13" text-anchor="middle"><text x="421" y="314">节点</text><text x="201" y="355">节点</text><text x="643" y="355">节点</text><text x="421" y="412">节点</text></g>
+<text x="480" y="383" font-size="14" fill="#a85c38">中心分叉造成阻抗突变</text>
+</svg>
