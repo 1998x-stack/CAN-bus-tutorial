@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 450" role="img" aria-labelledby="title desc">
+<title id="title">SJA1000 PeliCAN 模式在复位和运行状态下的重叠地址</title>
+<desc id="desc">0x00至0x0F主要是模式、中断、总线时序等控制状态寄存器；0x10至0x17在复位模式是ACR0到3和AMR0到3，在运行模式下是TXB写窗口和RXB读窗口；0x10至0x1C为缓冲窗口；0x1D接收计数，0x1E接收缓冲起始地址，0x1F时钟分频；同一个地址随模式以及读写方向改变语义。</desc>
+<rect width="1060" height="450" rx="18" fill="#fffdf9"/>
+<g font-family="system-ui,Microsoft YaHei,sans-serif" fill="#203035">
+<text x="36" y="42" font-size="25" font-weight="750">同一个地址，为什么“读 / 写 / 模式”会改变含义？</text>
+<text x="36" y="70" font-size="16" fill="#53676d">以 SJA1000 的 PeliCAN 模式为例：绝不是把 0x10～0x1C 永久定义成滤波器区。</text>
+<rect x="42" y="96" width="976" height="57" rx="9" fill="#e8f4f0" stroke="#92c5b6"/>
+<text x="66" y="120" font-size="19" font-weight="700">0x00–0x0F</text>
+<text x="272" y="121" font-size="17">MOD / CMR / SR / IR / IER / BTR0 / BTR1 / OCR / 错误诊断</text>
+<text x="271" y="143" font-size="13" fill="#53676d">各寄存器有不同访问条件；BTR0 / BTR1 等需在复位模式设置</text>
+<text x="42" y="188" font-size="18" font-weight="700">0x10–0x1C：重叠的核心窗口</text>
+<rect x="42" y="202" width="469" height="145" rx="11" fill="#fff4e7" stroke="#d8ac79" stroke-width="2"/>
+<text x="60" y="228" font-size="21" font-weight="700" fill="#995727">复位模式 · RM=1</text>
+<rect x="59" y="244" width="215" height="37" rx="5" fill="#f8dec5"/><text x="72" y="269" font-size="17">0x10–0x13  ACR0–3</text>
+<rect x="285" y="244" width="208" height="37" rx="5" fill="#f8dec5"/><text x="298" y="269" font-size="17">0x14–0x17  AMR0–3</text>
+<text x="60" y="320" font-size="15" fill="#79532c">在此配置验收代码与验收掩码</text>
+<rect x="533" y="202" width="485" height="145" rx="11" fill="#eaf3fc" stroke="#8aafd4" stroke-width="2"/>
+<text x="551" y="228" font-size="21" font-weight="700" fill="#345d89">运行模式 · RM=0</text>
+<rect x="550" y="244" width="451" height="37" rx="5" fill="#dbeaf8"/>
+<text x="563" y="268" font-size="17">同一缓冲窗口：读 RXB / 写 TXB</text>
+<text x="552" y="303" font-size="15" fill="#365e83">0x10 起依帧类型排列：信息、ID、数据字节</text>
+<text x="552" y="327" font-size="15" fill="#365e83">11 位与 29 位帧的字段长度不同</text>
+<rect x="42" y="366" width="976" height="52" rx="9" fill="#f2effa" stroke="#c8b7e4"/>
+<text x="65" y="391" font-size="18" font-weight="700">0x1D / 0x1E / 0x1F</text>
+<text x="297" y="392" font-size="16">RMC（接收帧计数） / RBSA（RX 起始地址） / CDR（时钟与模式选择）</text>
+<text x="42" y="438" font-size="13" fill="#53676d">上图归纳可编程可见窗口；完整寄存器读写权限与 PeliCAN/BasicCAN 差异以 SJA1000 数据手册表 10 为准。</text>
+</g></svg>
