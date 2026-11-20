@@ -1,0 +1,69 @@
+{
+  "chapter": "01.html",
+  "scope": "CAN基础入门与ISO 11898-2高速CAN典型情况",
+  "claims": [
+    {
+      "id": "CAN-HISTORY-1986",
+      "claim": "CAN于1986年SAE公开介绍，1993年进入ISO 11898标准化",
+      "kind": "history",
+      "source_url": "https://www.can-cia.org/can-knowledge/history-of-can-technology",
+      "locator": "History of CAN technology",
+      "status": "verified",
+      "notes": "1983研发启动参考CiA相关历史材料；不使用未经复核的车型首发断言"
+    },
+    {
+      "id": "CAN-FD-2012",
+      "claim": "Bosch于2012年介绍CAN FD；经典CAN最多8字节，CAN FD最多64字节",
+      "kind": "protocol",
+      "source_url": "https://www.bosch-semiconductors.com/products/ip-modules/can-protocols/can-fd/",
+      "locator": "CAN FD Protocol overview",
+      "status": "verified",
+      "notes": "CAN FD数据阶段具体速率由设备与拓扑决定"
+    },
+    {
+      "id": "CAN-HS-LEVELS",
+      "claim": "典型高速CAN显性CAN_H 3.5V/CAN_L 1.5V，隐性两线约2.5V",
+      "kind": "physical-layer",
+      "source_url": "https://www.can-cia.org/can-knowledge/can-hs-transmission",
+      "locator": "CAN HS transmission",
+      "status": "verified",
+      "notes": "典型值而非接收器绝对门限"
+    },
+    {
+      "id": "CAN-HS-TERMINATION",
+      "claim": "线型总线两端通常按约120Ω阻抗进行匹配终端",
+      "kind": "network-design",
+      "source_url": "https://www.can-cia.org/can-knowledge/designing-a-can-network",
+      "locator": "Designing a CAN network",
+      "status": "verified",
+      "notes": "限定高速CAN，其他物理层可能不同"
+    },
+    {
+      "id": "CAN-RESISTANCE",
+      "claim": "两个120欧姆理想电阻并联是60欧姆",
+      "kind": "calculation",
+      "source_url": null,
+      "locator": "R=1/(1/120+1/120)",
+      "status": "derived",
+      "notes": "断电且仅两个终端参与时的理想结果"
+    },
+    {
+      "id": "CAN-LENGTH",
+      "claim": "传统CAN在1Mbit/s时约40m是常见实践参考",
+      "kind": "engineering-guideline",
+      "source_url": "https://kvaser.com/lesson/can-physical-layers/",
+      "locator": "CAN Physical Layers",
+      "status": "verified",
+      "notes": "非所有拓扑的保证上限"
+    },
+    {
+      "id": "CAN-NETWORK-DIAGRAM",
+      "claim": "共享CAN通信介质可服务多个ECU",
+      "kind": "illustration",
+      "source_url": null,
+      "locator": "图1与图3",
+      "status": "illustrative",
+      "notes": "示意非具体整车线束拓扑；原创几何图"
+    }
+  ]
+}
