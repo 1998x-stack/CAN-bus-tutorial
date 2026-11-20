@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="c28-t2 c28-d2" viewBox="0 0 760 240"><style>text{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif}.diagram-label{font-size:16px;fill:#213f48;font-weight:650}.diagram-note{font-size:12px;fill:#536a71}.diagram-title{font-size:19px;fill:#204b52;font-weight:700}</style><title id="c28-t2">CAN 仲裁示意</title><desc id="c28-d2">节点 A 发 0x120，节点 B 发 0x320，首个不同标识符位 A 发显性0、B 发隐性1，B 观察显性而退出。</desc><rect width="760" height="240" rx="14" fill="#f6f8f4"/>
+<text x="22" y="38" class="diagram-title">两节点在 SOF 后同时开始发送</text>
+<text x="26" y="87" class="diagram-label">A · ID 0x120</text><text x="26" y="132" class="diagram-label">B · ID 0x320</text><text x="26" y="177" class="diagram-label">总线</text>
+<g font-family="ui-monospace,monospace" font-size="22" font-weight="700"><text x="235" y="87" fill="#087f82">0 0 1 0 0 1 0 0 0 0 0</text><text x="235" y="132" fill="#c76843">0 1 1 0 0 1 0 0 0 0 0</text><text x="235" y="177" fill="#087f82">0 0 1 0 0 1 0 0 0 0 0</text></g>
+<rect x="264" y="57" width="26" height="135" rx="5" fill="#d9c3f3" fill-opacity=".45" stroke="#7560ae" stroke-width="2"/>
+<path d="M277 199v15h208" stroke="#7560ae" stroke-width="2" fill="none"/>
+<text x="492" y="218" class="diagram-note">第二个标识符位：B 发送 1、读到 0 → 退出</text></svg>
