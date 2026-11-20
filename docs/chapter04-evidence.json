@@ -1,0 +1,142 @@
+{
+  "chapter": "04.html",
+  "scope": "Classical CAN (CAN CC), not CAN FD-specific CRC/frame rules. Python examples do not simulate full controller or error-counter event changes.",
+  "claims": [
+    {
+      "id": "C04-FIVE",
+      "claim": "CAN checks bit monitoring, bit stuffing, CRC, frame-form bits and ACK",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://kvaser.com/lesson/can-error-handling/",
+      "locator": "Error Detection Mechanisms, sections 1–5",
+      "notes": "These are detection classes, not node states"
+    },
+    {
+      "id": "C04-ACK",
+      "claim": "A transmitting node expects a dominant ACK bit from at least one other node receiving the message correctly; silent/listen-only nodes may not acknowledge",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://kvaser.com/lesson/can-error-handling/",
+      "locator": "Acknowledgement Check",
+      "notes": "ACK is not an application-level delivery receipt; single active transmitter may see repeated ACK errors"
+    },
+    {
+      "id": "C04-EXCEPTIONS",
+      "claim": "Normal arbitration loss, acknowledgment-slot dominant response and dominant overlay of passive error flag are not ordinary bit errors",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://www.analog.com/en/resources/app-notes/an-1123.html",
+      "locator": "Transmission Bit Verification, Arbitration, Acknowledgement Slot",
+      "notes": "Illustrates the limits of send-vs-sample mismatch tests"
+    },
+    {
+      "id": "C04-STUFF",
+      "claim": "Dynamic bit stuffing applies from SOF through CRC sequence of Classical CAN; five identical bits imply complementary stuff bit",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://kvaser.com/lesson/can-error-handling/",
+      "locator": "Bit Stuffing",
+      "notes": "fixed-form fields and error flags are excluded; exact span also cross-checked with Analog Devices"
+    },
+    {
+      "id": "C04-CRC",
+      "claim": "Classical CAN uses 15-bit CRC; field covers logical SOF to end of data, not CRC sequence itself",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://www.can-cia.org/can-knowledge/cyclic-redundancy-check-crc-in-can-frames",
+      "locator": "CAN CC CRC calculation / CRC sequence",
+      "notes": "Independent Python polynomial division checks reference function"
+    },
+    {
+      "id": "C04-POLY",
+      "claim": "CRC-15-CAN generator polynomial x^15 + x^14 + x^10 + x^8 + x^7 + x^4 + x^3 + 1, representation 0x4599 without leading term",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://www.can-cia.org/can-knowledge/cyclic-redundancy-check-crc-in-can-frames",
+      "locator": "CRC-15 CAN polynomial",
+      "notes": "Constant also matches chapter's pre-existing C implementation"
+    },
+    {
+      "id": "C04-FORM",
+      "claim": "CRC delimiter, ACK delimiter and EOF are fixed-form checked fields with frame end special cases",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://kvaser.com/lesson/can-error-handling/",
+      "locator": "Frame check",
+      "notes": "Avoid generalizing special delimiter/form rules"
+    },
+    {
+      "id": "C04-FLAGS",
+      "claim": "Active error flag is 6 dominant bits; passive error flag 6 recessive bits; error delimiter nominally 8 recessive bits",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://www.port.de/cgi-bin/CAN/CanFaqErrors",
+      "locator": "Error active / Error passive and error flags",
+      "notes": "Multiple error flags can superpose, making on-bus duration variable"
+    },
+    {
+      "id": "C04-COUNTERS",
+      "claim": "Error Active TEC and REC under 128; Error Passive if one reaches 128; Bus-Off only if TEC reaches 256",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://onlinedocs.microchip.com/oxy/GUID-0C0B825F-9C9F-446F-AFDD-2324B355B920-en-US-12/GUID-EF89A342-C3A3-4AFD-82E5-DF9BC1C77759.html",
+      "locator": "38.12 Error Handling, paragraph 1–2",
+      "notes": "Implemented as deterministic boundary classifier with TEC maximum sentinel 256"
+    },
+    {
+      "id": "C04-WARN",
+      "claim": "An error-warning diagnostic can be indicated at TEC or REC threshold 96 on some controllers",
+      "kind": "implementation",
+      "status": "verified",
+      "source_url": "https://onlinedocs.microchip.com/oxy/GUID-0C0B825F-9C9F-446F-AFDD-2324B355B920-en-US-12/GUID-EF89A342-C3A3-4AFD-82E5-DF9BC1C77759.html",
+      "locator": "38.12 Error Handling, CERRIF at 96",
+      "notes": "Warning is diagnostic, not fourth error-confinement state"
+    },
+    {
+      "id": "C04-EXCEPTIONS-COUNTERS",
+      "claim": "TEC +8 and REC +1 are not unconditional; passive ACK errors and successful receives with REC above 127 have exceptions",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://www.port.de/cgi-bin/CAN/CanFaqErrors",
+      "locator": "CAN Error Confinement Rules numbered 1–12",
+      "notes": "Do not use event-based counter increment simulator without full rules"
+    },
+    {
+      "id": "C04-SUSPEND",
+      "claim": "Error-passive node may require extra suspend transmission interval after intermission",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://www.port.de/cgi-bin/CAN/CanFaqErrors",
+      "locator": "Error passive paragraph: Suspend Transmission Field 8 recessive bits",
+      "notes": "Impacts timing of re-initiation after transmission"
+    },
+    {
+      "id": "C04-RECOVER",
+      "claim": "Bus-Off recovery requires monitoring 128 occurrences of 11 consecutive recessive bits; controller auto/software choice is implementation-dependent",
+      "kind": "protocol",
+      "status": "verified",
+      "source_url": "https://www.port.de/cgi-bin/CAN/CanFaqErrors",
+      "locator": "CAN Error Confinement Rules number 12 and Bus Off paragraph",
+      "notes": "Not a precise guaranteed fixed-duration timer"
+    },
+    {
+      "id": "C04-CRC-TEST",
+      "claim": "CRC15 feedback implementation equals independent integer polynomial long division over all bit strings up to length 10",
+      "kind": "derived",
+      "status": "derived",
+      "source_url": null,
+      "locator": "tests/test_chapter04.py, crc15_polynomial_division",
+      "notes": "Tests verify algorithm on synthetic logical bit strings, not real CAN capture"
+    },
+    {
+      "id": "C04-ART",
+      "claim": "Three original pedagogical diagrams visualize error detection, nominal flags, and fault-confinement states",
+      "kind": "illustration",
+      "status": "illustrative",
+      "source_url": null,
+      "locator": "Figures 1–3",
+      "notes": "Illustrative only; no waveform timing or measured physical characteristics"
+    }
+  ]
+}
+

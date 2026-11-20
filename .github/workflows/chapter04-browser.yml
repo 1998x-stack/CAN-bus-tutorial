@@ -1,0 +1,38 @@
+name: Chapter 04 browser QA
+on:
+  push:
+    paths:
+      - "04.html"
+      - "assets/chapter04-*.svg"
+      - "tests/browser_chapter04.py"
+      - ".github/workflows/chapter04-browser.yml"
+  pull_request:
+    paths:
+      - "04.html"
+      - "assets/chapter04-*.svg"
+      - "tests/browser_chapter04.py"
+      - ".github/workflows/chapter04-browser.yml"
+jobs:
+  visual-smoke:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Playwright and use runner-provided Chrome
+        run: |
+          python -m pip install playwright==1.56.0
+          command -v google-chrome
+      - name: Verify viewport, figure, link, mouse/keyboard and print behavior
+        run: python tests/browser_chapter04.py
+      - name: Upload screenshots and QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chapter04-visual-qa
+          path: reports/chapter04/
+          if-no-files-found: ignore
+
