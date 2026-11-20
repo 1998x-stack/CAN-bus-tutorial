@@ -60,23 +60,24 @@ python3 -m unittest discover -s tests -v
 
 具体修复清单、计算基准与实机验证边界见 [docs/P0_VERIFICATION.md](docs/P0_VERIFICATION.md)。Python单元测试通过不代表某块STM32开发板已经完成交叉编译或硬件总线验证。
 
+## 🔎 第 10–12 章：发送 / 接收 / 中断编程
 
-## 📘 第 19–21 章：CANopen 图解与可复算实验
+- [第 10 章 · CAN 报文发送](10.html)：三邮箱调度、TXFP、总线仲裁、RQCP/TXOK 的区别及 TX 中断。
+- [第 11 章 · CAN 报文接收](11.html)：过滤器、双 FIFO、RFLM 溢出策略、SPSC 队列与消息时效性。
+- [第 12 章 · CAN 中断编程](12.html)：STM32F103 共享向量、NVIC 分组、标志处理与 ISR 周期测量。
 
-- [第 19 章：NMT 与心跳](19.html)：Boot-up、NMT 状态、Heartbeat/Node Guarding、消费者超时编码。
-- [第 20 章：SDO 通信](20.html)：逐字节读取响应、分段 toggle、块确认与 Abort。
-- [第 21 章：PDO 通信](21.html)：对象映射、SYNC 时序、传输类型与带宽下界。
+三章共享 [阅读样式](reading.css)，每章的可独立查看的 SVG 图示位于 [assets/](assets/)；主张与参考手册的出处列在 [docs/chapter10-evidence.json](docs/chapter10-evidence.json)、[docs/chapter11-evidence.json](docs/chapter11-evidence.json)、[docs/chapter12-evidence.json](docs/chapter12-evidence.json)。
 
-三个章节各有 2 幅可独立查看的 SVG 图、浏览器内交互实验和来源清单（`docs/chapter19-evidence.json` 至 `docs/chapter21-evidence.json`）。底层计算参考模型见 `reference/canopen_ch19_21.py`。
+在仓库根目录执行：
 
 ```bash
-python3 -m unittest discover -s tests -v
-python3 -m reference.canopen_ch19_21
-# 可选浏览器 QA：安装 playwright 与 Chromium / Chrome 后
-python3 tests/browser_chapters19_21.py
+python -m unittest discover -s tests -p 'test_chapters_10_12.py' -v
+pip install playwright
+python -m playwright install chromium
+python tests/browser_chapters_10_12.py
 ```
 
-> 示例仅用于离线字段验证，不是 CANopen 一致性测试或实机安全认证。PDO 对象可映射性、设备单位和配置时机以各设备 EDS/文档为准。
+浏览器检查覆盖 1440 / 768 / 390 / 360 px、章节内交互、SVG、导航和页面横向溢出。GitHub Actions 的 [Chapter 10-12 QA](.github/workflows/chapter10-12-browser.yml) 工作流可在变更时运行；能否通过以实际工作流结果为准。代码示例基于 **STM32F103 / bxCAN / STM32F10x SPL**，仍须按实际板卡和启动文件做编译、接线与总线验证。
 
 ## 📂 项目结构
 
@@ -97,3 +98,20 @@ CAN-bus-tutorial/
 
 ---
 *本课程由 `CAN-bus-tutorial/` 项目维护。*
+
+## 📘 第 19–21 章：CANopen 图解与可复算实验
+
+- [第 19 章：NMT 与心跳](19.html)：Boot-up、NMT 状态、Heartbeat/Node Guarding、消费者超时编码。
+- [第 20 章：SDO 通信](20.html)：逐字节读取响应、分段 toggle、块确认与 Abort。
+- [第 21 章：PDO 通信](21.html)：对象映射、SYNC 时序、传输类型与带宽下界。
+
+三个章节各有 2 幅可独立查看的 SVG 图、浏览器内交互实验和来源清单（`docs/chapter19-evidence.json` 至 `docs/chapter21-evidence.json`）。底层计算参考模型见 `reference/canopen_ch19_21.py`。
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 -m reference.canopen_ch19_21
+# 可选浏览器 QA：安装 playwright 与 Chromium / Chrome 后
+python3 tests/browser_chapters19_21.py
+```
+
+> 示例仅用于离线字段验证，不是 CANopen 一致性测试或实机安全认证。PDO 对象可映射性、设备单位和配置时机以各设备 EDS/文档为准。

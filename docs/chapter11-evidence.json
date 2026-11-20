@@ -1,0 +1,56 @@
+{
+  "chapter": 11,
+  "platform": "STM32F103xB / bxCAN Classic CAN / STM32F10x SPL",
+  "scope_note": "Register/event semantics are tied to bxCAN. Code examples require board, startup-vector and interrupt integration review.",
+  "claims": [
+    {
+      "id": "ch11-1",
+      "claim": "bxCAN has FIFO0 and FIFO1 with three receive mailboxes each",
+      "locator": "RM0008 bxCAN, Reception handling",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "ch11-2",
+      "claim": "RFLM=0 overwrites last FIFO entry; RFLM=1 drops new incoming frame when full",
+      "locator": "RM0008 bxCAN, Overrun / CAN_MCR.RFLM",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "ch11-3",
+      "claim": "FMP counts pending receive frames, FOVR marks overflow",
+      "locator": "RM0008 bxCAN, CAN_RF0R register",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "ch11-4",
+      "claim": "Standard 11-bit ID maps to filter high-half bits 15..5",
+      "locator": "RM0008 bxCAN, Identifier filtering / filter register layout",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "ch11-5",
+      "claim": "IDE and RTR can be required by filter mask low bits 2 and 1",
+      "locator": "RM0008 bxCAN, Identifier filtering / filter registers",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "ch11-6",
+      "claim": "SPL CAN_Receive releases the output mailbox as part of receiving a message",
+      "locator": "STM32F10x SPL CAN_Receive implementation and interface",
+      "source_url": "https://ese.han.nl/STM32/stm32f10stdlibrary/html/group___c_a_n___exported___functions.html",
+      "status": "verified"
+    },
+    {
+      "id": "ch11-7",
+      "claim": "Age limit of 25ms in teaching code is an application example, not a CAN requirement",
+      "locator": "Chapter 11 code example (application design choice)",
+      "source_url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "status": "illustrative"
+    }
+  ]
+}

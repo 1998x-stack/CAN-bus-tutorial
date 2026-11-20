@@ -36,6 +36,17 @@ class TestPortableCExamples(unittest.TestCase):
                            capture_output=True, text=True)
 
     def test_chapter_10_spl_send(self):
+        # Chapter 10 was updated to CAN_SendStandard and added a vendor header
+        # after this portable regression test was written. Keep testing both
+        # chapter versions against the same tiny SPL stubs, without a HAL SDK.
+        fragment = snippet("10", 0)
+        fragment = "\n".join(
+            line for line in fragment.splitlines()
+            if line.strip() != '#include "stm32f10x_can.h"'
+        )
+        function_name = (
+            "CAN_SendStandard" if "CAN_SendStandard(" in fragment else "CAN_SendStd"
+        )
         source = r"""
 #include <stdint.h>
 #include <stddef.h>
@@ -56,7 +67,7 @@ static uint8_t CAN_Transmit(int can, CanTxMsg *msg) {
     ++sent;
     return 0;
 }
-""" + snippet("10", 0) + r"""
+""" + fragment + r"""
 int main(void) {
     uint8_t payload[3] = {0x10, 0x20, 0x30};
     assert(CAN_SendStd(0x321, payload, 3) == 0);
@@ -72,7 +83,7 @@ int main(void) {
     return 0;
 }
 """
-        self.compile_and_run(source)
+        self.compile_and_run(source.replace("CAN_SendStd(", function_name + "("))
 
     def test_chapter_27_signal_decode(self):
         source = r"""

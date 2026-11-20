@@ -3,6 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第12章 CAN中断编程</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -115,8 +116,10 @@
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
     </style>
+    <link rel="stylesheet" href="reading.css">
 </head>
 <body>
+<a class="skip-link" href="#content">跳转至正文</a>
 <div class="double-border">
 <div class="container">
     <div class="sidebar">
@@ -154,180 +157,138 @@
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
     </div>
-    <div class="main-content">
-        <h2>第12章 CAN中断编程：中断优先级配置、中断服务函数编写、中断调试技巧</h2>
+    <main class="main-content" id="content">
+<article class="article">
+<header>
+<p class="eyebrow">CAN 总线 · 第 12 章 / 中断与实时性</p>
+<h1>中断越快，CAN 通信就越可靠吗？</h1>
+<p class="dek">答案不是简单地“把优先级调到最高”。真正决定可靠性的，是正确的启动文件向量、短且有界的 ISR、明确的标志处理，以及主循环能够持续消化报文。</p>
+</header>
+<section id="irq-question">
+<p class="kicker">01 · 从延迟的来源开始</p>
+<h2>中断只是数据路径中的一小段</h2>
+<p class="lead">CAN 控制器收到完整有效帧时，若匹配过滤器就将报文写入 FIFO，并在相应使能条件下向 NVIC 提出中断请求。之后才是 CPU 响应、读取、搬运和应用解析。只测 ISR 的执行时间，不能等同于端到端的业务延迟。</p>
+<figure class="diagram"><div class="diagram-scroll">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 292" role="img" aria-labelledby="irq-title irq-desc">
+<title id="irq-title">CAN 接收中断与主循环的时间线</title>
+<desc id="irq-desc">硬件收帧写 FIFO 触发中断挂起；CPU 可能等待高优先级 ISR，随后进入 CAN ISR 搬运报文并退出；主循环稍后才解析数据。</desc>
+<defs><marker id="irq-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" stroke="#357771" stroke-width="1.5"/></marker></defs>
+<g font-size="14" fill="#315a5c"><text x="12" y="57">CAN 硬件</text><text x="12" y="127">CPU / NVIC</text><text x="12" y="215">主循环</text></g>
+<path d="M105 61 H762 M105 132 H762 M105 222 H762" stroke="#d4e3de" stroke-width="2"/>
+<rect x="121" y="43" width="133" height="36" rx="7" fill="#dff2e8" stroke="#77b6a7"/><text x="187" y="66" text-anchor="middle" font-size="14" fill="#1b655e">完整帧 → FIFO</text>
+<path d="M254 80 V131" stroke="#be8f5d" stroke-dasharray="5 4" stroke-width="2"/>
+<rect x="255" y="115" width="145" height="35" rx="6" fill="#fff2e5" stroke="#dfa975"/><text x="327" y="137" font-size="13" text-anchor="middle" fill="#915c2d">等待响应 / 可能抢占</text>
+<rect x="401" y="107" width="171" height="51" rx="8" fill="#e9e8fb" stroke="#a5a1d9"/><text x="486" y="126" font-size="14" text-anchor="middle" fill="#4d4882">CAN ISR</text><text x="486" y="146" font-size="12" text-anchor="middle" fill="#4d4882">读 FIFO · 快速入队</text>
+<path d="M570 159 V220" stroke="#357771" stroke-width="2.3" stroke-dasharray="5 4" marker-end="url(#irq-arrow)"/>
+<rect x="590" y="202" width="161" height="40" rx="8" fill="#e1f1f1" stroke="#8fbcb8"/><text x="671" y="227" font-size="14" text-anchor="middle" fill="#285e64">应用解析 / 超时判断</text>
+<text x="351" y="180" text-anchor="middle" font-size="13" fill="#7d623b">中断延迟</text><text x="486" y="181" text-anchor="middle" font-size="13" fill="#585187">ISR 时间</text><text x="665" y="264" text-anchor="middle" font-size="13" fill="#557076">排队与消费延迟</text>
+<path d="M115 277 H760" stroke="#357771" stroke-width="1.8" marker-end="url(#irq-arrow)"/><text x="438" y="289" text-anchor="middle" font-size="12" fill="#557076">时间向右 →</text>
+</svg></div><figcaption>图 12-1：软件通常关注的“CAN 中断延迟”只是从 FIFO 待处理到 ISR 开始的一段；对控制业务更重要的是从有效报文进入到最终使用的全链路时限。 <a href="assets/chapter12-irq-timeline.svg">单独查看图 12-1</a></figcaption></figure>
+<div class="callout"><p><strong>要优化的是截止期限，不是某个孤立函数的耗时。</strong> 如果应用线程积压，ISR 再快也无法保证信号新鲜。</p></div>
+</section>
 
-<p>说到CAN通信，中断处理绝对是绕不开的核心话题。我见过不少新手，CAN配置得挺顺，但一上中断就翻车。说白了，中断就像汽车的刹车系统——平时用不上，关键时刻必须可靠。</p>
+<section id="irq-vectors">
+<p class="kicker">02 · 找对向量，再谈优先级</p>
+<h2>STM32F103 的 CAN1 接收 0 中断为什么带 USB 前缀？</h2>
+<p>STM32F103 的常见启动文件把部分 CAN1 和 USB 中断共享在同一向量上。不能只凭名称缩写写出 <code>CAN1_RX0_IRQHandler</code>，而应以实际 MCU 型号对应的 CMSIS 头文件与启动文件为准。</p>
+<table><thead><tr><th>事件</th><th>F103 常用 IRQn</th><th>对应处理函数名</th></tr></thead><tbody>
+<tr><td>CAN1 发送</td><td>USB_HP_CAN1_TX_IRQn</td><td>USB_HP_CAN1_TX_IRQHandler</td></tr>
+<tr><td>CAN1 FIFO0 接收</td><td>USB_LP_CAN1_RX0_IRQn</td><td>USB_LP_CAN1_RX0_IRQHandler</td></tr>
+<tr><td>CAN1 FIFO1 接收</td><td>CAN1_RX1_IRQn</td><td>CAN1_RX1_IRQHandler</td></tr>
+<tr><td>CAN1 状态变化与错误</td><td>CAN1_SCE_IRQn</td><td>CAN1_SCE_IRQHandler</td></tr>
+</tbody></table>
+<p class="subtle">这是对常见 STM32F103 设备启动文件的说明；不同 F1 子系列、封装与库版本请按具体向量表核实。使用 USB 与 CAN 共享向量时，还需要设计两者的事件分发。</p>
+<h3>一段可以对应启动文件检查的配置</h3>
+<pre><code>#include "stm32f10x_can.h"
+#include "misc.h"
 
-<p>这一章，我带你把CAN中断的优先级配置、服务函数编写、还有调试技巧，一次性讲透。</p>
-
-<h3>12.1 中断优先级配置——别让优先级坑了你</h3>
-
-<p>先问个问题：你的MCU里，CAN中断该排第几？</p>
-
-<p>我个人习惯，把CAN中断放在中等偏高的优先级。为什么？因为CAN通信对实时性有要求，但也不是最高优先级——你总不能让CAN中断把系统滴答定时器给抢了吧？</p>
-
-<p>以STM32为例，NVIC配置是这样的：</p>
-
-<pre><code>// 配置CAN接收中断优先级
-NVIC_InitTypeDef NVIC_InitStructure;
-
-NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;  // CAN1接收中断
-NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;  // 抢占优先级
-NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;         // 子优先级
-NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-NVIC_Init(&NVIC_InitStructure);</code></pre>
-
-<p>这里有个坑，我踩过。抢占优先级和子优先级，很多人搞混。抢占优先级决定能否打断正在执行的中断，子优先级决定同抢占优先级下的响应顺序。</p>
-
-<div class="warning">
-  <strong>⚠️ 我曾经犯过的错：</strong> 把CAN中断优先级设得和定时器中断一样，结果两个中断互相抢，系统直接卡死。记住：同优先级的中断不会互相打断，只能排队。
-</div>
-
-<p>我建议你遵循这个原则：</p>
-<ul>
-  <li>时间敏感的中断（如电机控制PWM）→ 最高优先级</li>
-  <li>CAN通信中断 → 中等优先级</li>
-  <li>非实时任务（如按键扫描）→ 低优先级</li>
-</ul>
-
-<h3>12.2 中断服务函数编写——短小精悍是王道</h3>
-
-<p>中断服务函数（ISR）怎么写？四个字：短小精悍。</p>
-
-<p>你想想看，中断服务函数执行时间越长，其他中断被阻塞的时间就越长。我在项目中遇到过，有人把CAN报文解析逻辑直接写在ISR里，结果CAN总线负载一高，系统直接崩了。</p>
-
-<p>正确的做法：ISR里只做最必要的事，比如把数据搬到缓冲区，然后置一个标志位。真正的处理逻辑，放到主循环里做。</p>
-
-<pre><code>// 正确的CAN接收中断服务函数
-void CAN1_RX0_IRQHandler(void)
+void ConfigureCanRx0Irq(void)
 {
-    CanRxMsg RxMessage;
-    
-    // 1. 读取接收到的报文
-    CAN_Receive(CAN1, CAN_FIFO0, &RxMessage);
-    
-    // 2. 把数据存入环形缓冲区（快速操作）
-    if (ring_buffer_write(&can_rx_buf, &RxMessage) == 0)
-    {
-        // 缓冲区满了？记录溢出标志
-        can_overflow_flag = 1;
+    NVIC_InitTypeDef nvic = {0};
+
+    // 全系统通常在统一的 NVIC 配置阶段调用一次；不要由各模块争抢
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+
+    nvic.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
+    nvic.NVIC_IRQChannelPreemptionPriority = 2;
+    nvic.NVIC_IRQChannelSubPriority = 0;
+    nvic.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&amp;nvic);
+
+    // 报文已进入 FIFO0 时申请中断；不是“总线出现起始位时”
+    CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
+}</code></pre>
+<p><strong>数值越小，NVIC 优先级越高。</strong> 抢占优先级不同才有抢占关系；子优先级在相同抢占组下决定待处理异常的响应顺序。优先级分组是系统级选择，要同时考虑 RTOS 与其他外设，不要每个驱动自己重新设置。</p>
+<details><summary>同抢占优先级的两个中断会互相打断吗？</summary>
+<p>不会因子优先级不同而相互抢占。它们可能按子优先级先后被服务；若要让一个 ISR 能抢占另一个，需要不同的抢占优先级，而且要考虑最坏执行时间及系统中的其他实时任务。</p></details>
+</section>
+
+<section id="irq-isr">
+<p class="kicker">03 · 事件和清除方式一一对应</p>
+<h2>别用“进了 ISR 就清所有标志”的思路</h2>
+<p>bxCAN 的发送、接收和错误事件不应统一当作一个“清标志位”动作。接收 FIFO0 的 FMP0 反映待处理帧数；<strong>逐帧调用 CAN_Receive() 会释放输出邮箱</strong>，处理完后 FMP0 回落。发送请求完成位 RQCPx 是 W1C，且要先读取 TXOKx 等结果；状态/错误事件有各自的专用状态与清除路径。</p>
+<table><thead><tr><th>来源</th><th>应当观察</th><th>正确方向</th></tr></thead><tbody>
+<tr><td>RX FIFO0</td><td>FMP0、FULL0、FOVR0</td><td>读并释放 FIFO；溢出单独计数与清标志</td></tr>
+<tr><td>TX</td><td>RQCPx、TXOKx、ALSTx、TERRx</td><td>先记录结果，随后 W1C 清对应 RQCPx</td></tr>
+<tr><td>SCE / 错误</td><td>ESR 的 BOFF、EPVF、EWGF、LEC 等</td><td>区分错误状态与事件来源，按参考手册处理</td></tr>
+</tbody></table>
+<p>下例把 CAN1 RX0 ISR 的动作压缩为“批量取帧 + 交给已有的单生产者队列”，它依赖第 11 章已经实现的 <code>RxPushFromIrq()</code>。集成时请将第 11 章中的静态辅助函数与本 ISR 放在同一源文件，或改成合适的模块接口；避免重复定义 IRQHandler。</p>
+<pre><code>// 与第 11 章的 RxPushFromIrq() 放在同一编译单元
+volatile uint32_t can_rx_irq_count = 0;
+
+void USB_LP_CAN1_RX0_IRQHandler(void)
+{
+    can_rx_irq_count++;
+
+    while (CAN_MessagePending(CAN1, CAN_FIFO0) != 0u) {
+        CanRxMsg frame;
+        CAN_Receive(CAN1, CAN_FIFO0, &amp;frame);
+        RxPushFromIrq(&amp;frame);
     }
-    
-    // 3. 清除中断标志
-    CAN_ClearITPendingBit(CAN1, CAN_IT_FMP0);
-    
-    // 注意：这里没有报文解析，没有协议处理！
+
+    // RX FIFO0 挂起随 FIFO 读空而撤销；不要随意清其他事件
 }</code></pre>
+<div class="callout warn"><p><strong>ISR 的边界：</strong>避免 printf、动态内存、长延时和不受控循环。上述“读到 FIFO 空”的方式适合一般负载，但如果新报文持续高速涌入，也应测试最坏 ISR 占用时间，必要时采用有界批处理与再次触发策略。</p></div>
+</section>
 
-<div class="tip">
-  <strong>💡 我的小技巧：</strong> ISR里尽量不用printf、不用延时、不用malloc。这些函数执行时间不可控，而且printf本身可能触发中断，搞不好就递归了。
-</div>
+<section id="irq-measure">
+<p class="kicker">04 · 从感觉走向测量</p>
+<h2>怎样知道中断到底占用了多少时间？</h2>
+<p>可以在 ISR 入口置位 GPIO、出口复位 GPIO，再用逻辑分析仪读取脉宽；这测得的是包含探针开销的 ISR 执行时间，不是“报文上总线到进入 ISR”的完整响应延迟。另可在 Cortex-M3 上使用 DWT CYCCNT 统计周期数（需开启计数器，且不同芯片和调试状态要验证支持）。</p>
+<pre><code>// 在系统初始化阶段打开周期计数器（Cortex-M3）
+CoreDebug-&gt;DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+DWT-&gt;CYCCNT = 0u;
+DWT-&gt;CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 
-<p>嗯，这里还要注意一点：CAN有多个中断源——接收中断、发送中断、错误中断。每个中断源最好单独写一个ISR，别图省事写在一起。否则调试的时候，你根本分不清是哪个事件触发了中断。</p>
+// 在 ISR 入口、出口分别采样 DWT-&gt;CYCCNT；
+// 使用无符号差值统计，勿在 ISR 中打印。
+const uint32_t cycles = end_cycles - start_cycles;
+// 72 MHz 主频时：720 cycles / 72 MHz = 10 us
+// 720 仅用于演示换算，不是实测结果。</code></pre>
+<p>使用 DWT 或 GPIO 的数据前，要核对当前系统时钟、优化等级、探针开销以及是否允许抢占。打断点会改变时序，不能拿单步调试结果代表实时运行。</p>
+</section>
 
-<h3>12.3 中断调试技巧——没有示波器也能定位问题</h3>
-
-<p>中断调试，说实话比普通代码调试难。为什么？因为中断是异步的，你打断点的时候，中断可能已经跑飞了。</p>
-
-<p>我总结了几招，很实用：</p>
-
-<ol>
-  <li><strong>用GPIO翻转做“软示波器”</strong></li>
-</ol>
-
-<p>在ISR入口和出口各翻转一次GPIO，用逻辑分析仪或者示波器看这个引脚。你能直观看到：中断多久触发一次？ISR执行了多长时间？有没有嵌套？</p>
-
-<pre><code>void CAN1_RX0_IRQHandler(void)
-{
-    GPIO_SetBits(GPIOB, GPIO_Pin_0);  // 入口拉高
-    
-    // ... 中断处理 ...
-    
-    GPIO_ResetBits(GPIOB, GPIO_Pin_0); // 出口拉低
-}</code></pre>
-
-<ol start="2">
-  <li><strong>统计中断触发次数</strong></li>
-</ol>
-
-<p>定义一个全局变量，每次进ISR就加1。主循环里打印这个值。如果实际值和预期不符，说明中断配置有问题。</p>
-
-<pre><code>volatile uint32_t can_irq_count = 0;
-
-void CAN1_RX0_IRQHandler(void)
-{
-    can_irq_count++;
-    // ... 其他处理 ...
-}</code></pre>
-
-<ol start="3">
-  <li><strong>检查中断标志位</strong></li>
-</ol>
-
-<p>有时候中断没响应，不是因为没触发，而是标志位没清干净。我建议你在ISR开头先读一下中断状态寄存器，确认是哪个事件触发的。</p>
-
-<div class="highlight">
-  <p><strong>🔑 核心要点：</strong> CAN中断调试，80%的问题出在优先级配置和标志位处理上。先检查这两个，别一上来就怀疑硬件。</p>
-</div>
-
-<h3>12.4 实战中的那些坑</h3>
-
-<p>讲几个我亲身踩过的坑，你遇到了能少走弯路：</p>
-
-<table>
-  <tr>
-    <th>问题现象</th>
-    <th>原因</th>
-    <th>解决方案</th>
-  </tr>
-  <tr>
-    <td>CAN中断只触发一次</td>
-    <td>中断标志位没清除</td>
-    <td>ISR末尾调用清除函数</td>
-  </tr>
-  <tr>
-    <td>系统卡死，无法响应</td>
-    <td>ISR里调用了阻塞函数</td>
-    <td>ISR只做数据搬运</td>
-  </tr>
-  <tr>
-    <td>中断响应延迟大</td>
-    <td>优先级设置太低</td>
-    <td>提高抢占优先级</td>
-  </tr>
-  <tr>
-    <td>中断频繁触发</td>
-    <td>CAN总线错误导致错误中断</td>
-    <td>检查总线终端电阻和电平</td>
-  </tr>
-</table>
-
-<p>我曾经遇到一个特别诡异的bug：CAN接收中断偶尔丢包。查了两天，最后发现是ISR里用了一个全局变量，而这个变量在主循环里被修改了——没有加volatile关键字。编译器优化后，ISR读到的永远是旧值。</p>
-
-<p>所以，记住：ISR和主循环共享的变量，一定要加volatile！</p>
-
-<h3>12.5 总结一下</h3>
-
-<p>CAN中断编程，说白了就三件事：</p>
-<ul>
-  <li>优先级配好——别太高也别太低</li>
-  <li>ISR写短——只做搬运工</li>
-  <li>调试有招——GPIO翻转+计数统计</li>
-</ul>
-
-<p>你把这些掌握了，CAN中断这块基本就稳了。下一章，我们聊聊CAN的错误处理——那才是真正考验功底的地方。</p>
-
-<div class="tip">
-  <p><strong>📌 课后练习：</strong> 试着在你的开发板上，用GPIO翻转法测量CAN中断的响应时间。看看从报文到达MCU到ISR开始执行，到底花了多少微秒？</p>
-</div>
-        <div class="footer-nav">
+<section id="irq-diagnose">
+<p class="kicker">05 · 形成故障定位闭环</p>
+<h2>遇到“只中断一次”该从哪里查？</h2>
+<table><thead><tr><th>现象</th><th>检查顺序</th></tr></thead><tbody>
+<tr><td>ISR 完全不进</td><td>启动向量名 → NVIC IRQn → CAN_ITConfig → FIFO 过滤器 → 物理层与 ACK</td></tr>
+<tr><td>ISR 只进一次</td><td>FIFO 是否已读空 → 是否有残留 FMP / 错误源 → 中断使能状态</td></tr>
+<tr><td>高负载丢帧</td><td>FOVR → 软件队列满 → 中断最长耗时 → 应用任务周期</td></tr>
+<tr><td>系统周期抖动</td><td>抢占分组 → 高优先级 ISR 用时 → 是否在 ISR 里阻塞 / 打日志</td></tr>
+<tr><td>Bus-off 后不恢复</td><td>ESR 错误计数与 BOFF → 物理故障 → ABOM/恢复策略与重发时限</td></tr>
+</tbody></table>
+<p><strong>工程边界：</strong><code>volatile</code> 使共享变量的访问保持可观察性，但它不能替代原子操作、内存顺序或临界区。共享队列必须按明确的单生产者/单消费者或带锁协议设计，不应笼统地宣称“加 volatile 就没有竞争”。</p>
+<div class="callout"><p><strong>课后实验：</strong>在隔离 CAN 测试网上设置 10 ms 周期的消息，逐步引入可控的主循环延迟；同时记录 CAN FIFO 溢出、软件队列满次数、ISR 周期分布和业务消息年龄。观察哪个指标先触及应用的时限。</p></div>
+<p class="source-note">依据：ST <a href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">RM0008，bxCAN Interrupts / CAN_IER / CAN_TSR / CAN_RF0R</a>；<a href="https://github.com/STMicroelectronics/cmsis-device-f1/blob/master/Source/Templates/gcc/startup_stm32f103xb.s">ST 的 STM32F103xB 启动向量表</a>。下一章进一步拆解接收过滤器的工作方式。</p>
+</section>
+</article>
+<div class="footer-nav">
             <a href="11.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="13.html">下一章 →</a>
         </div>
-        
-    </div>
+</main>
 </div>
 </div>
 </body>

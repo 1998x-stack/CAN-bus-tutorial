@@ -1,0 +1,8 @@
+<svg viewBox="0 0 742 224" role="img" aria-labelledby="c18pdo-t c18pdo-d" xmlns="http://www.w3.org/2000/svg">
+      <title id="c18pdo-t">将两个对象映射为六字节的 TPDO 载荷</title>
+      <desc id="c18pdo-d">0x1A00 的两个映射项分别是 0x6041:00，16 位；0x606C:00，32 位。TPDO 数据载荷先传两个字节状态字，再传四个字节实际速度，总共六字节；这只是条件成立时的例子。</desc>
+      <g font-family="sans-serif" fill="#345350" font-size="16"><text x="25" y="28" font-weight="700">映射字典 0x1A00:00 = 2</text><text x="25" y="60">0x1A00:01 → 0x60410010 · 16 bit</text><text x="25" y="88">0x1A00:02 → 0x606C0020 · 32 bit</text><text x="26" y="128" font-weight="700">TPDO 载荷顺序（例）</text></g>
+      <rect x="27" y="148" width="225" height="50" rx="7" fill="#147f80"/><rect x="254" y="148" width="452" height="50" rx="7" fill="#cf6c4d"/>
+      <g font-family="sans-serif" font-size="15" fill="white" text-anchor="middle" font-weight="700"><text x="137" y="179">0x6041 · 2 字节</text><text x="480" y="179">0x606C · 4 字节</text></g>
+      <text x="28" y="217" font-family="sans-serif" font-size="13" fill="#63766e">合计 16 + 32 = 48 bit ≤ 64 bit（经典 CAN PDO）</text>
+    </svg>

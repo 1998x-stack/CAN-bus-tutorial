@@ -114,12 +114,39 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
+    /* Chapter 22–24 reading layout */
+.main-content{min-width:0;padding:clamp(20px,4vw,54px)}.main-content article{max-width:920px;margin:0 auto;color:#203035;font-size:17px;line-height:1.86}
+.main-content article header{padding:0 0 1.1rem;border-bottom:1px solid #cbd5d9;margin-bottom:2.7rem}
+.main-content article h1{font-size:clamp(1.75rem,3.3vw,2.5rem);line-height:1.35;color:#16334b;letter-spacing:-.02em;margin:0 0 1rem}
+.main-content article .dek{color:#50666e;font-size:1.12rem}.main-content article h2{border-left:0;padding-left:0;color:#164f57;font-size:1.52rem;margin:3.4rem 0 1.1rem}
+.main-content article h3{font-size:1.15rem;margin:1.8rem 0 .6rem}.main-content article p{margin:.9rem 0 1.25rem}
+.main-content article ul,.main-content article ol{padding-left:1.55rem;margin:1rem 0}.main-content article li{margin:.45rem 0}
+.main-content article figure{margin:2rem 0;background:#f7faf9;border:1px solid #d6e2e0;border-radius:18px;padding:clamp(10px,2vw,24px)}
+.main-content article figure svg{display:block;width:100%;height:auto}.main-content article figcaption{font-size:.88rem;color:#52646a;margin-top:.8rem;line-height:1.6}
+.main-content article pre{font-size:.86rem;line-height:1.6;white-space:pre;overflow:auto;background:#172b36;color:#eff6f8}
+.main-content article code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.main-content article :not(pre)>code{padding:.12em .3em;background:#eaf1f1;border-radius:4px;font-size:.9em}
+.main-content article table{display:table;min-width:650px;background:white}.main-content article .table-scroll{width:100%;overflow-x:auto}
+.main-content article th{background:#e9f1ef}.main-content article th,.main-content article td{border:1px solid #cddbd8;vertical-align:top}
+.main-content article .note{background:#edf5f4;padding:1rem 1.2rem;border-left:4px solid #147f80;border-radius:5px;margin:1.4rem 0}
+.main-content article .caution{background:#fff6eb;border-left-color:#bf723d}.main-content article .equation{overflow-x:auto;max-width:100%;padding:1rem;border-radius:12px;background:#f3f7f6;margin:1.5rem 0}
+.main-content article math{font-size:1.1em}.main-content article a{color:#126b76;text-underline-offset:3px}
+.main-content article .lab{background:#f1f7f8;border:1px solid #bfd8db;border-radius:16px;padding:1.1rem 1.3rem;margin:1.6rem 0}
+.main-content article .lab label{font-weight:700;display:block}.main-content article .lab input,.main-content article .lab select{font:inherit;max-width:100%;margin:.4rem 0 .8rem;padding:.45rem .65rem;border:1px solid #829c9f;border-radius:8px;background:white}
+.main-content article .lab output{display:block;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:.89rem;overflow-wrap:anywhere}
+.skip-link{position:absolute;top:-60px;left:12px;z-index:50;background:white;padding:10px}.skip-link:focus{top:6px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #147f80;outline-offset:3px}
+@media(max-width:900px){body{padding:8px}.container{grid-template-columns:minmax(0,1fr)}.sidebar{border-right:0;border-bottom:1px solid #e8d6af;padding:12px 16px;max-height:185px;overflow:auto}.sidebar h3{font-size:1rem;margin:0 0 .5rem}.chapter-list{display:flex;flex-wrap:wrap;gap:3px}.chapter-list li{margin:0}.chapter-list a{font-size:.78rem;padding:5px 8px}.double-border{border-radius:12px}.footer-nav{gap:8px;flex-wrap:wrap}.footer-nav a{padding:7px 12px}}
+@media(max-width:480px){.main-content{padding:18px 14px}.main-content article{font-size:16px}.main-content article h2{font-size:1.3rem}.main-content article figure{padding:7px}.main-content article figure{overflow-x:auto}.main-content article figure svg{min-width:720px}.main-content article .lab{padding:.8rem}}
+@media(prefers-reduced-motion:reduce){.chapter-list a,.footer-nav a{transition:none!important;transform:none!important}}
+@media print{body{padding:0;background:white}.double-border{border:0;box-shadow:none}.container{display:block}.sidebar,.footer-nav,.lab{display:none!important}.main-content{padding:0}.main-content article{max-width:none}figure{break-inside:avoid}}
+
+</style>
 </head>
 <body>
+<a class="skip-link" href="#chapter-24">跳转至正文</a>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>📚 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
@@ -153,136 +180,146 @@
 <li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第24章：CAN总线测试工具：CAN分析仪使用（PCAN、USBCAN等）、CANscope、CANstress</h2>
+    </nav>
+    <main class="main-content" id="content">
 
-<p>做CAN总线开发，手里没几把趁手的工具，那真是寸步难行。我经常跟团队里的年轻人说，调试CAN总线就像修车，光有理论不行，你得会看波形、会抓报文、会模拟故障。今天这一章，我就把压箱底的工具使用经验掏出来，跟你聊聊PCAN、USBCAN、CANscope和CANstress这些家伙到底怎么用。</p>
+<article id="chapter-24">
+<header><h1>第24章 CAN 测试工具：为什么抓到报文还不够？</h1>
+<p class="dek">同一条总线，把“协议正确”“电气正确”“容错可靠”分开测。工具不是清单，而是三种不同的观察能力。</p></header>
+<section id="ch24-problem"><h2>24.1 先定位观察层：报文、波形与故障</h2>
+<p>一台控制器偶发 Bus Off，PCAN-View 记录却只显示一些正常的 CAN 帧。究竟是软件漏处理、位时序不匹配、线束反射，还是硬件在干扰下退出？<strong>仅能读取成功接收的报文，并不能证明总线上没有错误位或物理异常。</strong>因此需要三条互相补充的证据链。</p>
+<figure>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 285" role="img" aria-labelledby="tools24-title tools24-desc" data-export="can-debug-three-layers.svg">
+<title id="tools24-title">CAN 测试工具覆盖的三个验证层次</title>
+<desc id="tools24-desc">分析仪回答是否收发了哪些报文；示波器回答显性差分幅度、波形和边沿是否合格；故障注入设备回答总线受到可控扰动时能否正确检测并恢复，三者共同支持结论。</desc>
+<g font-family="system-ui,sans-serif" font-size="17" fill="#173946" text-anchor="middle">
+ <rect x="16" y="24" width="252" height="150" rx="15" fill="#e1f1ef" stroke="#147f80" stroke-width="2"/>
+ <rect x="294" y="24" width="252" height="150" rx="15" fill="#f9e9e0" stroke="#d06d4d" stroke-width="2"/>
+ <rect x="572" y="24" width="252" height="150" rx="15" fill="#ece8f7" stroke="#7461ba" stroke-width="2"/>
+ <text x="142" y="57" font-size="21" font-weight="700">协议分析仪</text><text x="142" y="91">ID / DLC / 数据</text><text x="142" y="118">时间戳 / 错误状态</text><text x="142" y="145" font-size="15">回答：通信发生了什么？</text>
+ <text x="420" y="57" font-size="21" font-weight="700">示波器 / CANscope</text><text x="420" y="91">CAN_H / CAN_L</text><text x="420" y="118">差分幅度 / 边沿 / 振铃</text><text x="420" y="145" font-size="15">回答：电气上为什么？</text>
+ <text x="698" y="57" font-size="21" font-weight="700">CANstress 类工具</text><text x="698" y="91">受控扰动 / 错误注入</text><text x="698" y="118">恢复 / 故障计数</text><text x="698" y="145" font-size="15">回答：出错后如何响应？</text>
+ <path d="M142 179 V208 H698 V179" fill="none" stroke="#647c82" stroke-width="3"/>
+ <path d="M420 208 V224" stroke="#647c82" stroke-width="3"/><path d="M414 218 L420 226 L426 218" fill="none" stroke="#647c82" stroke-width="2"/>
+ <text x="420" y="251" font-size="20" font-weight="700">交叉验证：日志 + 波形 + 可重复的测试条件</text>
+</g>
+</svg>
+<figcaption>图中的箭头表示证据合流，而不是三个仪器必须串联。只有日志、模拟/物理测量和复现场景互相印证，才更接近根因。</figcaption>
+</figure>
+<div class="table-scroll"><table><thead><tr><th>目标</th><th>典型工具</th><th>能看到</th><th>看不到 / 限制</th></tr></thead><tbody>
+<tr><td>帧与协议</td><td>PEAK PCAN、部分厂商 USBCAN、SocketCAN 适配器</td><td>ID、帧格式、内容、时间戳、接口状态</td><td>未必能准确反映总线实际模拟波形，错误帧支持依硬件而定</td></tr>
+<tr><td>物理层</td><td>支持 CAN 解码的示波器、CANscope 类设备</td><td>CAN_H、CAN_L、差分波形、边沿与振铃</td><td>不能仅从“波形看起来不错”推导出应用 PGN/SPN 正确</td></tr>
+<tr><td>容错</td><td>CANstress 类故障注入设备、受控实验台</td><td>对预定扰动的错误检测与恢复能力</td><td>故障种类、幅度、时长受仪器规格与测试安全边界限制</td></tr>
+</tbody></table></div>
+</section>
 
-<h3>24.1 认识CAN分析仪：PCAN与USBCAN</h3>
+<section id="ch24-capture"><h2>24.2 抓报文：先建立可信的捕获基线</h2>
+<p>使用 PCAN-View、某款 USBCAN 的配套软件或 Linux can-utils，底层动作通常相同：<strong>核对硬件能力 → 选择通道 → 设定位速率和帧格式 → 确认总线连接 → 记录原始帧与时间戳</strong>。PCAN 是 PEAK-System 的具体产品系列；USBCAN 则常是不同厂商设备的通用称呼，菜单与驱动不能混为一谈。</p>
+<ol>
+<li>确认被测网络是 Classical CAN 还是 CAN FD，标准帧还是扩展帧，实际标称位速率是多少；J1939 通常需要 29 位扩展帧。</li>
+<li>先用接收或硬件支持的 listen-only 模式捕获，避免测试器意外向实际车辆发送报文。单独用一个分析仪接总线时，还要留意 ACK 与终端配置。</li>
+<li>保留原始 ID、帧格式、DLC、原始数据、单调时间戳和接口错误状态。先抓全量基线，再按 ID 或 PGN 筛选。</li>
+<li>若需要解码 SPN，加载匹配设备与版本的数据库（DBC），并保留原始字节，方便排查缩放、字节序和保留值。</li>
+</ol>
+<h3>两个过滤器别混淆</h3>
+<p>“只看标准帧 ID <code>0x123</code>”和“只看 J1939 PGN <code>0xF004</code>”不是同一种匹配。更重要的是，不同硬件的 <em>acceptance mask</em> 位极性和寄存器对齐可能不同；不能把某一款设备的 <code>0x7FF</code> 配法当成所有软件的通用设置。PCAN-View 应优先使用当前版本说明的 ID 范围/接收过滤功能。</p>
+<pre><code># Linux SocketCAN 示例：仅适合已正确接入的支持 CAN 的接口
+sudo ip link set can0 down
+sudo ip link set can0 type can bitrate 500000 listen-only on
+sudo ip link set can0 up
+candump -L can0,123:7FF          # 标准帧 0x123 的 ID 匹配示意
+# J1939 EEC1，匹配 0x18F00400 且忽略低 8 位 SA
+candump -L can0,18F00400:1FFFFF00
+</code></pre>
+<div class="note caution"><strong>适用条件：</strong>上面的 500 kbit/s 只是示例，必须替换为真实总线速率；<code>listen-only</code> 并非所有 CAN 适配器都支持。标准帧/扩展帧区分需要以工具的帧类型过滤选项或 EFF 标志控制，不能只看十六进制 ID。上述配置是 Linux can-utils 的命令，不是 PCAN-View 菜单步骤。</div>
+</section>
 
-<p>先说说最常用的CAN分析仪。说白了，它就是一台能把CAN总线上的电信号翻译成我们能看懂的报文的小盒子。PCAN和USBCAN是市面上最常见的两种。</p>
+<section id="ch24-physical"><h2>24.3 看物理层：先测差分，再判断收发器</h2>
+<p>高速 CAN 的关键不是“CAN_H 一定是 3.5 V”这样一个死数，而是被测收发器数据手册规定的<strong>差分电压、共模范围和时序边界</strong>。典型高速 CAN 显性态可看到 CAN_H 约 3.5 V、CAN_L 约 1.5 V，差分约 2 V；隐性态两线通常接近 2.5 V，差分趋于 0。具体容限需要查芯片规格，不能把典型值当作所有设备的合格阈值。</p>
+<figure>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 265" role="img" aria-labelledby="wave24-title wave24-desc" data-export="can-differential-waveform.svg">
+<title id="wave24-title">CAN_H、CAN_L 与差分信号的概念波形</title>
+<desc id="wave24-desc">示意四个采样区间：隐性时两线均约2.5伏；显性时CAN_H约3.5伏、CAN_L约1.5伏，形成约2伏差分；随后返回隐性。数值只是典型情况。</desc>
+<g font-family="system-ui,sans-serif" font-size="16" fill="#304b53">
+ <line x1="74" y1="32" x2="74" y2="214" stroke="#9fb1b6"/><line x1="74" y1="214" x2="800" y2="214" stroke="#9fb1b6"/>
+ <text x="22" y="42">3.5V</text><text x="22" y="99">2.5V</text><text x="22" y="161">1.5V</text><text x="22" y="221">0V</text>
+ <g stroke="#dae6e5" stroke-dasharray="4 5"><path d="M74 36 H800 M74 94 H800 M74 153 H800"/></g>
+ <path d="M74 94 H254 V36 H430 V94 H604 V36 H780" stroke="#d06d4d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+ <path d="M74 94 H254 V153 H430 V94 H604 V153 H780" stroke="#147f80" stroke-width="4" fill="none" stroke-linejoin="round"/>
+ <path d="M74 214 H254 V99 H430 V214 H604 V99 H780" stroke="#7461ba" stroke-width="4" fill="none" stroke-linejoin="round"/>
+ <text x="155" y="244" text-anchor="middle">隐性</text><text x="340" y="244" text-anchor="middle">显性</text><text x="516" y="244" text-anchor="middle">隐性</text><text x="691" y="244" text-anchor="middle">显性</text>
+ <text x="690" y="27" fill="#d06d4d">CAN_H</text><text x="690" y="147" fill="#147f80">CAN_L</text><text x="460" y="194" fill="#7461ba">差分示意</text>
+</g></svg>
+<figcaption>概念波形不是实测屏幕截图，也不代表所有收发器的绝对电压规格。判断质量时应同时测量 H、L 与差分，并检查采样点附近的噪声、振铃和地电位差。</figcaption>
+</figure>
+<p>断电且隔离主动驱动源后，若线束两端各有一只 120 Ω 终端，跨 CAN_H/CAN_L 测得的等效直流电阻通常接近 <strong>60 Ω</strong>（120 Ω 并联）。这只是快速排查，不代替反射测试、线束拓扑检查，也不适用于所有带有内部电路的网络。</p>
+<div class="note caution"><strong>测量安全：</strong>使用接地示波器时要核对探头地与车辆参考地的连接风险，必要时采用合适的差分/隔离测量方案。不要在带电车辆、动力电池或不明接地系统上随意接地、短路或断线。</div>
+</section>
 
-<p><strong>PCAN</strong>，全称是PEAK CAN，德国佬做的，稳定得一塌糊涂。我个人习惯在实验室里常备一块PCAN-USB Pro FD，支持CAN FD，调试新项目时特别顺手。</p>
+<section id="ch24-inject"><h2>24.4 受控故障注入：验证检测、隔离和恢复</h2>
+<p>CANstress 类设备的价值不是“把总线搞坏”，而是在<strong>可重复、可量化、受保护</strong>的环境下引入扰动，观察错误计数、错误被动状态、Bus Off、重启策略与业务降级。注入能力取决于具体仪器型号；有些侧重扰码/边沿时序，有些侧重线路断路或短路矩阵。</p>
+<div class="table-scroll"><table><thead><tr><th>实验台测试</th><th>记录量</th><th>避免的错误推论</th></tr></thead><tbody>
+<tr><td>轻微共模干扰与边沿扰动</td><td>错误帧、重试、延迟、误码</td><td>“没丢应用帧”不等于“没有位错误”</td></tr>
+<tr><td>终端错配/支线超长的受控复现</td><td>反射、差分眼图、报文错误</td><td>不能仅凭总线电阻认定信号完整性合格</td></tr>
+<tr><td>安全限流下的短路/开路注入</td><td>设备保护、故障诊断、恢复路径</td><td>某一颗高速收发器并不自动拥有单线 CAN 模式</td></tr>
+</tbody></table></div>
+<p>特别是常见高速 CAN 收发器 <strong>TJA1040</strong>：它<strong>不是</strong>可自动切换单线 CAN 通信的收发器。单线 CAN 是另一类专用物理层，不要把电气容错测试结果误读成“断一根线还能保证通信”。</p>
+</section>
 
-<p><strong>USBCAN</strong>，国内厂商做的，性价比高。我记得有一次去现场排查问题，客户那边只有USBCAN-II，照样把问题揪出来了。工具不在贵，在于你会不会用。</p>
-
-<div class="highlight">
-  <p><strong>核心区别：</strong></p>
-  <ul>
-    <li>PCAN：驱动成熟，API文档全，适合做自动化测试脚本</li>
-    <li>USBCAN：上手快，价格亲民，适合日常调试和教学</li>
-  </ul>
+<section id="ch24-flow"><h2>24.5 一个能复用的故障定位顺序</h2>
+<p>看到“偶发 Bus Off”后，避免同时修改三处参数。先记录条件，再把每一步的证据写成能够被他人复验的断言。</p>
+<ol>
+<li><strong>捕获：</strong>记录位速率、帧类型、原始日志、TEC/REC 或设备可获得的错误计数，以及触发时间。</li>
+<li><strong>对照：</strong>将错误出现时间与供电、负载、温度、波形振铃关联；必要时分别测两根线和差分信号。</li>
+<li><strong>复现：</strong>只在隔离的实验台上单因素注入扰动，记录阈值和持续时间，并保留无故障对照组。</li>
+<li><strong>修复与回归：</strong>修复线束、供电、终端或时序后，重复同一测试，并以日志/波形/误码计数共同判定改善。</li>
+</ol>
+<div class="lab">
+<label for="tool24-symptom">选择观察到的现象</label>
+<select id="tool24-symptom">
+ <option value="no-rx">完全收不到报文</option>
+ <option value="bad-value">收到帧但物理量不对</option>
+ <option value="bus-off">出现 Bus Off 或错误帧</option>
+ <option value="only-stress">只在压力测试时失败</option>
+</select>
+<output id="tool24-advice" aria-live="polite">先核对布线、终端、位速率、帧类型和监听模式，再比对示波器差分波形。</output>
 </div>
+<h3>可复制的验收记录</h3>
+<pre><code>测试对象: ECU / 固件版本 / 收发器型号
+拓扑: 节点数 / 线长 / 支线 / 终端位置
+配置: Classical CAN 或 CAN FD / nominal bitrate / sample point
+工具: 分析仪型号+版本 / 探头 / 校准状态
+观察: 原始时间戳、ID、DLC、数据、错误状态、波形
+故障条件: 幅度 / 持续时间 / 复现次数 / 安全保护
+验收: 丢帧、总线恢复、TEC/REC、应用恢复时延
+</code></pre>
+</section>
+<section id="ch24-sources"><h2>24.6 官方资料与继续学习</h2>
+<p>软件能力可参考 <a href="https://www.peak-system.com/support/software-information/software/pcan-view/">PEAK-System PCAN-View 文档</a> 与 <a href="https://www.kernel.org/doc/html/latest/networking/can.html">Linux SocketCAN 文档</a>；单线 CAN 与 TJA1040 的区别可参考 <a href="https://community.nxp.com/t5/Other-NXP-Products/Can-I-use-TJA1040-to-communicate-with-a-Single-Wire-CAN-device/m-p/1078111">NXP 官方技术社区答复</a>，以及实际收发器数据手册。选型与操作总以实际型号为准。</p>
+<p>到这里，工具选择就有了明确顺序：<strong>协议工具告诉你发生了什么，物理测量告诉你为什么，受控扰动告诉你修复是否可靠</strong>。下一章继续讨论如何从大量现场日志中更快地定位故障。</p>
+</section>
+</article>
+<script>
+(function(){
+ const select=document.getElementById("tool24-symptom"),out=document.getElementById("tool24-advice");
+ const options={
+  "no-rx":"先核对布线、终端、位速率、帧类型和监听模式，再比对示波器差分波形。",
+  "bad-value":"保存原始字节，核对 DBC 版本、PGN/SPN、字节序、比例、偏移与无效值编码。",
+  "bus-off":"同时记录控制器错误状态和错误计数，用示波器看差分幅度、边沿、终端、共模与供电。",
+  "only-stress":"在隔离实验台记录注入波形、阈值、复现概率及恢复时延，并做无注入对照组。"
+ };
+ function render(){out.textContent=options[select.value];}
+ select.addEventListener("change",render);render();
+})();
+</script>
 
-<h3>24.2 实战：用PCAN抓取和分析报文</h3>
-
-<p>嗯，这里要注意，拿到PCAN第一件事不是插电脑，而是装驱动。我见过有人插上没反应，急得满头大汗，结果发现驱动没装。</p>
-
-<p>驱动装好后，打开PCAN-View软件。界面很简单，左边是发送区，右边是接收区。你想想看，这就像个聊天窗口，左边你发消息，右边看别人回什么。</p>
-
-<p>举个例子，我们要抓ECU发送的0x123这个ID的报文：</p>
-
-<pre><code>// 配置PCAN-View接收过滤
-1. 点击 "View" -> "Filter Configuration"
-2. 在 "Acceptance Code" 填入 0x123
-3. 在 "Acceptance Mask" 填入 0x7FF
-4. 点击 "OK" 开始过滤接收</code></pre>
-
-<p>为什么填0x7FF？因为标准帧的ID是11位，0x7FF就是全1，表示精确匹配。我在项目中遇到过有人把Mask填成0x000，结果所有报文都进来了，还以为总线出故障了。</p>
-
-<div class="tip">
-  <p><strong>小技巧：</strong> 用PCAN-View的"Trace"功能，可以记录长时间的总线数据。我曾经用它连续抓了48小时的报文，最后分析出某个节点在温度升高后偶发丢帧的问题。</p>
-</div>
-
-<h3>24.3 USBCAN的使用要点</h3>
-
-<p>USBCAN的操作逻辑跟PCAN差不多，但有个坑——它的终端电阻。很多USBCAN分析仪内部默认没有集成120欧姆终端电阻，需要你在外部接上。</p>
-
-<p>我曾经在调试一个电机控制器时，怎么都收不到报文，折腾了半天。后来发现是USBCAN的终端电阻没接，总线信号反射得一塌糊涂。你想想看，信号在线上来回弹，能收到才怪。</p>
-
-<p>USBCAN的配套软件通常是CANTest或CANPro。我个人习惯用CANTest，因为它有个"自动发送"功能，可以设置周期发送报文，模拟节点行为。</p>
-
-<pre><code>// CANTest 自动发送设置示例
-1. 打开CANTest，选择设备类型 USBCAN-II
-2. 设置波特率 500kbps
-3. 在发送区输入 ID: 0x100, 数据: 01 02 03 04 05 06 07 08
-4. 勾选 "周期发送"，设置间隔 100ms
-5. 点击 "启动"</code></pre>
-
-<h3>24.4 CANscope：看波形，治疑难杂症</h3>
-
-<p>CANscope，说白了就是带CAN解码功能的示波器。普通示波器只能看电压波形，CANscope能直接把波形翻译成CAN报文。</p>
-
-<p>什么时候用CANscope？我告诉你，当CAN分析仪抓到的报文看起来正常，但节点就是报错时，就该上CANscope了。它能让你看到物理层的真实情况。</p>
-
-<p>举个例子，有一次我调试一个车载空调控制器，CAN分析仪显示报文收发正常，但控制器就是不停进入Bus Off状态。用CANscope一看波形，发现显性电平（Dominant）的幅值只有1.2V，正常应该是2.5V左右。原来是CAN收发器的驱动能力下降了。</p>
-
-<div class="warning">
-  <p><strong>警告：</strong> CANscope的探头地线一定要接好。我见过有人用示波器探头的地线夹子夹在车身上，结果夹子松了，波形全是噪声。建议用短地线弹簧针，效果最好。</p>
-</div>
-
-<h3>24.5 CANstress：制造故障，验证容错</h3>
-
-<p>CANstress，这名字起得好，就是给CAN总线"施加压力"的。它能模拟各种总线故障，比如短路、断路、干扰、位错误等。</p>
-
-<p>为什么要用CANstress？你想想看，产品出厂前不测试容错能力，到了客户手里一出问题，那可就麻烦了。我习惯在项目验证阶段，用CANstress做一轮完整的压力测试。</p>
-
-<p>常见的测试场景：</p>
-
-<ul>
-  <li><strong>短路测试：</strong> 将CAN_H对地短路，看节点能否检测到错误并恢复</li>
-  <li><strong>干扰注入：</strong> 在总线上叠加噪声信号，验证通信的鲁棒性</li>
-  <li><strong>位错误模拟：</strong> 随机翻转某些位，看CRC校验能否正确捕获</li>
-</ul>
-
-<div class="highlight">
-  <p><strong>我的经验：</strong> 用CANstress做"CAN_H断路"测试时，很多便宜的收发器会直接挂掉，而像TJA1040这样的工业级芯片能自动切换到单线模式继续通信。这就是选型的重要性。</p>
-</div>
-
-<h3>24.6 工具组合拳：实战案例</h3>
-
-<p>最后，我分享一个真实案例。某次在测试一个BMS（电池管理系统）时，总线上偶尔出现"帧丢失"现象。我用PCAN抓了半小时，报文看起来都正常。后来用CANscope看波形，发现CAN_L的波形在某个特定频率下有抖动。</p>
-
-<p>再用CANstress模拟这个频率的干扰，果然复现了丢帧问题。最终定位到是BMS的CAN收发器电源滤波电容虚焊，导致高频干扰下供电不稳。</p>
-
-<p>你看，这三样工具各司其职：</p>
-
-<table>
-  <tr>
-    <th>工具</th>
-    <th>用途</th>
-    <th>典型场景</th>
-  </tr>
-  <tr>
-    <td>PCAN/USBCAN</td>
-    <td>报文级分析</td>
-    <td>日常调试、协议解析</td>
-  </tr>
-  <tr>
-    <td>CANscope</td>
-    <td>物理层诊断</td>
-    <td>波形异常、信号质量</td>
-  </tr>
-  <tr>
-    <td>CANstress</td>
-    <td>容错性验证</td>
-    <td>压力测试、故障注入</td>
-  </tr>
-</table>
-
-<p>做CAN总线开发，别光盯着报文看。物理层的问题，报文是看不出来的。该上示波器就上示波器，该做压力测试就做压力测试。工具是死的，人是活的，关键是你得知道什么时候用哪把刀。</p>
-
-<div class="tip">
-  <p><strong>最后提醒一句：</strong> 无论用哪种工具，记得先确认波特率。我见过太多人折腾半天，最后发现是波特率设错了。500k和250k的波形，在示波器上看起来差不多，但节点就是不通。</p>
-</div>
         <div class="footer-nav">
             <a href="23.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="25.html">下一章 →</a>
         </div>
         
-    </div>
+    </main>
 </div>
 </div>
 </body>

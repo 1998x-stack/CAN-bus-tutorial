@@ -1,0 +1,53 @@
+name: Chapter 10-12 QA
+on:
+  push:
+    paths:
+      - "10.html"
+      - "11.html"
+      - "12.html"
+      - "reading.css"
+      - "assets/chapter10-*.svg"
+      - "assets/chapter11-*.svg"
+      - "assets/chapter12-*.svg"
+      - "docs/chapter10-evidence.json"
+      - "docs/chapter11-evidence.json"
+      - "docs/chapter12-evidence.json"
+      - "tests/test_chapters_10_12.py"
+      - "tests/browser_chapters_10_12.py"
+      - ".github/workflows/chapter10-12-browser.yml"
+  pull_request:
+    paths:
+      - "10.html"
+      - "11.html"
+      - "12.html"
+      - "reading.css"
+      - "assets/chapter10-*.svg"
+      - "assets/chapter11-*.svg"
+      - "assets/chapter12-*.svg"
+      - "tests/test_chapters_10_12.py"
+      - "tests/browser_chapters_10_12.py"
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Static and algorithm tests
+        run: python -m unittest discover -s tests -p 'test_chapters_10_12.py' -v
+      - name: Install browser
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Browser QA and snapshots
+        run: python tests/browser_chapters_10_12.py
+      - name: Upload screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chapter10-12-browser
+          path: qa/chapter10-12/*.png
+          if-no-files-found: ignore

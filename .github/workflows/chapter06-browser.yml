@@ -1,0 +1,41 @@
+name: Chapter 06 browser QA
+on:
+  push:
+    paths:
+      - "06.html"
+      - "assets/chapter06-*.svg"
+      - "examples/can_chapter06_checks.py"
+      - "tests/browser_chapter06.py"
+      - "tests/test_chapter06.py"
+      - ".github/workflows/chapter06-browser.yml"
+  pull_request:
+    paths:
+      - "06.html"
+      - "assets/chapter06-*.svg"
+      - "examples/can_chapter06_checks.py"
+      - "tests/browser_chapter06.py"
+      - "tests/test_chapter06.py"
+      - ".github/workflows/chapter06-browser.yml"
+jobs:
+  visual-smoke:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Playwright and use runner's Chrome
+        run: |
+          python -m pip install playwright==1.56.0
+          command -v google-chrome
+      - name: Verify 1440/768/390/360 viewports, keyboard, SVG and print
+        run: python tests/browser_chapter06.py
+      - name: Upload screenshots and JSON report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chapter06-visual-qa
+          path: reports/chapter06/
+          if-no-files-found: ignore

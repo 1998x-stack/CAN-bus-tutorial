@@ -1,0 +1,16 @@
+<svg style="font-family:system-ui,-apple-system,Segoe UI,sans-serif" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 262" role="img" aria-labelledby="tx-flow-title tx-flow-desc">
+<title id="tx-flow-title">CAN 报文发送的两级调度与完成判定</title>
+<desc id="tx-flow-desc">软件队列先提交到三个发送邮箱之一；本地选择待发邮箱，随后参与总线仲裁；完成请求后必须检查 TXOK 或失败原因。</desc>
+<defs><marker id="tx-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" fill="none" stroke="#3b7776" stroke-width="1.5"/></marker></defs>
+<rect x="8" y="83" width="138" height="84" rx="11" fill="#e6f5ef" stroke="#81b6a7"/>
+<text x="77" y="114" text-anchor="middle" font-size="17" fill="#245956">软件发送队列</text><text x="77" y="140" text-anchor="middle" font-size="13" fill="#376d65">可排队、可限流</text>
+<path d="M147 125 H191" stroke="#3b7776" stroke-width="2.5" marker-end="url(#tx-arrow)"/>
+<g fill="#eef0fb" stroke="#9fadd5"><rect x="197" y="37" width="162" height="56" rx="9"/><rect x="197" y="103" width="162" height="56" rx="9"/><rect x="197" y="169" width="162" height="56" rx="9"/></g>
+<g font-size="15" fill="#414874" text-anchor="middle"><text x="278" y="61">Mailbox 0</text><text x="278" y="81" font-size="12">ID = 0x300</text><text x="278" y="127">Mailbox 1</text><text x="278" y="147" font-size="12">ID = 0x100</text><text x="278" y="193">Mailbox 2</text><text x="278" y="213" font-size="12">ID = 0x200</text></g>
+<path d="M360 131 H397" stroke="#3b7776" stroke-width="2.5" marker-end="url(#tx-arrow)"/>
+<rect x="404" y="82" width="143" height="86" rx="11" fill="#fff4e6" stroke="#dca86e"/><text x="475" y="111" text-anchor="middle" font-size="16" fill="#92562a">本地邮箱调度</text><text x="475" y="133" text-anchor="middle" font-size="12" fill="#92562a">TXFP 决定规则</text><text x="475" y="151" text-anchor="middle" font-size="12" fill="#92562a">≠ 线上优先级</text>
+<path d="M548 125 H585" stroke="#3b7776" stroke-width="2.5" marker-end="url(#tx-arrow)"/>
+<rect x="590" y="82" width="180" height="86" rx="11" fill="#dff1f1" stroke="#80b6b8"/><text x="680" y="110" text-anchor="middle" font-size="16" fill="#225f67">总线仲裁 + 传输</text><text x="680" y="134" text-anchor="middle" font-size="13" fill="#225f67">成功 → TXOK = 1</text><text x="680" y="152" text-anchor="middle" font-size="13" fill="#225f67">失败 → 查原因</text>
+<text x="391" y="22" text-anchor="middle" font-size="13" fill="#52666d">硬件管本地发送顺序；总线仍逐位仲裁</text>
+<text x="391" y="250" text-anchor="middle" font-size="13" fill="#52666d">RQCP 表示请求处理完毕；不代表 TXOK 一定成立</text>
+</svg>

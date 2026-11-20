@@ -1,0 +1,41 @@
+{
+  "chapter": 7,
+  "scope": "STM32F103 SPL / classical CAN where relevant",
+  "claims": [
+    {
+      "id": "controller-transceiver",
+      "statement": "CAN控制器和物理层收发器分工",
+      "locator": "NXP TJA1050, section 7 / block diagram",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/TJA1050.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "tja1050-silent",
+      "statement": "TJA1050 S脚静默而非低功耗待机",
+      "locator": "NXP TJA1050, modes of operation",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/TJA1050.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "hvd230-rs",
+      "statement": "SN65HVD230 RS脚可选高速、斜率或低电流监听待机",
+      "locator": "TI SN65HVD23x, function table / modes",
+      "source_url": "https://www.ti.com/lit/ds/symlink/sn65hvd230.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "waveform",
+      "statement": "3.5/1.5/2.5 V仅作为5V高速CAN教学典型波形",
+      "locator": "article figure 7-2; ideal voltage model",
+      "source_url": "https://www.nxp.com/docs/en/data-sheet/TJA1050.pdf",
+      "status": "illustrative"
+    },
+    {
+      "id": "differential",
+      "statement": "等幅共模偏移在理想模型下差分保持不变",
+      "locator": "Vdiff=H-L, Vcm=(H+L)/2",
+      "source_url": "https://www.ti.com/lit/ds/symlink/sn65hvd230.pdf",
+      "status": "derived"
+    }
+  ]
+}

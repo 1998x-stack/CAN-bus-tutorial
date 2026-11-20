@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 265" role="img" aria-labelledby="wave24-title wave24-desc" data-export="can-differential-waveform.svg">
+<title id="wave24-title">CAN_H、CAN_L 与差分信号的概念波形</title>
+<desc id="wave24-desc">示意四个采样区间：隐性时两线均约2.5伏；显性时CAN_H约3.5伏、CAN_L约1.5伏，形成约2伏差分；随后返回隐性。数值只是典型情况。</desc>
+<g font-family="system-ui,sans-serif" font-size="16" fill="#304b53">
+ <line x1="74" y1="32" x2="74" y2="214" stroke="#9fb1b6"/><line x1="74" y1="214" x2="800" y2="214" stroke="#9fb1b6"/>
+ <text x="22" y="42">3.5V</text><text x="22" y="99">2.5V</text><text x="22" y="161">1.5V</text><text x="22" y="221">0V</text>
+ <g stroke="#dae6e5" stroke-dasharray="4 5"><path d="M74 36 H800 M74 94 H800 M74 153 H800"/></g>
+ <path d="M74 94 H254 V36 H430 V94 H604 V36 H780" stroke="#d06d4d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+ <path d="M74 94 H254 V153 H430 V94 H604 V153 H780" stroke="#147f80" stroke-width="4" fill="none" stroke-linejoin="round"/>
+ <path d="M74 214 H254 V99 H430 V214 H604 V99 H780" stroke="#7461ba" stroke-width="4" fill="none" stroke-linejoin="round"/>
+ <text x="155" y="244" text-anchor="middle">隐性</text><text x="340" y="244" text-anchor="middle">显性</text><text x="516" y="244" text-anchor="middle">隐性</text><text x="691" y="244" text-anchor="middle">显性</text>
+ <text x="690" y="27" fill="#d06d4d">CAN_H</text><text x="690" y="147" fill="#147f80">CAN_L</text><text x="460" y="194" fill="#7461ba">差分示意</text>
+</g></svg>

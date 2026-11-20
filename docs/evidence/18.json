@@ -1,0 +1,61 @@
+{
+  "chapter": 18,
+  "scope": "CANopen CC / classic CAN",
+  "note": "Evidence ledger for Olah-style pedagogical revision. Illustrative entries are not field measurements.",
+  "claims": [
+    {
+      "id": "c18-profile",
+      "claim": "CANopen CC CiA301 定义对象字典、PDO、SDO、NMT 等",
+      "kind": "technical",
+      "source_url": "https://www.can-cia.org/can-knowledge/canopen",
+      "locator": "CANopen application layer",
+      "status": "verified",
+      "notes": "排除 CANopen FD"
+    },
+    {
+      "id": "c18-od",
+      "claim": "0x1000 为设备类型，0x1017 为生产者心跳时间，0x1018 为 identity",
+      "kind": "technical",
+      "source_url": "https://canopennode.github.io/CANopenNode/md_doc_2objectDictionary.html",
+      "locator": "Object dictionary / CiA 301",
+      "status": "verified",
+      "notes": "原文 0x0000 和 0x1000:01 例子错误"
+    },
+    {
+      "id": "c18-pdo",
+      "claim": "PDO 包含至多 8 字节应用数据，映射和通信参数分别在标准范围",
+      "kind": "technical",
+      "source_url": "https://www.can-cia.org/can-knowledge/pdo-protocol/",
+      "locator": "PDO parameter sets / mapping",
+      "status": "verified",
+      "notes": "映射的 0x6041/0x606C 是有条件例子"
+    },
+    {
+      "id": "c18-sdo",
+      "claim": "SDO 是被确认的客户端-服务器服务，支持快速/分段/块传输",
+      "kind": "technical",
+      "source_url": "https://www.can-cia.org/can-knowledge/sdo-protocol",
+      "locator": "SDO variants / channels",
+      "status": "verified",
+      "notes": "确认服务不意味着应用自动重试或无丢失"
+    },
+    {
+      "id": "c18-4b",
+      "claim": "0x4B 命令字表示快速上传且包含两字节有效数据",
+      "kind": "technical",
+      "source_url": "https://canopennode.github.io/CANopenNode/group__CO__SDOserver.html",
+      "locator": "Initiate SDO upload response command bits",
+      "status": "verified",
+      "notes": "响应 0x0064=100ms 为假定设备值"
+    },
+    {
+      "id": "c18-nmt",
+      "claim": "Pre-operational 允许 SDO，PDO 通信在 Operational",
+      "kind": "technical",
+      "source_url": "https://www.can-cia.org/can-knowledge/network-management/",
+      "locator": "NMT state machine",
+      "status": "verified",
+      "notes": "未假设某设备上电后自动 Operational"
+    }
+  ]
+}

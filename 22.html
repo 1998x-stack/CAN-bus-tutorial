@@ -114,12 +114,40 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
+    
+/* Chapter 22–24 reading layout */
+.main-content{min-width:0;padding:clamp(20px,4vw,54px)}.main-content article{max-width:920px;margin:0 auto;color:#203035;font-size:17px;line-height:1.86}
+.main-content article header{padding:0 0 1.1rem;border-bottom:1px solid #cbd5d9;margin-bottom:2.7rem}
+.main-content article h1{font-size:clamp(1.75rem,3.3vw,2.5rem);line-height:1.35;color:#16334b;letter-spacing:-.02em;margin:0 0 1rem}
+.main-content article .dek{color:#50666e;font-size:1.12rem}.main-content article h2{border-left:0;padding-left:0;color:#164f57;font-size:1.52rem;margin:3.4rem 0 1.1rem}
+.main-content article h3{font-size:1.15rem;margin:1.8rem 0 .6rem}.main-content article p{margin:.9rem 0 1.25rem}
+.main-content article ul,.main-content article ol{padding-left:1.55rem;margin:1rem 0}.main-content article li{margin:.45rem 0}
+.main-content article figure{margin:2rem 0;background:#f7faf9;border:1px solid #d6e2e0;border-radius:18px;padding:clamp(10px,2vw,24px)}
+.main-content article figure svg{display:block;width:100%;height:auto}.main-content article figcaption{font-size:.88rem;color:#52646a;margin-top:.8rem;line-height:1.6}
+.main-content article pre{font-size:.86rem;line-height:1.6;white-space:pre;overflow:auto;background:#172b36;color:#eff6f8}
+.main-content article code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.main-content article :not(pre)>code{padding:.12em .3em;background:#eaf1f1;border-radius:4px;font-size:.9em}
+.main-content article table{display:table;min-width:650px;background:white}.main-content article .table-scroll{width:100%;overflow-x:auto}
+.main-content article th{background:#e9f1ef}.main-content article th,.main-content article td{border:1px solid #cddbd8;vertical-align:top}
+.main-content article .note{background:#edf5f4;padding:1rem 1.2rem;border-left:4px solid #147f80;border-radius:5px;margin:1.4rem 0}
+.main-content article .caution{background:#fff6eb;border-left-color:#bf723d}.main-content article .equation{overflow-x:auto;max-width:100%;padding:1rem;border-radius:12px;background:#f3f7f6;margin:1.5rem 0}
+.main-content article math{font-size:1.1em}.main-content article a{color:#126b76;text-underline-offset:3px}
+.main-content article .lab{background:#f1f7f8;border:1px solid #bfd8db;border-radius:16px;padding:1.1rem 1.3rem;margin:1.6rem 0}
+.main-content article .lab label{font-weight:700;display:block}.main-content article .lab input,.main-content article .lab select{font:inherit;max-width:100%;margin:.4rem 0 .8rem;padding:.45rem .65rem;border:1px solid #829c9f;border-radius:8px;background:white}
+.main-content article .lab output{display:block;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:.89rem;overflow-wrap:anywhere}
+.skip-link{position:absolute;top:-60px;left:12px;z-index:50;background:white;padding:10px}.skip-link:focus{top:6px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #147f80;outline-offset:3px}
+@media(max-width:900px){body{padding:8px}.container{grid-template-columns:minmax(0,1fr)}.sidebar{border-right:0;border-bottom:1px solid #e8d6af;padding:12px 16px;max-height:185px;overflow:auto}.sidebar h3{font-size:1rem;margin:0 0 .5rem}.chapter-list{display:flex;flex-wrap:wrap;gap:3px}.chapter-list li{margin:0}.chapter-list a{font-size:.78rem;padding:5px 8px}.double-border{border-radius:12px}.footer-nav{gap:8px;flex-wrap:wrap}.footer-nav a{padding:7px 12px}}
+@media(max-width:480px){.main-content{padding:18px 14px}.main-content article{font-size:16px}.main-content article h2{font-size:1.3rem}.main-content article figure{padding:7px}.main-content article figure{overflow-x:auto}.main-content article figure svg{min-width:720px}.main-content article .lab{padding:.8rem}}
+@media(prefers-reduced-motion:reduce){.chapter-list a,.footer-nav a{transition:none!important;transform:none!important}}
+@media print{body{padding:0;background:white}.double-border{border:0;box-shadow:none}.container{display:block}.sidebar,.footer-nav,.lab{display:none!important}.main-content{padding:0}.main-content article{max-width:none}figure{break-inside:avoid}}
+
+</style>
 </head>
 <body>
+<a class="skip-link" href="#chapter-22">跳转至正文</a>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>📚 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
@@ -153,162 +181,150 @@
 <li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
+    </nav>
+    <main class="main-content" id="content">
+
+<article id="chapter-22">
+  <header>
+    <h1>第22章 J1939：29 位 ID 如何变成可理解的发动机数据？</h1>
+    <p class="dek">从一帧 <code>0x0CF00401</code> 出发，沿着“标识符 → PGN → SPN → 设备身份”逐层解码。</p>
+  </header>
+  <section id="ch22-problem">
+    <h2>22.1 一串十六进制，为什么能表示发动机转速？</h2>
+    <p>CAN 只规定怎样把一帧可靠地送上总线，却不会告诉你 <code>E0 2E</code> 是电压、温度还是转速。SAE J1939 为重型车辆等网络增加了一层共同语言：<strong>PGN 指明这一帧属于哪一组参数，SPN 再指明组内的具体信号</strong>。设备还需要通过地址声明告诉网络“谁在发送”。</p>
+    <div class="note"><strong>边界先说清：</strong>本章先讨论常见的基于 Classical CAN、29 位扩展标识符的 J1939 报文。传统网络常见 250 kbit/s，但也有 500 kbit/s 等物理层配置；不能仅凭 J1939 三个字母决定波特率。CAN FD、J1939-22 与特定行业配置另行处理。</div>
+  </section>
+  <section id="ch22-id">
+    <h2>22.2 先拆 ID：优先级、PGN、地址并不是同一个字段</h2>
+    <p>看一帧 <code>0x0CF00401</code>。它的左边是仲裁优先级，右边是发送者地址；中间的 PF、PS 决定“这是什么数据”。</p>
+    <figure>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 225" role="img" aria-labelledby="id22-title id22-desc" data-export="j1939-id-fields.svg">
+        <title id="id22-title">J1939 的 29 位扩展标识符</title><desc id="id22-desc">从高位到低位依次是优先级三位、R或EDP一位、DP一位、PF八位、PS八位、源地址八位；PDU1的PS为目标地址而PDU2的PS为组扩展。</desc>
+        <g font-family="system-ui,sans-serif" font-size="17" text-anchor="middle" fill="#153542">
+          <rect x="20" y="46" width="114" height="72" rx="8" fill="#e0f0ef" stroke="#147f80" stroke-width="2"/><text x="77" y="78">Priority</text><text x="77" y="101">3 bits</text>
+          <rect x="139" y="46" width="75" height="72" rx="8" fill="#e9e5f6" stroke="#7461ba"/><text x="176" y="78">R/EDP</text><text x="176" y="101">1</text>
+          <rect x="219" y="46" width="65" height="72" rx="8" fill="#e9e5f6" stroke="#7461ba"/><text x="251" y="78">DP</text><text x="251" y="101">1</text>
+          <rect x="289" y="46" width="171" height="72" rx="8" fill="#f9e7dd" stroke="#d06d4d" stroke-width="2"/><text x="374" y="78">PF</text><text x="374" y="101">8 bits</text>
+          <rect x="465" y="46" width="171" height="72" rx="8" fill="#f9e7dd" stroke="#d06d4d" stroke-width="2"/><text x="550" y="78">PS</text><text x="550" y="101">8 bits</text>
+          <rect x="641" y="46" width="178" height="72" rx="8" fill="#e0f0ef" stroke="#147f80" stroke-width="2"/><text x="730" y="78">SA</text><text x="730" y="101">8 bits</text>
+          <text x="77" y="31" font-size="13">28–26</text><text x="176" y="31" font-size="13">25</text><text x="251" y="31" font-size="13">24</text><text x="374" y="31" font-size="13">23–16</text><text x="550" y="31" font-size="13">15–8</text><text x="730" y="31" font-size="13">7–0</text>
+          <path d="M374 123 V146 H550 V123" fill="none" stroke="#d06d4d" stroke-width="2"/>
+          <text x="462" y="168" font-size="15">PF 决定 PS 的含义</text><text x="462" y="193" font-size="14">PF &lt; 240 → 目标地址；PF ≥ 240 → 组扩展</text>
+        </g>
+      </svg>
+      <figcaption>一图只回答一个问题：PS 到底是地址还是 PGN 的一部分？答案取决于 PF 与 240 的边界。R/EDP 与 DP 均占据标识符中的独立位。</figcaption>
+    </figure>
+    <div class="table-scroll"><table><thead><tr><th>字段</th><th>位宽</th><th>作用</th><th>例子 0x0CF00401</th></tr></thead><tbody>
+      <tr><td>Priority</td><td>3 位</td><td>仲裁优先级，数字越小优先级越高</td><td>3</td></tr>
+      <tr><td>R/EDP + DP</td><td>1 + 1 位</td><td>数据页相关位（按网络配置解释）</td><td>0、0</td></tr>
+      <tr><td>PF</td><td>8 位</td><td>PDU Format</td><td>0xF0（240）</td></tr>
+      <tr><td>PS</td><td>8 位</td><td>PDU Specific</td><td>0x04（组扩展）</td></tr>
+      <tr><td>SA</td><td>8 位</td><td>Source Address</td><td>0x01</td></tr>
+    </tbody></table></div>
+    <p>PF 为 <code>0x00–0xEF</code> 时叫 <strong>PDU1</strong>，PS 放目标地址（DA），因此 PGN 的最低字节必须清零；PF 为 <code>0xF0–0xFF</code> 时叫 <strong>PDU2</strong>，PS 是组扩展，属于 PGN。<strong>目标地址不是“源地址”</strong>，源地址永远从标识符最低 8 位读取。</p>
+    <div class="equation" tabindex="0" aria-label="PGN 计算公式">
+      <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>PGN</mi><mo>=</mo><mo>(</mo><mi>ID</mi><mo>≫</mo><mn>8</mn><mo>)</mo><mo>∧</mo><msub><mi>M</mi><mi>PF</mi></msub></mrow></math>
+      <p>这里的位掩码按 PF 分支取值：PDU1 用 <code>0x03FF00</code>，PDU2 用 <code>0x03FFFF</code>（结果同时保留 R/EDP 和 DP）。</p>
     </div>
-    <div class="main-content">
-        <h2>第22章 J1939协议入门：协议栈结构、PGN与SPN、地址声明</h2>
+    <div class="lab">
+      <label for="id22-input">试一试：输入 29 位 CAN ID（十六进制）</label>
+      <input id="id22-input" value="0x0CF00401" spellcheck="false" inputmode="text" aria-describedby="id22-output"/>
+      <output id="id22-output" aria-live="polite">优先级 3 · PGN 61444 (0xF004) · SA 0x01 · 广播参数组</output>
+    </div>
+  </section>
+  <section id="ch22-spn">
+    <h2>22.3 再拆数据：PGN 是一个容器，SPN 才是信号</h2>
+    <p><code>PGN 61444 / 0xF004</code> 名为 EEC1（Electronic Engine Controller 1）。其中 <strong>SPN 190</strong> 是发动机转速，位于数据字节 4 和 5（按 1 起始计数），16 位无符号小端序，分辨率为 0.125 rpm/bit。</p>
+    <figure>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 180" role="img" aria-labelledby="spn22-title spn22-desc" data-export="j1939-engine-speed.svg">
+        <title id="spn22-title">EEC1 从原始字节得到发动机转速</title><desc id="spn22-desc">E0 和 2E 是第四、第五字节，小端组合得到 0x2EE0 即 12000，乘以 0.125 得 1500 rpm。</desc>
+        <g font-family="system-ui,sans-serif" text-anchor="middle" fill="#193f4a">
+          <text x="420" y="26" font-size="17" font-weight="700">EEC1 的 8 字节数据区（教学示例）</text>
+          <g font-size="18" font-family="ui-monospace,monospace">
+            <rect x="22" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="69" y="81">00</text>
+            <rect x="122" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="169" y="81">7D</text>
+            <rect x="222" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="269" y="81">82</text>
+            <rect x="322" y="49" width="94" height="53" rx="7" fill="#f9e4d8" stroke="#d06d4d" stroke-width="2"/><text x="369" y="81">E0</text>
+            <rect x="422" y="49" width="94" height="53" rx="7" fill="#f9e4d8" stroke="#d06d4d" stroke-width="2"/><text x="469" y="81">2E</text>
+            <rect x="522" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="569" y="81">FF</text>
+            <rect x="622" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="669" y="81">FF</text>
+            <rect x="722" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="769" y="81">FF</text>
+          </g>
+          <path d="M369 107 V122 H469 V107" stroke="#d06d4d" stroke-width="2" fill="none"/>
+          <text x="420" y="151" font-size="17">0x2EE0 = 12000 → × 0.125 = 1500 rpm</text>
+        </g>
+      </svg>
+      <figcaption>为什么不能把 <code>E0 2E</code> 当成大端 0xE02E？因为这里的 SPN 190 在字节 4–5 使用小端组合，计算结果会相差数倍。</figcaption>
+    </figure>
+    <div class="table-scroll"><table><thead><tr><th>SPN</th><th>字段</th><th>位置</th><th>转换</th></tr></thead><tbody>
+      <tr><td>899</td><td>发动机扭矩模式</td><td>字节 1，低 4 位</td><td>枚举编码，非连续物理量</td></tr>
+      <tr><td>512</td><td>驾驶员需求扭矩百分比</td><td>字节 2</td><td>raw × 1% − 125%</td></tr>
+      <tr><td>190</td><td>发动机转速</td><td>字节 4–5</td><td>raw × 0.125 rpm</td></tr>
+    </tbody></table></div>
+    <p>要检查 <strong>Not Available</strong>、错误指示和保留值，不能直接把所有原始码值都当成有效物理量。定义以适用版本的 SAE J1939-71 / 数字定义或 OEM DBC 为准。</p>
+    <h3>最小可运行解码器</h3>
+    <pre><code>def decode_j1939(can_id, data):
+    assert 0 &lt;= can_id &lt; (1 &lt;&lt; 29)
+    assert len(data) == 8
+    pf = (can_id &gt;&gt; 16) &amp; 0xFF
+    pgn = (can_id &gt;&gt; 8) &amp; (0x3FF00 if pf &lt; 240 else 0x3FFFF)
+    sa = can_id &amp; 0xFF
+    rpm = None
+    if pgn == 0xF004:
+        raw = int.from_bytes(data[3:5], "little")
+        if raw not in (0xFFFE, 0xFFFF):
+            rpm = raw * 0.125
+    return pgn, sa, rpm
 
-<p>好，咱们今天聊聊J1939。很多做CAN的朋友，从CAN2.0A/B入门后，下一步就会碰到J1939。说实话，我第一次接触J1939时，也被那一堆缩写搞得头大——PGN、SPN、SA、DA……感觉像在看天书。</p>
+frame = bytes.fromhex("00 7D 82 E0 2E FF FF FF")
+assert decode_j1939(0x0CF00401, frame) == (61444, 1, 1500.0)
+assert decode_j1939(0x18EAFF80, bytes(8))[0] == 59904
+</code></pre>
+  </section>
+  <section id="ch22-name">
+    <h2>22.4 最后找发送者：地址声明不是静态“抢号”</h2>
+    <p>SA 是通信地址，不等同于设备身份。同一个 ECU 的 <strong>64 位 NAME</strong> 才描述其身份及功能。设备通过 <code>PGN 60928 (0xEE00)</code> 声明 SA；报文 <strong>CAN ID</strong> 携带声明的 SA，<strong>8 字节数据区</strong> 携带 NAME（小端字节序）。</p>
+    <div class="table-scroll"><table><thead><tr><th>NAME 位范围</th><th>字段</th><th>位数</th></tr></thead><tbody>
+      <tr><td>0–20</td><td>Identity Number</td><td>21</td></tr>
+      <tr><td>21–31</td><td>Manufacturer Code</td><td>11</td></tr>
+      <tr><td>32–34 / 35–39</td><td>ECU Instance / Function Instance</td><td>3 / 5</td></tr>
+      <tr><td>40–47 / 48</td><td>Function / Reserved</td><td>8 / 1</td></tr>
+      <tr><td>49–55 / 56–59</td><td>Vehicle System / Vehicle System Instance</td><td>7 / 4</td></tr>
+      <tr><td>60–62 / 63</td><td>Industry Group / Arbitrary Address Capable</td><td>3 / 1</td></tr>
+    </tbody></table></div>
+    <p>假设设备 A 和 B 都声明 SA <code>0x80</code>：各自会比较 NAME 的完整 64 位无符号值，<strong>数值较小者保留地址</strong>。失去竞争的设备若具备任意地址能力，可按规则尝试其他地址；否则需要报告无法声明。地址声明还有启动、请求、冲突和等待窗口等规则，不能简化成“发完后 250 ms 就永远属于自己”。</p>
+    <div class="note caution"><strong>工程检查：</strong>抓不到业务数据时，先抓 <code>0xEE00</code> 的声明与 SA 是否冲突，再核对 NAME 唯一性及厂商代码配置，而不是随意增加上电延时。</div>
+  </section>
+  <section id="ch22-sources">
+    <h2>22.5 证据与边界</h2>
+    <p>29 位 ID 与 PDU1/PDU2 路由依据 <a href="https://www.kernel.org/doc/html/latest/networking/j1939.html">Linux 内核 J1939 文档</a>；NAME 字段见 <a href="https://github.com/torvalds/linux/blob/master/include/uapi/linux/can/j1939.h">Linux UAPI 的 NAME 位定义</a>；EEC1 中 SPN 190 的位置与比例可对照 <a href="https://canboat.github.io/canboat/canboat-j1939.html">公开 J1939 PGN 表</a>。公开资料用于复核教学示例，产品中仍应以采购的 SAE 标准及 OEM 通信矩阵为准。</p>
+    <p><strong>记住这条解码链：</strong>先用 ID 求 PGN 和 SA，再用 PGN 定位字节布局，最后按 SPN 的字节序、缩放、偏移及无效值规则解释数据。下一章我们就让一个 PGN 跨越多帧。</p>
+  </section>
+</article>
+<script>
+(function(){
+  const input=document.getElementById("id22-input");
+  const output=document.getElementById("id22-output");
+  function show(){
+    const raw=input.value.trim().replace(/^0x/i,"");
+    if(!/^[0-9a-f]{1,8}$/i.test(raw)){output.textContent="请输入最多 8 位十六进制 CAN ID";return;}
+    const id=parseInt(raw,16);
+    if(id>0x1FFFFFFF){output.textContent="超出 29 位扩展 ID 范围";return;}
+    const pf=(id>>>16)&255, ps=(id>>>8)&255, sa=id&255;
+    const pgn=(id>>>8)&(pf<240?0x3FF00:0x3FFFF);
+    output.textContent="Priority "+(id>>>26)+" · PGN "+pgn+" (0x"+pgn.toString(16).toUpperCase()+") · SA 0x"+sa.toString(16).toUpperCase().padStart(2,"0")+(pf<240?" · 目标地址 DA 0x"+ps.toString(16).toUpperCase().padStart(2,"0"):" · PDU2 参数组");
+  }
+  input.addEventListener("input",show);show();
+})();
+</script>
 
-<p>但别怕。J1939说白了就是一套“行业黑话”，是SAE这帮老法师给商用车、工程机械定的一套通信规矩。你只要搞懂它的骨架——协议栈结构、核心数据单元PGN/SPN、以及地址怎么分配，后面就顺了。</p>
-
-<h3>22.1 J1939协议栈结构</h3>
-
-<p>J1939的协议栈，跟OSI七层模型有点像，但它只用了其中几层。我个人习惯把它分成三层来看：</p>
-
-<ul>
-  <li><strong>物理层</strong>：就是CAN总线那套东西，双绞线、120Ω终端电阻、CAN收发器。J1939推荐用250kbps的速率，比普通CAN的500k要慢一点，但抗干扰更强。我在做农机项目时，田间地头电磁环境特别差，250k的速率反而更稳。</li>
-  <li><strong>数据链路层</strong>：基于CAN2.0B的29位扩展帧。J1939的报文ID就是这29位，里面塞了优先级、PGN、源地址等信息。说白了，CAN2.0B是“普通话”，J1939是“方言”。</li>
-  <li><strong>应用层</strong>：这才是J1939的精髓。它定义了数据怎么组织、参数怎么命名、设备怎么通信。PGN和SPN就是这层的核心。</li>
-</ul>
-
-<div class="highlight">
-  <p><strong>重点：</strong>J1939的报文ID（29位）结构如下：</p>
-  <ul>
-    <li>Bit 28-26：优先级（3位，0最高，7最低）</li>
-    <li>Bit 25-24：保留位</li>
-    <li>Bit 23-16：数据页（1位）+ PDU格式（8位）</li>
-    <li>Bit 15-8：PDU特定（8位，可能是目标地址或组扩展）</li>
-    <li>Bit 7-0：源地址（8位）</li>
-  </ul>
-</div>
-
-<p>嗯，这里要注意：PDU格式（PF）和PDU特定（PS）的组合，决定了这个报文是发往特定设备（点对点），还是广播给所有人。PF值在0-239之间时，PS是目标地址；PF在240-255之间时，PS是组扩展，用于广播。</p>
-
-<h3>22.2 PGN——参数组编号</h3>
-
-<p>PGN，全称Parameter Group Number，参数组编号。它是J1939里最核心的概念之一。你想想看，发动机转速、车速、水温……这些数据不能乱发，得按规矩打包。每个“数据包”就是一个参数组，PGN就是它的身份证号。</p>
-
-<p>PGN是怎么算出来的？其实很简单：</p>
-
-<pre><code>PGN = (数据页 &lt;&lt; 16) | (PF &lt;&lt; 8) | PS</code></pre>
-
-<p>但要注意：当PF值小于240时，PS是目标地址，此时PS不参与PGN计算，PGN只取PF部分。当PF大于等于240时，PS是组扩展，PGN = (数据页 << 16) | (PF << 8) | PS。</p>
-
-<p>举个例子：</p>
-
-<ul>
-  <li><strong>PGN 61444 (0xF004)</strong>：电子发动机控制器1（EEC1），包含发动机转速、扭矩等。</li>
-  <li><strong>PGN 65265 (0xFEF1)</strong>：车辆速度（CCVS），包含车速、巡航状态等。</li>
-  <li><strong>PGN 65270 (0xFEF6)</strong>：燃油经济性（LFE），包含燃油消耗率。</li>
-</ul>
-
-<p>我在项目中遇到过一个问题：有个同事把PGN算错了，导致ECU一直收不到发动机数据。查了半天，发现是PF和PS的位运算搞反了。所以，算PGN时一定要仔细，尤其是PF在240边界附近时。</p>
-
-<div class="tip">
-  <p><strong>小技巧：</strong>很多工具（比如CANalyzer、PCAN-View）可以直接显示PGN，不用自己算。但理解原理很重要，否则出了问题你都不知道从哪查。</p>
-</div>
-
-<h3>22.3 SPN——可疑参数编号</h3>
-
-<p>SPN，Suspect Parameter Number，可疑参数编号。这个名字有点吓人，其实它就是给每个具体参数分配的唯一编号。比如发动机转速是SPN 190，车速是SPN 84，冷却液温度是SPN 110。</p>
-
-<p>一个PGN里可以包含多个SPN。比如PGN 61444（EEC1）里就包含了：</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>SPN</th>
-      <th>参数名称</th>
-      <th>起始位</th>
-      <th>长度（位）</th>
-      <th>分辨率</th>
-      <th>范围</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>190</td>
-      <td>发动机转速</td>
-      <td>24</td>
-      <td>16</td>
-      <td>0.125 rpm/bit</td>
-      <td>0 - 8031.875 rpm</td>
-    </tr>
-    <tr>
-      <td>512</td>
-      <td>发动机扭矩模式</td>
-      <td>8</td>
-      <td>4</td>
-      <td>1</td>
-      <td>0 - 15</td>
-    </tr>
-    <tr>
-      <td>513</td>
-      <td>驾驶员需求扭矩</td>
-      <td>12</td>
-      <td>8</td>
-      <td>1%</td>
-      <td>0 - 250%</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>解析SPN时，关键是要知道每个参数在数据场里的起始位、长度、分辨率和偏移量。我曾经踩过一个坑：某个传感器的数据总是偏大，后来发现是分辨率搞错了——文档写的是0.1，我当成了1。所以，拿到J1939的DBC文件或协议文档后，第一件事就是核对SPN的定义。</p>
-
-<div class="warning">
-  <p><strong>注意：</strong>SPN的编号范围是0-524287，但实际常用的也就几千个。SAE每年都会更新SPN列表，做产品时一定要用最新版本，否则可能跟别人的设备对不上。</p>
-</div>
-
-<h3>22.4 地址声明</h3>
-
-<p>J1939网络里，每个设备都需要一个唯一的源地址（SA），范围是0-253。地址声明就是设备上线时，告诉全网“我是谁，我用哪个地址”的过程。</p>
-
-<p>地址声明的流程大致如下：</p>
-
-<ol>
-  <li><strong>设备上电</strong>：先监听总线一段时间（至少250ms），看看有没有地址冲突。</li>
-  <li><strong>发送地址声明报文</strong>：用PGN 60928（0xEE00）发送，数据场包含设备的名字（64位）和请求的地址。</li>
-  <li><strong>等待响应</strong>：如果其他设备发现地址冲突，会发送一个“地址声明”报文来抗议。此时，新设备需要重新选择地址。</li>
-  <li><strong>地址确认</strong>：如果没人反对，这个地址就归你了。之后所有报文都会用这个源地址发送。</li>
-</ol>
-
-<p>设备名字（NAME）是64位的，包含了很多信息：</p>
-
-<ul>
-  <li>Bit 63：任意地址能力（1表示可以接受任意地址）</li>
-  <li>Bit 62：行业组（0表示全球，1表示特定行业）</li>
-  <li>Bit 61-48：车辆系统实例</li>
-  <li>Bit 47-40：车辆系统</li>
-  <li>Bit 39-32：功能实例</li>
-  <li>Bit 31-24：ECU实例</li>
-  <li>Bit 23-16：制造商代码</li>
-  <li>Bit 15-0：身份编号</li>
-</ul>
-
-<p>我曾经调试过一个多ECU系统，有台设备老是抢不到地址。后来发现是它的NAME里“任意地址能力”位没置1，导致它只能用一个固定地址，而那个地址已经被别的设备占了。改了一下固件，问题就解决了。</p>
-
-<div class="highlight">
-  <p><strong>避坑指南：</strong>我曾经遇到过一台ECU，上电后一直不发地址声明报文。查了半天，发现是它的上电延时太短，还没等总线稳定就开始发，结果报文被总线错误吞掉了。后来我把延时从50ms改到300ms，就正常了。所以，地址声明前的监听时间一定要给够，别省那几百毫秒。</p>
-</div>
-
-<h3>22.5 小结</h3>
-
-<p>J1939入门，说白了就是三件事：</p>
-
-<ul>
-  <li><strong>协议栈结构</strong>：物理层用CAN，数据链路层用29位扩展帧，应用层定义PGN和SPN。</li>
-  <li><strong>PGN与SPN</strong>：PGN是数据包的编号，SPN是具体参数的编号。解析报文时，先找PGN，再按SPN拆数据。</li>
-  <li><strong>地址声明</strong>：设备上线时通过PGN 60928声明自己的地址和名字，确保全网地址唯一。</li>
-</ul>
-
-<p>你想想看，搞懂了这些，J1939的报文在你眼里就不再是一堆乱码了。下一章我们会深入J1939的传输协议，看看大数据怎么拆包、重组。到时候你会发现，J1939其实挺聪明的。</p>
         <div class="footer-nav">
             <a href="21.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="23.html">下一章 →</a>
         </div>
         
-    </div>
+    </main>
 </div>
 </div>
 </body>

@@ -1,0 +1,60 @@
+{
+  "chapter": "13",
+  "scope": "STM32F4 bxCAN 32-bit mask mode; standard 11-bit data frames; not FDCAN",
+  "claims": [
+    {
+      "id": "filter-path",
+      "claim": "bxCAN filters decide whether messages enter receive FIFO, not whether frames circulate on the CAN wires",
+      "kind": "reference",
+      "source_url": "https://www.st.com/resource/en/reference_manual/dm00135183-stm32f446xx-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf",
+      "locator": "bxCAN acceptance filter / filter banks",
+      "status": "verified",
+      "notes": ""
+    },
+    {
+      "id": "filter-layout",
+      "claim": "In bxCAN 32-bit format STID occupies the high 11 bits of the filter register and IDE/RTR are filterable fields",
+      "kind": "reference",
+      "source_url": "https://www.st.com/resource/en/reference_manual/dm00135183-stm32f446xx-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf",
+      "locator": "bxCAN filter registers, 32-bit scale mapping",
+      "status": "verified",
+      "notes": ""
+    },
+    {
+      "id": "mask-zero",
+      "claim": "A zero mask in identifier-mask mode disregards all compared fields, enabling accept-all in the described setup",
+      "kind": "reference",
+      "source_url": "https://community.st.com/stm32-mcus-60/using-can-bxcan-in-normal-mode-with-stm32-microcontrollers-part-2-152668",
+      "locator": "CAN filter pass-all example",
+      "status": "verified",
+      "notes": ""
+    },
+    {
+      "id": "mask-boundary",
+      "claim": "(rx & 0x7F0)==(0x200 & 0x7F0) matches exactly 0x200..0x20F for standard identifiers",
+      "kind": "formula",
+      "source_url": "https://www.st.com/resource/en/reference_manual/dm00135183-stm32f446xx-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf",
+      "locator": "chapter 13 mask example, examples/can_chapters13_15_checks.py",
+      "status": "derived",
+      "notes": ""
+    },
+    {
+      "id": "ide-rtr",
+      "claim": "FilterMaskIdLow 0x0006 additionally compares IDE=0 and RTR=0 in bxCAN 32-bit filter encoding",
+      "kind": "formula",
+      "source_url": "https://www.st.com/resource/en/reference_manual/dm00135183-stm32f446xx-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf",
+      "locator": "bxCAN register field map; chapter 13 HAL snippet",
+      "status": "derived",
+      "notes": ""
+    },
+    {
+      "id": "bank-scope",
+      "claim": "bxCAN filtering bank count and CAN1/CAN2 shared-bank assignment are MCU specific",
+      "kind": "reference",
+      "source_url": "https://www.st.com/resource/en/reference_manual/dm00135183-stm32f446xx-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf",
+      "locator": "bxCAN filter banks",
+      "status": "verified",
+      "notes": ""
+    }
+  ]
+}

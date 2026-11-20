@@ -1,0 +1,10 @@
+<svg viewBox="0 0 744 242" role="img" aria-labelledby="c18sdo-t c18sdo-d" xmlns="http://www.w3.org/2000/svg">
+      <title id="c18sdo-t">SDO 读取心跳周期的请求与应答</title>
+      <desc id="c18sdo-d">节点 1，客户端使用 COB-ID 0x601 发送命令 40 17 10 00 00 00 00 00 请求读取 0x1017:00；服务器使用 COB-ID 0x581 返回 4B 17 10 00 64 00 00 00，表示两个有效数据字节 64 00，即 100 毫秒。</desc>
+      <g font-family="sans-serif" font-size="16" fill="#2d4c48" text-anchor="middle"><text x="99" y="32" font-weight="700">SDO 客户端</text><text x="641" y="32" font-weight="700">节点 1（服务器）</text></g>
+      <path d="M99 44V223M641 44V223" stroke="#abc5bb" stroke-width="3" stroke-dasharray="5 5"/>
+      <path d="M111 86H625" stroke="#cf6c4d" stroke-width="5"/><path d="M611 76L626 86L611 96" fill="none" stroke="#cf6c4d" stroke-width="4"/>
+      <path d="M629 160H115" stroke="#147f80" stroke-width="5"/><path d="M130 150L115 160L130 170" fill="none" stroke="#147f80" stroke-width="4"/>
+      <g text-anchor="middle" font-size="15" font-family="monospace"><text x="370" y="65" fill="#a75337">0x601 · 40 17 10 00 00 00 00 00</text><text x="370" y="141" fill="#0b6b6b">0x581 · 4B 17 10 00 64 00 00 00</text></g>
+      <text x="370" y="205" text-anchor="middle" fill="#465e59" font-size="14" font-family="sans-serif">响应示例：0x0064 = 100 ms（示意设备值）</text>
+    </svg>

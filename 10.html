@@ -3,6 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第10章 CAN报文发送</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -115,8 +116,10 @@
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
     </style>
+    <link rel="stylesheet" href="reading.css">
 </head>
 <body>
+<a class="skip-link" href="#content">跳转至正文</a>
 <div class="double-border">
 <div class="container">
     <div class="sidebar">
@@ -154,173 +157,130 @@
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
     </div>
-    <div class="main-content">
-        <h2>10. CAN报文发送：发送邮箱机制、发送优先级、发送流程、发送完成中断</h2>
-
-<p>好，咱们今天聊聊CAN报文的发送。说实话，很多初学者觉得发送就是往寄存器里写数据，然后等着发出去就行了。嗯，要是真这么简单，那汽车上就不会有那么多通信故障了。</p>
-
-<p>我个人习惯把CAN发送比作「快递发货」。你想想看，一个快递站有多个发货口，每个口一次只能发一个包裹，而且包裹还有轻重缓急之分。CAN的发送邮箱，说白了就是干这个的。</p>
-
-<h3>10.1 发送邮箱机制</h3>
-
-<p>CAN控制器内部一般有3个发送邮箱（有些芯片更多，比如STM32有3个，有些高端芯片有8个甚至16个）。每个邮箱就是一个独立的「发货窗口」。</p>
-
-<p><strong>邮箱的结构</strong>：每个邮箱包含标识符、数据长度、数据场、控制位这些信息。你往邮箱里填好数据，告诉控制器「发吧」，剩下的硬件自己搞定。</p>
-
-<div class="highlight">
-  <p><strong>关键点：</strong>发送邮箱是硬件资源，不是软件队列。你往邮箱里写数据，硬件就自动开始发送流程。如果三个邮箱都满了，你再想发，就得等其中一个发完。</p>
+    <main class="main-content" id="content">
+<article class="article">
+<header>
+<p class="eyebrow">CAN 总线 · 第 10 章 / 发送路径</p>
+<h1>一条 CAN 报文，何时才算真正发出去？</h1>
+<p class="dek">从软件提交、三个 bxCAN 发送邮箱，到线上逐位仲裁与完成状态：区分“接受发送请求”和“总线上成功发送”，才能写出可诊断的发送程序。</p>
+</header>
+<section id="tx-problem">
+<p class="kicker">01 · 先厘清一个误解</p>
+<h2>调用 CAN_Transmit() 不等于发送成功</h2>
+<p class="lead">假设 10 ms 内必须发出 ID 为 0x100 的控制帧。函数返回了邮箱号，难道接收节点就已经收到了吗？并没有。返回邮箱号只表示控制器接受了请求，后面可能还要等空闲总线、竞争仲裁、检测错误与获得 ACK。</p>
+<figure class="diagram">
+<div class="diagram-scroll">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 262" role="img" aria-labelledby="tx-flow-title tx-flow-desc">
+<title id="tx-flow-title">CAN 报文发送的两级调度与完成判定</title>
+<desc id="tx-flow-desc">软件队列先提交到三个发送邮箱之一；本地选择待发邮箱，随后参与总线仲裁；完成请求后必须检查 TXOK 或失败原因。</desc>
+<defs><marker id="tx-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" fill="none" stroke="#3b7776" stroke-width="1.5"/></marker></defs>
+<rect x="8" y="83" width="138" height="84" rx="11" fill="#e6f5ef" stroke="#81b6a7"/>
+<text x="77" y="114" text-anchor="middle" font-size="17" fill="#245956">软件发送队列</text><text x="77" y="140" text-anchor="middle" font-size="13" fill="#376d65">可排队、可限流</text>
+<path d="M147 125 H191" stroke="#3b7776" stroke-width="2.5" marker-end="url(#tx-arrow)"/>
+<g fill="#eef0fb" stroke="#9fadd5"><rect x="197" y="37" width="162" height="56" rx="9"/><rect x="197" y="103" width="162" height="56" rx="9"/><rect x="197" y="169" width="162" height="56" rx="9"/></g>
+<g font-size="15" fill="#414874" text-anchor="middle"><text x="278" y="61">Mailbox 0</text><text x="278" y="81" font-size="12">ID = 0x300</text><text x="278" y="127">Mailbox 1</text><text x="278" y="147" font-size="12">ID = 0x100</text><text x="278" y="193">Mailbox 2</text><text x="278" y="213" font-size="12">ID = 0x200</text></g>
+<path d="M360 131 H397" stroke="#3b7776" stroke-width="2.5" marker-end="url(#tx-arrow)"/>
+<rect x="404" y="82" width="143" height="86" rx="11" fill="#fff4e6" stroke="#dca86e"/><text x="475" y="111" text-anchor="middle" font-size="16" fill="#92562a">本地邮箱调度</text><text x="475" y="133" text-anchor="middle" font-size="12" fill="#92562a">TXFP 决定规则</text><text x="475" y="151" text-anchor="middle" font-size="12" fill="#92562a">≠ 线上优先级</text>
+<path d="M548 125 H585" stroke="#3b7776" stroke-width="2.5" marker-end="url(#tx-arrow)"/>
+<rect x="590" y="82" width="180" height="86" rx="11" fill="#dff1f1" stroke="#80b6b8"/><text x="680" y="110" text-anchor="middle" font-size="16" fill="#225f67">总线仲裁 + 传输</text><text x="680" y="134" text-anchor="middle" font-size="13" fill="#225f67">成功 → TXOK = 1</text><text x="680" y="152" text-anchor="middle" font-size="13" fill="#225f67">失败 → 查原因</text>
+<text x="391" y="22" text-anchor="middle" font-size="13" fill="#52666d">硬件管本地发送顺序；总线仍逐位仲裁</text>
+<text x="391" y="250" text-anchor="middle" font-size="13" fill="#52666d">RQCP 表示请求处理完毕；不代表 TXOK 一定成立</text>
+</svg>
 </div>
+<figcaption>图 10-1：三个发送邮箱是 bxCAN 的硬件资源，不是软件任务优先级。示例中 mailbox 1 的 ID 最小，但实际调度还取决于 TXFP 设置。 <a href="assets/chapter10-tx-flow.svg">单独查看图 10-1</a></figcaption>
+</figure>
+<div class="callout"><p><strong>三件不同的事：</strong>软件申请到了邮箱；控制器完成了一次发送请求；CAN 控制器确认成功发送（TXOK）。应用层收到并处理是更高层的协议问题，不能从 TXOK 推断。</p></div>
+</section>
 
-<p>我在项目中遇到过一个问题：某个节点需要频繁发送诊断报文，结果因为邮箱被其他报文占满了，诊断响应超时了。后来怎么解决的？我把诊断报文单独用一个邮箱，并且优先级设得最高。</p>
+<section id="tx-mailboxes">
+<p class="kicker">02 · 拆开本地调度</p>
+<h2>为什么邮箱编号不决定 CAN 优先级</h2>
+<p>STM32F1 bxCAN 有三个发送邮箱，忙碌期间其报文寄存器由硬件保护。多个邮箱同时待发时，<strong>CAN_TXFP = DISABLE</strong> 让本地选择偏向报文标识符优先级；<strong>CAN_TXFP = ENABLE</strong> 则按请求先后顺序。真正的总线仲裁仍由发送中的 CAN 帧标识符及相关位决定。</p>
+<table><thead><tr><th>位置</th><th>ID</th><th>TXFP=DISABLE</th><th>TXFP=ENABLE</th></tr></thead><tbody>
+<tr><td>邮箱 0</td><td>0x300</td><td>后于 0x100 / 0x200</td><td>由请求时间决定</td></tr>
+<tr><td>邮箱 1</td><td>0x100</td><td>本地优先</td><td>由请求时间决定</td></tr>
+<tr><td>邮箱 2</td><td>0x200</td><td>次于 0x100</td><td>由请求时间决定</td></tr>
+</tbody></table>
+<details><summary>想一想：把紧急报文强行放进邮箱 0，就一定先发吗？</summary>
+<p>不一定。SPL 的 CAN_Transmit() 会选择可用邮箱；三个邮箱全部占用时，新报文进不去。即使找到邮箱，也要面对本地调度和外部节点仲裁。要保障时限，需要软件队列的优先级、明确的过期策略和总线负载预算。</p></details>
+</section>
 
-<h3>10.2 发送优先级</h3>
-
-<p>CAN总线的优先级，不是靠邮箱编号决定的，而是靠报文ID。ID越小，优先级越高。这个大家应该都知道。</p>
-
-<p>但这里有个细节：<strong>当多个邮箱同时有数据要发送时，硬件会怎么选？</strong></p>
-
-<p><strong>bxCAN需要区分邮箱调度与总线仲裁：</strong>CAN_TXFP=DISABLE时，本地待发报文按标识符优先级调度；CAN_TXFP=ENABLE时按发送请求顺序调度。真正的线上仲裁仍按CAN标识符及帧格式进行，不能仅根据邮箱编号断言优先级。</p>
-
-<table>
-  <tr>
-    <th>邮箱编号</th>
-    <th>报文ID</th>
-    <th>发送优先级</th>
-  </tr>
-  <tr>
-    <td>邮箱0</td>
-    <td>0x100</td>
-    <td>最高（ID最小）</td>
-  </tr>
-  <tr>
-    <td>邮箱1</td>
-    <td>0x200</td>
-    <td>中等</td>
-  </tr>
-  <tr>
-    <td>邮箱2</td>
-    <td>0x300</td>
-    <td>最低</td>
-  </tr>
-</table>
-
-<p>我曾经踩过一个坑：把紧急报文放在邮箱2里，结果邮箱0和邮箱1一直有数据在发，紧急报文死活发不出去。后来我把紧急报文放在邮箱0，问题就解决了。</p>
-
-<div class="tip">
-  <p>关键业务报文应采用明确的标识符优先级、软件队列容量控制和发送截止期限。仅把某条报文放入邮箱0不能保证它在本地队列拥塞或总线占用时按时发送；应记录邮箱溢出和实际发送延迟。</p>
-</div>
-
-<h3>10.3 发送流程</h3>
-
-<p>CAN报文的发送流程，其实就三步：填数据、请求发送、等待完成。</p>
-
-<p><strong>第一步：填数据</strong></p>
-<p>你要往邮箱的寄存器里写：</p>
-<ul>
-  <li>标识符（ID）</li>
-  <li>数据长度码（DLC）</li>
-  <li>数据场（最多8字节）</li>
-  <li>控制位（比如是否使用扩展帧）</li>
-</ul>
-
-<p><strong>第二步：请求发送</strong></p>
-<p>把邮箱的发送请求位置1。硬件检测到这个位被置1，就开始尝试发送。</p>
-
-<p><strong>第三步：等待完成</strong></p>
-<p>硬件发送完成后，会把发送完成位置1。你可以轮询这个位，也可以开中断。</p>
-
-<p>下面是一个典型的发送代码示例：</p>
-
-<pre><code>// STM32F1 Standard Peripheral Library 示例。假设 CAN1 已正常初始化。
-// CAN_Transmit 自动选择可用邮箱；不应直接操作忙碌邮箱寄存器。
+<section id="tx-code">
+<p class="kicker">03 · 把代码与状态对应起来</p>
+<h2>最小安全发送：校验、提交、确认</h2>
+<p>以下为 <strong>STM32F10x Standard Peripheral Library（经典 CAN，非 CAN FD）</strong> 示例。前置条件：CAN1/GPIO/波特率已初始化，总线有另一正常节点参与 ACK，且调用方不会并发改写同一软件队列。</p>
+<pre><code>#include "stm32f10x_can.h"
 #include &lt;stdint.h&gt;
 #include &lt;stddef.h&gt;
-uint8_t CAN_SendStd(uint16_t id, const uint8_t *data, uint8_t len) {
-    if (id &gt; 0x7FFu || len &gt; 8u || (len &amp;&amp; data == NULL))
-        return CAN_TxStatus_NoMailBox;
-    CanTxMsg tx = {0};
-    tx.StdId = id;
-    tx.IDE = CAN_Id_Standard;
-    tx.RTR = CAN_RTR_Data;
-    tx.DLC = len;
-    for (uint8_t i = 0; i &lt; len; ++i) tx.Data[i] = data[i];
-    // 返回邮箱号0..2或CAN_TxStatus_NoMailBox；须异步检查最终发送状态。
-    return CAN_Transmit(CAN1, &amp;tx);
-}</code></pre>
 
-<p>嗯，这里要注意：<strong>发送请求位一旦置1，就不能再修改邮箱里的数据了</strong>。否则会导致发送错误。我见过有人一边发一边改数据，结果报文内容乱套了。</p>
-
-<h3>10.4 发送完成中断</h3>
-
-<p>轮询发送完成位，其实挺浪费CPU的。你想想看，CPU一直在那傻等，啥也干不了。所以，更高效的做法是用中断。</p>
-
-<p>发送完成中断，就是硬件发完一个报文后，自动触发一个中断。你在中断服务函数里处理后续逻辑，比如释放邮箱、更新状态、或者发送下一条报文。</p>
-
-<p><strong>中断的配置步骤：</strong></p>
-<ol>
-  <li>使能发送完成中断（一般有个寄存器位控制）</li>
-  <li>在中断向量表中注册中断服务函数</li>
-  <li>在中断服务函数里读取状态，清除中断标志</li>
-</ol>
-
-<p>代码示例：</p>
-
-<pre><code>// 发送完成中断服务函数
-void CAN_TX_IRQHandler(void)
+uint8_t CAN_SendStandard(uint16_t id, const uint8_t *bytes, uint8_t dlc)
 {
-    // 检查是哪个邮箱完成了发送
-    if (CAN-&gt;TSR &amp; CAN_TSR_RQCP0) {
-        // 邮箱0发送完成
-        CAN-&gt;TSR |= CAN_TSR_RQCP0;  // 清除中断标志
-        
-        // 处理后续逻辑，比如发送下一条报文
-        SendNextMessage();
+    if (id &gt; 0x7FFu || dlc &gt; 8u || (dlc != 0u &amp;&amp; bytes == NULL))
+        return CAN_TxStatus_NoMailBox;
+
+    CanTxMsg msg = {0};
+    msg.StdId = id;
+    msg.IDE   = CAN_Id_Standard;
+    msg.RTR   = CAN_RTR_Data;
+    msg.DLC   = dlc;
+    for (uint8_t i = 0; i &lt; dlc; i++)
+        msg.Data[i] = bytes[i];
+
+    // 0、1、2：请求进入的邮箱；NoMailBox：当前没有空位
+    return CAN_Transmit(CAN1, &amp;msg);
+}
+
+// 用法：记录返回邮箱号，后续通过状态查询或 TX 中断确认结果。
+// 切勿把“返回 0..2”直接记为“成功发送”。</code></pre>
+<p>CAN_TransmitStatus(CAN1, mailbox) 可以用于受控的轮询场景，但要保证邮箱在查询期间不会被复用。更稳妥的异步方案是在 TX 中断中立即读取对应邮箱的 RQCP/TXOK/ALST/TERR，并将结果转交给主循环。</p>
+<h3>TX 中断应怎样记录结果？</h3>
+<pre><code>// STM32F103 常用启动文件中的共享向量：USB_HP_CAN1_TX
+// 需先 NVIC 使能 USB_HP_CAN1_TX_IRQn，并 CAN_ITConfig(CAN1, CAN_IT_TME, ENABLE)。
+volatile uint32_t tx_ok_count = 0, tx_fail_count = 0;
+
+void USB_HP_CAN1_TX_IRQHandler(void)
+{
+    const uint32_t tsr = CAN1-&gt;TSR; // 快照：先看结果，再清除
+
+    if ((tsr &amp; CAN_TSR_RQCP0) != 0u) {
+        if (tsr &amp; CAN_TSR_TXOK0) tx_ok_count++;
+        else tx_fail_count++; // 另查 ALST0 / TERR0 / 是否中止
+        CAN1-&gt;TSR = CAN_TSR_RQCP0; // W1C：只清该邮箱完成位
     }
-    
-    if (CAN-&gt;TSR &amp; CAN_TSR_RQCP1) {
-        // 邮箱1发送完成
-        CAN-&gt;TSR |= CAN_TSR_RQCP1;
-        // ...
+    if ((tsr &amp; CAN_TSR_RQCP1) != 0u) {
+        if (tsr &amp; CAN_TSR_TXOK1) tx_ok_count++;
+        else tx_fail_count++;
+        CAN1-&gt;TSR = CAN_TSR_RQCP1;
     }
-    
-    if (CAN-&gt;TSR &amp; CAN_TSR_RQCP2) {
-        // 邮箱2发送完成
-        CAN-&gt;TSR |= CAN_TSR_RQCP2;
-        // ...
+    if ((tsr &amp; CAN_TSR_RQCP2) != 0u) {
+        if (tsr &amp; CAN_TSR_TXOK2) tx_ok_count++;
+        else tx_fail_count++;
+        CAN1-&gt;TSR = CAN_TSR_RQCP2;
     }
+    // 若 USB 与 CAN 共用向量，必须协调共享中断源处理。
 }</code></pre>
+<div class="callout warn"><p><strong>留意 W1C 寄存器：</strong>对完成标志使用明确的写 1 清除，而不是对 TSR 做不加区分的按位或读改写。<strong>RQCP=1 不等于 TXOK=1</strong>；仲裁丢失、传输错误、中止及关闭自动重传配置都影响状态解释。</p></div>
+</section>
 
-<div class="warning">
-  <p><strong>警告：</strong>中断服务函数里不要做太多事情！我曾经见过有人在中断里调用延时函数，结果整个系统卡死了。中断里只做最必要的事情，比如置个标志位，复杂逻辑放到主循环里处理。</p>
-</div>
-
-<p>还有一个坑：<strong>发送完成中断和发送错误中断是共用一个中断源的</strong>。你处理的时候，一定要区分是正常完成还是错误导致的完成。否则，你可能会把错误报文当成正常报文处理。</p>
-
-<h3>10.5 避坑指南</h3>
-
-<p>最后，我总结几个实际项目中容易踩的坑：</p>
-
-<ul>
-  <li><strong>邮箱溢出：</strong>三个邮箱都满了，你还往里写数据，数据就丢了。解决办法：要么增加邮箱数量（换芯片），要么用软件队列缓冲。</li>
-  <li><strong>优先级反转：</strong>低优先级报文占着邮箱，高优先级报文发不出去。解决办法：合理分配邮箱，紧急报文用独立邮箱。</li>
-  <li><strong>中断嵌套：</strong>发送完成中断里又触发了发送完成中断，导致递归。解决办法：中断里只清标志，不做发送操作。</li>
-  <li><strong>总线关闭：</strong>发送错误太多，节点进入总线关闭状态。解决办法：监控错误计数器，及时复位。</li>
-</ul>
-
-<p>我曾经在一个项目中，因为发送完成中断里调用了发送函数，导致中断递归，堆栈溢出。查了两天才找到原因。从那以后，我定了个规矩：<strong>中断里只做标志位操作，不做任何函数调用</strong>。</p>
-
-<p>好了，关于CAN报文发送，今天就聊这么多。下一章咱们讲讲接收，那又是另一番天地了。</p>
-
-<div class="tip">
-  <p><strong>课后思考：</strong>如果三个邮箱都满了，你又想发一条紧急报文，你会怎么处理？是丢弃一条低优先级的报文，还是等待？欢迎在评论区讨论。</p>
-</div>
-        <div class="footer-nav">
+<section id="tx-diagnose">
+<p class="kicker">04 · 让故障可定位</p>
+<h2>发送卡住时，先问哪一个环节失败？</h2>
+<table><thead><tr><th>观测</th><th>优先排查</th><th>下一步</th></tr></thead><tbody>
+<tr><td>返回 NoMailBox</td><td>三个邮箱忙；软件提交速度大于发送能力</td><td>限流、队列、deadline 与邮箱占用时长</td></tr>
+<tr><td>RQCP 置位但 TXOK 未置位</td><td>查看 ALST/TERR、NART、是否被中止</td><td>读 ESR 与总线分析仪日志</td></tr>
+<tr><td>长期没有成功完成</td><td>ACK 缺失、线缆与终端、波特率、总线关闭</td><td>检查另一节点、ESR、收发器状态</td></tr>
+<tr><td>低 ID 帧仍超时</td><td>本地队列、TXFP、总线负载与仲裁竞争</td><td>度量“入队→TXOK”延迟分位数</td></tr>
+</tbody></table>
+<p><strong>练习：</strong>同时排队 ID=0x300 与 ID=0x100，分别测试 TXFP 两种设置；记录请求顺序、实际 TXOK 次序与错误计数。在两节点且物理层正确的网络上验证，不要用单节点无 ACK 的情形误判为发送 API 错误。</p>
+<p class="source-note">依据：ST <a href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">RM0008，bxCAN Transmission Handling / CAN_TSR</a>；STM32F10x SPL 的 CAN_Transmit / CAN_TransmitStatus 接口。下一章把镜头转向接收 FIFO。</p>
+</section>
+</article>
+<div class="footer-nav">
             <a href="09.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="11.html">下一章 →</a>
         </div>
-        
-    </div>
+</main>
 </div>
 </div>
 </body>

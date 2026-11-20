@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 285" role="img" aria-labelledby="tools24-title tools24-desc" data-export="can-debug-three-layers.svg">
+<title id="tools24-title">CAN 测试工具覆盖的三个验证层次</title>
+<desc id="tools24-desc">分析仪回答是否收发了哪些报文；示波器回答显性差分幅度、波形和边沿是否合格；故障注入设备回答总线受到可控扰动时能否正确检测并恢复，三者共同支持结论。</desc>
+<g font-family="system-ui,sans-serif" font-size="17" fill="#173946" text-anchor="middle">
+ <rect x="16" y="24" width="252" height="150" rx="15" fill="#e1f1ef" stroke="#147f80" stroke-width="2"/>
+ <rect x="294" y="24" width="252" height="150" rx="15" fill="#f9e9e0" stroke="#d06d4d" stroke-width="2"/>
+ <rect x="572" y="24" width="252" height="150" rx="15" fill="#ece8f7" stroke="#7461ba" stroke-width="2"/>
+ <text x="142" y="57" font-size="21" font-weight="700">协议分析仪</text><text x="142" y="91">ID / DLC / 数据</text><text x="142" y="118">时间戳 / 错误状态</text><text x="142" y="145" font-size="15">回答：通信发生了什么？</text>
+ <text x="420" y="57" font-size="21" font-weight="700">示波器 / CANscope</text><text x="420" y="91">CAN_H / CAN_L</text><text x="420" y="118">差分幅度 / 边沿 / 振铃</text><text x="420" y="145" font-size="15">回答：电气上为什么？</text>
+ <text x="698" y="57" font-size="21" font-weight="700">CANstress 类工具</text><text x="698" y="91">受控扰动 / 错误注入</text><text x="698" y="118">恢复 / 故障计数</text><text x="698" y="145" font-size="15">回答：出错后如何响应？</text>
+ <path d="M142 179 V208 H698 V179" fill="none" stroke="#647c82" stroke-width="3"/>
+ <path d="M420 208 V224" stroke="#647c82" stroke-width="3"/><path d="M414 218 L420 226 L426 218" fill="none" stroke="#647c82" stroke-width="2"/>
+ <text x="420" y="251" font-size="20" font-weight="700">交叉验证：日志 + 波形 + 可重复的测试条件</text>
+</g>
+</svg>

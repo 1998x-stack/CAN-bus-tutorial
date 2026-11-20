@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第27章 CAN总线软件架构</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -114,12 +114,15 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
+    </style><style id="chapter-visual-reading">
+:root{--ink:#213b39;--accent:#127b79;--paper:#fffdf9}html{scroll-behavior:smooth}body{background:#edf3ee}.double-border{border:1px solid #d4e1d8;box-shadow:0 12px 35px #213b3912;background:var(--paper)}.container{grid-template-columns:235px minmax(0,1fr)}.sidebar{position:sticky;top:0;max-height:100vh;overflow:auto;align-self:start;background:#f7faf7}.sidebar .active{background:var(--accent)}.main-content{padding:44px min(5vw,64px);min-width:0;background:var(--paper)}.chapter-article{max-width:840px;margin:auto;font-size:17px;line-height:1.85;color:var(--ink)}.chapter-article p,.chapter-article li{line-height:1.85}.chapter-article h1{font-size:clamp(1.8rem,3vw,2.65rem);line-height:1.35;color:#164846}.chapter-article h2{border:0;padding:0;margin:3rem 0 1rem;font-size:1.53rem;color:#164846}.chapter-article h3{font-size:1.15rem}.chapter-article .hero{border-bottom:1px solid #d8e6df;padding-bottom:1.5rem}.chapter-article .eyebrow{letter-spacing:.16em;font-weight:700;color:var(--accent);font-size:.78rem}.chapter-article .lead{font-size:1.12rem;color:#516963}.chapter-article .toc{display:flex;gap:9px;flex-wrap:wrap}.chapter-article .toc a{border:1px solid #c6dbd1;border-radius:20px;padding:2px 12px;color:#127b79;text-decoration:none;font-size:.87rem}.chapter-article figure{background:#f6faf8;padding:14px;border:1px solid #d3e3da;border-radius:14px;margin:25px 0;overflow-x:auto}.chapter-article figure img{width:100%;height:auto;min-width:620px}.chapter-article figcaption{font-size:.86rem;color:#566b64;line-height:1.7}.chapter-article .demo{background:#f3f9f6;padding:18px;border:1px solid #c9ddd2;border-radius:12px;margin:24px 0}.chapter-article .controls{display:flex;flex-wrap:wrap;gap:12px}.chapter-article label{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px;font-size:.86rem;font-weight:bold}.chapter-article select,.chapter-article input,.chapter-article button{font:inherit;border:1px solid #b7c9be;border-radius:7px;padding:8px;background:white;max-width:100%}.chapter-article button{background:#137f7b;color:white;border:0;cursor:pointer}.chapter-article .output{font-size:1.35rem;font-weight:750;color:#176662}.chapter-article .detail{font-size:.87rem;color:#516963}.chapter-article table{display:block;overflow-x:auto;background:transparent}.chapter-article td,.chapter-article th{border-color:#d5e3db}.chapter-article th{background:#e7f1eb}.chapter-article .tip,.chapter-article .warning{background:#f4f9f6;border:1px solid #ceddd5;border-left:4px solid #17857f;border-radius:8px;padding:12px 16px}.chapter-article .warning{background:#fff7f0;border-left-color:#be7946}.chapter-article pre{background:#253942;color:#fff;overflow:auto}.chapter-article pre code{background:transparent;color:inherit}.chapter-article a{color:#127b79}.chapter-article .mathbox{overflow:auto;background:#f6f5ed;padding:8px;border-radius:8px}.skip-link{position:absolute;left:12px;top:-60px;background:white;padding:12px}.skip-link:focus{top:12px}:focus-visible{outline:3px solid #127b79;outline-offset:3px}
+@media(max-width:900px){.container{grid-template-columns:minmax(0,1fr)}.sidebar{position:static;max-height:185px;overflow-y:auto}.main-content{padding:28px 22px}}@media(max-width:480px){body{padding:0}.double-border{border:0;border-radius:0}.main-content{padding:22px 17px}.chapter-article{font-size:16px}.chapter-article figure{padding:8px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@media print{.sidebar,.skip-link,.demo button{display:none}.container{display:block}.main-content{padding:0}.double-border{border:0;box-shadow:none}.chapter-article figure{break-inside:avoid}}
+</style>
 </head>
-<body>
+<body><a class="skip-link" href="#content">跳转至正文</a>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="全部章节">
         <h3>📚 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
@@ -153,196 +156,29 @@
 <li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第27章 CAN总线软件架构：分层设计思想、驱动层、协议层、应用层分离</h2>
-
-<p>做CAN开发这么多年，我见过太多人一上来就写代码。</p>
-<p>把报文收发、ID过滤、数据处理全塞在一个文件里。结果呢？项目后期改一个需求，牵一发而动全身。说白了，这就是没有分层设计带来的恶果。</p>
-
-<p>今天咱们聊聊CAN总线的软件架构。我个人习惯把CAN软件分成三层：驱动层、协议层、应用层。这三层各司其职，互不干扰。你想想看，这样做的好处是什么？</p>
-
-<p>维护方便，移植简单，团队协作也清晰。嗯，咱们一层一层拆开看。</p>
-
-<h3>27.1 为什么要分层？</h3>
-
-<p>先问个问题：你写的CAN代码，换一个MCU平台，要改多少行？</p>
-
-<p>如果答案是「几乎全改」，那你的架构就有问题了。我在项目中遇到过这种情况——客户突然要求从STM32换到NXP平台。幸好当时做了分层设计，驱动层重写，协议层和应用层几乎没动。两周搞定，客户都惊讶。</p>
-
-<p>分层设计的核心思想就一句话：<strong>各层只关心自己的事</strong>。</p>
-
-<ul>
-  <li><strong>驱动层</strong>：管硬件，收发报文</li>
-  <li><strong>协议层</strong>：管格式，解析打包</li>
-  <li><strong>应用层</strong>：管业务，处理数据</li>
-</ul>
-
-<p>每一层都通过接口跟上下层通信。层与层之间不直接访问内部变量。这就是所谓的「高内聚、低耦合」。</p>
-
-<div class="highlight">
-  <p><strong>核心原则：</strong></p>
-  <ul>
-    <li>驱动层不知道报文里是什么数据</li>
-    <li>协议层不知道硬件怎么收发</li>
-    <li>应用层不知道报文怎么打包的</li>
-  </ul>
-</div>
-
-<h3>27.2 驱动层：硬件的「翻译官」</h3>
-
-<p>驱动层是离硬件最近的一层。它直接操作CAN控制器寄存器，负责最底层的收发工作。</p>
-
-<p>我习惯把驱动层做得尽可能薄。只做三件事：</p>
-
-<ol>
-  <li><strong>初始化CAN控制器</strong>：设置波特率、工作模式、过滤器</li>
-  <li><strong>发送报文</strong>：把数据写入发送邮箱</li>
-  <li><strong>接收报文</strong>：从接收FIFO读取数据</li>
-</ol>
-
-<p>来看一个典型的驱动层接口：</p>
-
-<pre><code>/* 驱动层接口 - 硬件无关 */
-typedef struct {
-    uint32_t id;        /* 标准帧或扩展帧ID */
-    uint8_t  data[8];   /* 数据场，最多8字节 */
-    uint8_t  dlc;       /* 数据长度 */
-    uint8_t  is_ext;    /* 1:扩展帧, 0:标准帧 */
-    uint8_t  is_rtr;    /* 1:远程帧, 0:数据帧 */
-} CanFrame_t;
-
-/* 初始化CAN控制器 */
-int CAN_Driver_Init(uint32_t baudrate);
-
-/* 发送一帧报文 */
-int CAN_Driver_Send(CanFrame_t *frame);
-
-/* 接收一帧报文（非阻塞） */
-int CAN_Driver_Receive(CanFrame_t *frame);</code></pre>
-
-<p>注意看，驱动层只处理<code>CanFrame_t</code>这种原始报文结构。它不关心ID是0x123还是0x456，也不关心data[0]代表什么物理量。</p>
-
-<div class="tip">
-  <p><strong>我的经验：</strong>驱动层一定要做超时处理。我曾经遇到过CAN总线被拉死的情况，驱动层没有超时机制，整个系统卡死在发送函数里。从那以后，我所有发送接口都加了超时参数。</p>
-</div>
-
-<h3>27.3 协议层：数据的「翻译官」</h3>
-
-<p>协议层在驱动层之上。它把原始报文翻译成应用层能理解的数据。</p>
-
-<p>说白了，协议层做两件事：</p>
-
-<ul>
-  <li><strong>打包</strong>：把应用层的数据（比如车速、转速）按照协议格式塞进报文</li>
-  <li><strong>解析</strong>：从收到的报文里提取出各个信号值</li>
-</ul>
-
-<p>不同的项目用不同的协议。J1939、CANopen、或者自己定义的私有协议。协议层就是把这些协议逻辑封装起来。</p>
-
-<p>举个例子，假设我们有一个车速信号，定义在ID=0x100的报文里，起始位bit 8，长度16位，分辨率0.01 km/h：</p>
-
-<pre><code>/* 教学示例：自定义ID=0x100的小端16位车速信号。
-   实际项目须使用可信DBC并验证信号有效性与时效性。 */
-float Protocol_GetVehicleSpeed(const CanFrame_t *frame)
-{
-    if (frame == NULL || frame-&gt;id != 0x100u ||
-        frame-&gt;is_ext || frame-&gt;is_rtr || frame-&gt;dlc &lt; 3u) {
-        return -1.0f;
-    }
-    uint16_t raw = (uint16_t)frame-&gt;data[1] |
-                   ((uint16_t)frame-&gt;data[2] &lt;&lt; 8);
-    return raw * 0.01f; /* km/h */
-}</code></pre>
-
-<p>你看，协议层只处理数据格式。它不关心这个车速值最终用来做什么——那是应用层的事。</p>
-
-<div class="warning">
-  <p><strong>注意：</strong>协议层不要直接调用驱动层函数。我曾经见过有人直接在协议层里写<code>HAL_CAN_Transmit()</code>，换平台时改到崩溃。正确的做法是：协议层通过回调函数或接口指针调用驱动层。</p>
-</div>
-
-<h3>27.4 应用层：业务的「决策者」</h3>
-
-<p>应用层是最高层。它从协议层拿到解析好的数据，然后做业务逻辑处理。</p>
-
-<p>比如：</p>
-
-<ul>
-  <li>车速超过120 km/h时报警</li>
-  <li>发动机水温过高时降功率</li>
-  <li>收到远程诊断请求时回复数据</li>
-</ul>
-
-<p>应用层不关心CAN报文怎么收发，也不关心数据怎么解析。它只关心：我拿到了什么数据？我要做什么决策？</p>
-
-<pre><code>/* 应用层 - 超速报警逻辑 */
-void App_CheckSpeedLimit(void)
-{
-    float speed = Protocol_GetVehicleSpeed(&g_rxFrame);
-    
-    if (speed &gt; 120.0f) {
-        App_TriggerAlarm(ALARM_OVERSPEED);
-    }
-}</code></pre>
-
-<p>简单吧？应用层代码写起来最轻松，因为它不需要处理底层细节。</p>
-
-<h3>27.5 三层之间的调用关系</h3>
-
-<p>我习惯用一张图来描述这三层的关系。不过这里咱们用文字描述：</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>方向</th>
-      <th>调用链</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>发送</td>
-      <td>应用层 → 协议层 → 驱动层</td>
-      <td>应用层给数据，协议层打包，驱动层发送</td>
-    </tr>
-    <tr>
-      <td>接收</td>
-      <td>驱动层 → 协议层 → 应用层</td>
-      <td>驱动层收报文，协议层解析，应用层处理</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>接收方向要注意：驱动层收到报文后，通常通过回调函数通知协议层。协议层解析完，再通过另一个回调通知应用层。这样每一层都是被动触发的，不会出现轮询浪费CPU。</p>
-
-<div class="highlight">
-  <p><strong>避坑指南：</strong>我曾经在一个项目里，把协议层和应用层的回调函数写成了同步调用。结果协议层解析耗时太长，导致驱动层丢帧。后来改成异步队列，驱动层收完报文就扔进队列，协议层从队列里取数据解析。问题解决了。</p>
-</div>
-
-<h3>27.6 实际项目中的分层建议</h3>
-
-<p>说了这么多理论，来点实际的。我总结了几条分层设计的原则：</p>
-
-<ol>
-  <li><strong>驱动层不要包含任何业务逻辑</strong>。哪怕是一个简单的if判断，也要慎重。</li>
-  <li><strong>协议层不要直接操作硬件</strong>。所有硬件操作都通过驱动层接口。</li>
-  <li><strong>应用层不要直接调用驱动层</strong>。必须经过协议层。</li>
-  <li><strong>每一层都要有独立的头文件</strong>。比如<code>can_driver.h</code>、<code>can_protocol.h</code>、<code>can_app.h</code>。</li>
-  <li><strong>接口参数尽量简单</strong>。能用基本类型就别用结构体，减少耦合。</li>
-</ol>
-
-<p>嗯，最后说一句。分层设计不是银弹。小项目、原型验证阶段，你可以适当简化。但一旦进入量产阶段，分层带来的维护优势是巨大的。</p>
-
-<p>我见过太多「先跑起来再说」的项目，最后代码改到崩溃。你想想看，是现在多花两天做分层设计划算，还是以后花两个月重构划算？</p>
-
-<p>答案不言而喻。</p>
-        <div class="footer-nav">
+    </nav>
+<main class="main-content" id="content"><article class="chapter-article">
+<header class="hero"><p class="eyebrow">CAN ENGINEERING / CHAPTER 27</p><h1>第27章 · 让接收中断与业务逻辑分开</h1><p class="lead">软件分层的核心不是把代码放入三个目录，而是明确谁负责读取硬件、谁负责解码、谁负责判断数据是否仍有效。</p><nav class="toc" aria-label="本章目录"><a href="#path27">数据路径</a><a href="#contract27">接口</a><a href="#queue27">队列</a><a href="#test27">测试</a></nav></header>
+<section id="path27"><h2>27.1 一个短中断，一条可追踪的数据路径</h2><p>驱动层在 ISR 中快速读取硬件 FIFO，连同 ID、帧类型、DLC、时间戳入队；协议任务解析信号；应用层检查数据时效并执行业务动作。把复杂解析和日志打印留在中断中，可能造成下一帧来不及取出。</p><figure tabindex="0"><img src="assets/olah-ch27-queue.svg" width="900" height="230" alt="接收ISR从硬件FIFO取帧并入队，协议层解码，应用层检查数据新鲜度"><figcaption>图27-1 · 队列建立的是调度边界。队列满必须有可观测的丢弃或背压策略。</figcaption></figure><p>驱动层对业务字节含义一无所知；协议层不直接绑定某个 MCU 的 HAL；应用层不直接访问 CAN RX FIFO。驱动和协议之间可以经抽象接口传递消息，并非禁止协议发送。</p></section>
+<section id="contract27"><h2>27.2 协议解析必须给出“失败”状态</h2><p>以下是<strong>教学用私有编码</strong>：经典 CAN 标准帧 ID=0x100，字节 1、2 为小端无符号车速，系数 0.01 km/h。它不是任何标准 DBC。</p><pre><code>typedef struct { float kmh; uint32_t received_ms; } SpeedSample;
+/* CanFrame 包含 id、dlc、extended、rtr、data[8] 和 timestamp_ms。 */
+bool protocol_decode_speed(const CanFrame *f, SpeedSample *out) {
+    if (!f || !out || f-&gt;id != 0x100u || f-&gt;extended ||
+        f-&gt;rtr || f-&gt;dlc &lt; 3u || f-&gt;dlc &gt; 8u) return false;
+    uint16_t raw = (uint16_t)f-&gt;data[1] |
+                   ((uint16_t)f-&gt;data[2] &lt;&lt; 8);
+    out-&gt;kmh = raw * 0.01f;
+    out-&gt;received_ms = f-&gt;timestamp_ms;
+    return true;
+}</code></pre><p>用 <code>bool</code> 显式报告解码成功与否，优于用 <code>-1.0f</code> 假冒车速。应用还要验证新鲜度：例如本教学示例以 100ms 为上限，过期信号应按安全需求降级。完整的 <a href="examples/can_ch27_pipeline.c">可编译 C 最小示例与断言</a>在仓库中。</p></section>
+<section id="queue27"><h2>27.3 动手实验：四格队列的第 5 帧去哪了？</h2><p>点击“接收”五次、期间不处理：前四帧排队，第五帧被拒绝并计入溢出。这是软件队列模型，而非总线物理丢帧率。</p><div class="demo"><div class="controls"><button type="button" id="add27">接收一帧</button><button type="button" id="pop27">处理一帧</button><button type="button" id="reset27">重置</button></div><p id="out27" class="output" aria-live="polite">队列 0 / 4 · 溢出 0</p><p id="note27" class="detail">连续接收 5 帧观察变化。</p></div><p>真实多任务系统还需要并发安全、硬件 FIFO 溢出监控、时序约束、bus-off 恢复状态机、优先级与异常数据策略；本例不声称替代 RTOS 驱动。</p></section>
+<section id="test27"><h2>27.4 失败用例决定分层是否真的有用</h2><table><tr><th>输入</th><th>协议/驱动预期</th><th>应用预期</th></tr><tr><td>扩展帧数值 ID=0x100</td><td>解码拒绝</td><td>不更新车速</td></tr><tr><td>DLC=2</td><td>禁止访问 data[2]</td><td>记录信号无效</td></tr><tr><td>有效车速但已超过时效</td><td>解码可成功</td><td>降级而非沿用旧值</td></tr><tr><td>队列满、硬件 FIFO 丢帧</td><td>丢失计数可观察</td><td>执行相应故障处理</td></tr></table><div class="tip">验证目标是让每个异常都有明确责任层和可测输出，而不是“目录结构看起来整齐”。</div></section><section id="references"><h2>范围与参考</h2><p><a href="https://kvaser.com/can-protocol-tutorial/">Kvaser CAN Protocol Tutorial</a>（经典 CAN 帧结构）；<a href="examples/can_ch27_pipeline.c">本章 C 断言示例</a>。信号字节和 100ms 时效均为教学假设，量产须遵循 DBC、MCU 与安全需求。</p></section><script>(()=>{'use strict';let q=0,lost=0;const o=document.getElementById('out27'),note=document.getElementById('note27');function show(m){o.textContent='队列 '+q+' / 4 · 溢出 '+lost;note.textContent=m}document.getElementById('add27').addEventListener('click',()=>{if(q<4){q++;show('已入队')}else{lost++;show('队列满：拒绝本帧并计数')}});document.getElementById('pop27').addEventListener('click',()=>{if(q){q--;show('任务已消费一帧')}else show('队列为空')});document.getElementById('reset27').addEventListener('click',()=>{q=lost=0;show('已重置')})})();</script>
+<div class="footer-nav">
             <a href="26.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="28.html">下一章 →</a>
         </div>
-        
-    </div>
+</article></main>
 </div>
 </div>
 </body>

@@ -1,0 +1,61 @@
+{
+  "chapter": 23,
+  "method": "Public documentation cross-check. Educational derived examples are not SAE conformance certificates.",
+  "scope": "Classic CAN / J1939-21 unless otherwise stated.",
+  "claims": [
+    {
+      "id": "tp_pgns",
+      "claim": "TP.CM=60416 and TP.DT=60160 with per-DT seven-byte payload",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://www.kernel.org/doc/html/latest/networking/j1939.html",
+      "locator": "Transport protocol",
+      "notes": "Classic CAN only."
+    },
+    {
+      "id": "max_tp",
+      "claim": "Traditional J1939 TP maximum 255*7=1785 bytes",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://www.kernel.org/doc/html/latest/networking/j1939.html",
+      "locator": "Transport protocol message size",
+      "notes": "ETP and J1939-22 differ."
+    },
+    {
+      "id": "tp_controls",
+      "claim": "Control codes RTS 0x10, CTS 0x11, EOM ACK 0x13, BAM 0x20",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://android.googlesource.com/kernel/common/+/refs/heads/android-gs-comet-6.1-android16/net/can/j1939/transport.c",
+      "locator": "J1939_TP_CMD_* constants",
+      "notes": "The protocol stack uses these controls in its state transitions."
+    },
+    {
+      "id": "eom_owner",
+      "claim": "Receiver sends EOM ACK following final packet in CMDT",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://www.kernel.org/doc/html/latest/networking/j1939.html",
+      "locator": "RTS/CTS transport description",
+      "notes": "Correction to the original chapter's sender-EOM claim."
+    },
+    {
+      "id": "tp_timers",
+      "claim": "T1/T2/T3/T4 values 750/1250/1250/1050 ms",
+      "kind": "standard_or_documentation",
+      "status": "verified",
+      "source_url": "https://www.cankit.pro/packages/j1939tp/",
+      "locator": "J1939-21 timer defaults and state meaning",
+      "notes": "Cross-check with selected J1939-21 version in products."
+    },
+    {
+      "id": "tp_50_example",
+      "claim": "50 bytes split into 8 packets, 6 pad bytes in last packet",
+      "kind": "calculation",
+      "status": "derived",
+      "source_url": "https://www.kernel.org/doc/html/latest/networking/j1939.html",
+      "locator": "TP.DT seven-byte segmentation",
+      "notes": "Computed ceiling(50/7) and 7*8-50."
+    }
+  ]
+}

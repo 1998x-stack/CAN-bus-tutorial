@@ -1,0 +1,60 @@
+{
+  "chapter": "14",
+  "scope": "Classical high-speed CAN passive linear trunk; cable-only illustrative propagation model",
+  "claims": [
+    {
+      "id": "multimaster",
+      "claim": "The CAN physical bus is shared multidrop and multimaster, not a master/slave topology",
+      "kind": "reference",
+      "source_url": "https://www.ti.com/document-viewer/lit/html/SLLA555/GUID-B6EFC304-6CF0-429D-A913-0E138E894DF3",
+      "locator": "CAN two-wire bus multi-master, multi-drop topology",
+      "status": "verified",
+      "notes": ""
+    },
+    {
+      "id": "two-ends",
+      "claim": "Typical high-speed CAN linear trunk places 120-ohm termination at the two physical endpoints",
+      "kind": "reference",
+      "source_url": "https://www.ti.com/document-viewer/lit/html/SLLA555/GUID-B6EFC304-6CF0-429D-A913-0E138E894DF3",
+      "locator": "120 Ω resistors at extreme bus ends",
+      "status": "verified",
+      "notes": ""
+    },
+    {
+      "id": "star-caveat",
+      "claim": "Special transceiver topologies may support more complex multi-stub arrangements than ordinary high-speed CAN",
+      "kind": "reference",
+      "source_url": "https://www.nxp.com/company/about-nxp/smarter-world-blog/BL-REIMAGINING-CAN-FOR-INDUSTRIAL",
+      "locator": "multi-stub / CAN SIC discussion",
+      "status": "verified",
+      "notes": ""
+    },
+    {
+      "id": "four-terminations",
+      "claim": "Four identical 120-ohm terminations in parallel create a 30-ohm DC load",
+      "kind": "formula",
+      "source_url": "https://www.ti.com/tool/TIDA-01238",
+      "locator": "chapter 14 star-network arithmetic",
+      "status": "derived",
+      "notes": ""
+    },
+    {
+      "id": "prop-delay",
+      "claim": "A 40m main line with assumed 5ns/m one-way delay has cable-only 400ns round-trip",
+      "kind": "teaching example",
+      "source_url": "https://www.ti.com/document-viewer/lit/html/SLLA555/GUID-B6EFC304-6CF0-429D-A913-0E138E894DF3",
+      "locator": "chapter 14 equation and assumptions; examples/can_chapters13_15_checks.py",
+      "status": "illustrative",
+      "notes": "5 ns/m is an explicitly illustrative assumption, not a protocol maximum."
+    },
+    {
+      "id": "no-universal-max",
+      "claim": "End-to-end CAN physical viability depends on propagation budget, branch geometry and devices; common cable-length tables are not universal ISO maxima",
+      "kind": "reference",
+      "source_url": "https://www.ti.com/document-viewer/lit/html/SLLA555/GUID-B6EFC304-6CF0-429D-A913-0E138E894DF3",
+      "locator": "CAN physical-layer layout / device-specific constraint",
+      "status": "verified",
+      "notes": ""
+    }
+  ]
+}

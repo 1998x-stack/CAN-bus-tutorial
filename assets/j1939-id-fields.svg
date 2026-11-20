@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 225" role="img" aria-labelledby="id22-title id22-desc" data-export="j1939-id-fields.svg">
+        <title id="id22-title">J1939 的 29 位扩展标识符</title><desc id="id22-desc">从高位到低位依次是优先级三位、R或EDP一位、DP一位、PF八位、PS八位、源地址八位；PDU1的PS为目标地址而PDU2的PS为组扩展。</desc>
+        <g font-family="system-ui,sans-serif" font-size="17" text-anchor="middle" fill="#153542">
+          <rect x="20" y="46" width="114" height="72" rx="8" fill="#e0f0ef" stroke="#147f80" stroke-width="2"/><text x="77" y="78">Priority</text><text x="77" y="101">3 bits</text>
+          <rect x="139" y="46" width="75" height="72" rx="8" fill="#e9e5f6" stroke="#7461ba"/><text x="176" y="78">R/EDP</text><text x="176" y="101">1</text>
+          <rect x="219" y="46" width="65" height="72" rx="8" fill="#e9e5f6" stroke="#7461ba"/><text x="251" y="78">DP</text><text x="251" y="101">1</text>
+          <rect x="289" y="46" width="171" height="72" rx="8" fill="#f9e7dd" stroke="#d06d4d" stroke-width="2"/><text x="374" y="78">PF</text><text x="374" y="101">8 bits</text>
+          <rect x="465" y="46" width="171" height="72" rx="8" fill="#f9e7dd" stroke="#d06d4d" stroke-width="2"/><text x="550" y="78">PS</text><text x="550" y="101">8 bits</text>
+          <rect x="641" y="46" width="178" height="72" rx="8" fill="#e0f0ef" stroke="#147f80" stroke-width="2"/><text x="730" y="78">SA</text><text x="730" y="101">8 bits</text>
+          <text x="77" y="31" font-size="13">28–26</text><text x="176" y="31" font-size="13">25</text><text x="251" y="31" font-size="13">24</text><text x="374" y="31" font-size="13">23–16</text><text x="550" y="31" font-size="13">15–8</text><text x="730" y="31" font-size="13">7–0</text>
+          <path d="M374 123 V146 H550 V123" fill="none" stroke="#d06d4d" stroke-width="2"/>
+          <text x="462" y="168" font-size="15">PF 决定 PS 的含义</text><text x="462" y="193" font-size="14">PF &lt; 240 → 目标地址；PF ≥ 240 → 组扩展</text>
+        </g>
+      </svg>

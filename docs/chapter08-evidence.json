@@ -1,0 +1,41 @@
+{
+  "chapter": 8,
+  "scope": "STM32F103 SPL / classical CAN where relevant",
+  "claims": [
+    {
+      "id": "bxcan-resources",
+      "statement": "bxCAN 3TX邮箱2RX FIFO且每FIFO深度为3",
+      "locator": "ST RM0008 bxCAN overview",
+      "source_url": "https://www.st.com/resource/en/reference_manual/cd00171190.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "banks",
+      "statement": "常规F103 14滤波器组；连接型F105/F107双CAN共享28组",
+      "locator": "ST RM0008 filters section",
+      "source_url": "https://www.st.com/resource/en/reference_manual/cd00171190.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "timing",
+      "statement": "36MHz 4 14 3得到500k和83.33%",
+      "locator": "integer division 36000000/(4*18), (1+14)/18",
+      "source_url": "https://www.st.com/resource/en/reference_manual/cd00171190.pdf",
+      "status": "derived"
+    },
+    {
+      "id": "f1pin",
+      "statement": "F103 PA11/PA12默认映射与PB8/PB9重映射",
+      "locator": "STM32F103 datasheet/remapping, SPL examples",
+      "source_url": "https://www.st.com/resource/en/reference_manual/cd00171190.pdf",
+      "status": "verified"
+    },
+    {
+      "id": "api",
+      "statement": "SPL CAN_Init负责退出初始化模式",
+      "locator": "STM32F10x SPL CAN_Init implementation / RM0008",
+      "source_url": "https://www.st.com/resource/en/reference_manual/cd00171190.pdf",
+      "status": "verified"
+    }
+  ]
+}
