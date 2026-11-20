@@ -1,0 +1,38 @@
+name: Chapter 02 browser QA
+on:
+  push:
+    paths:
+      - "02.html"
+      - "assets/chapter02-*.svg"
+      - "tests/browser_chapter02.py"
+      - ".github/workflows/chapter02-browser.yml"
+  pull_request:
+    paths:
+      - "02.html"
+      - "assets/chapter02-*.svg"
+      - "tests/browser_chapter02.py"
+      - ".github/workflows/chapter02-browser.yml"
+jobs:
+  visual-smoke:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Playwright and use Chrome supplied by runner
+        run: |
+          python -m pip install playwright==1.56.0
+          command -v google-chrome
+      - name: Inspect desktop, tablet, mobile, keyboard interaction and print
+        run: python tests/browser_chapter02.py
+      - name: Upload screenshots and QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chapter02-visual-qa
+          path: reports/chapter02/
+          if-no-files-found: ignore
+
