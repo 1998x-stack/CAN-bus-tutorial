@@ -5,11 +5,11 @@ class CheckChapters(unittest.TestCase):
     def test_chapters(self):
         for n in (25,26,27):
             p=(ROOT/f'{n}.html').read_text(encoding='utf-8')
-            self.assertEqual(len(re.findall(r'<h1\\b',p)),1)
+            self.assertEqual(len(re.findall(r'<h1\b',p)),1)
             self.assertIn('name="viewport"',p)
             self.assertIn('aria-live="polite"',p)
             self.assertIn('id="references"',p)
-            img=re.search(r'src="(assets/olah-ch[^"]+\\.svg)"',p)
+            img=re.search(r'src="(assets/olah-ch[^"]+\.svg)"',p)
             self.assertIsNotNone(img)
             svg=ET.parse(ROOT/img.group(1)).getroot()
             self.assertIn('viewBox',svg.attrib)
