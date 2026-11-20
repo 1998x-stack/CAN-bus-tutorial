@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 314" role="img" aria-labelledby="title desc">
+<title id="title">仲裁所需的往返传播延迟</title>
+<desc id="desc">节点A驱动电平沿线缆传播到节点B，B的显性状态再沿线缆返回A被检测，延迟预算必须包含线缆往返和节点收发器的相关延迟，不等于单程线长除以传播速度。</desc>
+<rect width="980" height="314" rx="18" fill="#fffdf9"/>
+<g font-family="system-ui,'Microsoft YaHei',sans-serif" fill="#203035">
+<text x="40" y="39" font-size="22" font-weight="750">为什么必须算“往返”，而不是只算单程？</text>
+<rect x="42" y="90" width="175" height="118" rx="11" fill="#e8f3f0" stroke="#57a297" stroke-width="2"/>
+<text x="130" y="124" font-size="20" font-weight="700" text-anchor="middle">节点 A</text>
+<text x="130" y="152" font-size="15" text-anchor="middle">发送并回读</text>
+<text x="130" y="176" font-size="13" text-anchor="middle" fill="#53676d">控制器 + 收发器</text>
+<rect x="765" y="90" width="175" height="118" rx="11" fill="#e8f3f0" stroke="#57a297" stroke-width="2"/>
+<text x="852" y="124" font-size="20" font-weight="700" text-anchor="middle">节点 B</text>
+<text x="852" y="152" font-size="15" text-anchor="middle">也参与仲裁</text>
+<text x="852" y="176" font-size="13" text-anchor="middle" fill="#53676d">控制器 + 收发器</text>
+<path d="M219 112 H744 l-15 -8 m15 8 l-15 8" fill="none" stroke="#147f80" stroke-width="5" stroke-linecap="round"/>
+<text x="492" y="97" text-anchor="middle" font-size="16" font-weight="700" fill="#147f80">去程：A → B</text>
+<path d="M762 185 H235 l15 -8 m-15 8 l15 8" fill="none" stroke="#c27349" stroke-width="5" stroke-linecap="round"/>
+<text x="492" y="211" text-anchor="middle" font-size="16" font-weight="700" fill="#aa5d34">回程：B → A</text>
+<rect x="150" y="233" width="680" height="49" rx="11" fill="#f4f2fa"/>
+<text x="490" y="254" text-anchor="middle" font-size="15" font-weight="650" fill="#544886">对称简化预算：t_prop ≈ 2 × (t_bus + t_TX + t_RX)</text>
+<text x="490" y="272" text-anchor="middle" font-size="12" fill="#53676d">实际以最坏节点组合、隔离/收发器延迟和器件手册为准</text>
+<text x="41" y="302" font-size="12" fill="#53676d">本图解释仲裁的传播预算，箭头仅表示影响路径；并非通信中有一条额外的“应答线”。</text>
+</g></svg>
