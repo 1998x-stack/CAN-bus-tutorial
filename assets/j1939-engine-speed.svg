@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 180" role="img" aria-labelledby="spn22-title spn22-desc" data-export="j1939-engine-speed.svg">
+        <title id="spn22-title">EEC1 从原始字节得到发动机转速</title><desc id="spn22-desc">E0 和 2E 是第四、第五字节，小端组合得到 0x2EE0 即 12000，乘以 0.125 得 1500 rpm。</desc>
+        <g font-family="system-ui,sans-serif" text-anchor="middle" fill="#193f4a">
+          <text x="420" y="26" font-size="17" font-weight="700">EEC1 的 8 字节数据区（教学示例）</text>
+          <g font-size="18" font-family="ui-monospace,monospace">
+            <rect x="22" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="69" y="81">00</text>
+            <rect x="122" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="169" y="81">7D</text>
+            <rect x="222" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="269" y="81">82</text>
+            <rect x="322" y="49" width="94" height="53" rx="7" fill="#f9e4d8" stroke="#d06d4d" stroke-width="2"/><text x="369" y="81">E0</text>
+            <rect x="422" y="49" width="94" height="53" rx="7" fill="#f9e4d8" stroke="#d06d4d" stroke-width="2"/><text x="469" y="81">2E</text>
+            <rect x="522" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="569" y="81">FF</text>
+            <rect x="622" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="669" y="81">FF</text>
+            <rect x="722" y="49" width="94" height="53" rx="7" fill="#e7eeef"/><text x="769" y="81">FF</text>
+          </g>
+          <path d="M369 107 V122 H469 V107" stroke="#d06d4d" stroke-width="2" fill="none"/>
+          <text x="420" y="151" font-size="17">0x2EE0 = 12000 → × 0.125 = 1500 rpm</text>
+        </g>
+      </svg>
