@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第25章 CAN总线调试技巧</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -114,12 +114,15 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
+    </style><style id="chapter-visual-reading">
+:root{--ink:#213b39;--accent:#127b79;--paper:#fffdf9}html{scroll-behavior:smooth}body{background:#edf3ee}.double-border{border:1px solid #d4e1d8;box-shadow:0 12px 35px #213b3912;background:var(--paper)}.container{grid-template-columns:235px minmax(0,1fr)}.sidebar{position:sticky;top:0;max-height:100vh;overflow:auto;align-self:start;background:#f7faf7}.sidebar .active{background:var(--accent)}.main-content{padding:44px min(5vw,64px);min-width:0;background:var(--paper)}.chapter-article{max-width:840px;margin:auto;font-size:17px;line-height:1.85;color:var(--ink)}.chapter-article p,.chapter-article li{line-height:1.85}.chapter-article h1{font-size:clamp(1.8rem,3vw,2.65rem);line-height:1.35;color:#164846}.chapter-article h2{border:0;padding:0;margin:3rem 0 1rem;font-size:1.53rem;color:#164846}.chapter-article h3{font-size:1.15rem}.chapter-article .hero{border-bottom:1px solid #d8e6df;padding-bottom:1.5rem}.chapter-article .eyebrow{letter-spacing:.16em;font-weight:700;color:var(--accent);font-size:.78rem}.chapter-article .lead{font-size:1.12rem;color:#516963}.chapter-article .toc{display:flex;gap:9px;flex-wrap:wrap}.chapter-article .toc a{border:1px solid #c6dbd1;border-radius:20px;padding:2px 12px;color:#127b79;text-decoration:none;font-size:.87rem}.chapter-article figure{background:#f6faf8;padding:14px;border:1px solid #d3e3da;border-radius:14px;margin:25px 0;overflow-x:auto}.chapter-article figure img{width:100%;height:auto;min-width:620px}.chapter-article figcaption{font-size:.86rem;color:#566b64;line-height:1.7}.chapter-article .demo{background:#f3f9f6;padding:18px;border:1px solid #c9ddd2;border-radius:12px;margin:24px 0}.chapter-article .controls{display:flex;flex-wrap:wrap;gap:12px}.chapter-article label{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px;font-size:.86rem;font-weight:bold}.chapter-article select,.chapter-article input,.chapter-article button{font:inherit;border:1px solid #b7c9be;border-radius:7px;padding:8px;background:white;max-width:100%}.chapter-article button{background:#137f7b;color:white;border:0;cursor:pointer}.chapter-article .output{font-size:1.35rem;font-weight:750;color:#176662}.chapter-article .detail{font-size:.87rem;color:#516963}.chapter-article table{display:block;overflow-x:auto;background:transparent}.chapter-article td,.chapter-article th{border-color:#d5e3db}.chapter-article th{background:#e7f1eb}.chapter-article .tip,.chapter-article .warning{background:#f4f9f6;border:1px solid #ceddd5;border-left:4px solid #17857f;border-radius:8px;padding:12px 16px}.chapter-article .warning{background:#fff7f0;border-left-color:#be7946}.chapter-article pre{background:#253942;color:#fff;overflow:auto}.chapter-article pre code{background:transparent;color:inherit}.chapter-article a{color:#127b79}.chapter-article .mathbox{overflow:auto;background:#f6f5ed;padding:8px;border-radius:8px}.skip-link{position:absolute;left:12px;top:-60px;background:white;padding:12px}.skip-link:focus{top:12px}:focus-visible{outline:3px solid #127b79;outline-offset:3px}
+@media(max-width:900px){.container{grid-template-columns:minmax(0,1fr)}.sidebar{position:static;max-height:185px;overflow-y:auto}.main-content{padding:28px 22px}}@media(max-width:480px){body{padding:0}.double-border{border:0;border-radius:0}.main-content{padding:22px 17px}.chapter-article{font-size:16px}.chapter-article figure{padding:8px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@media print{.sidebar,.skip-link,.demo button{display:none}.container{display:block}.main-content{padding:0}.double-border{border:0;box-shadow:none}.chapter-article figure{break-inside:avoid}}
+</style>
 </head>
-<body>
+<body><a class="skip-link" href="#content">跳转至正文</a>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="全部章节">
         <h3>📚 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
@@ -153,125 +156,19 @@
 <li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第25章 CAN总线调试技巧：逻辑分析仪抓包、总线负载率计算、常见故障排查</h2>
-
-<p>做CAN总线开发，调试是家常便饭。说实话，我见过不少工程师，代码写得漂亮，但一遇到总线问题就抓瞎。今天这章，我就把压箱底的调试技巧拿出来聊聊。</p>
-
-<h3>25.1 逻辑分析仪抓包：别光看波形</h3>
-
-<p>很多人觉得逻辑分析仪就是看个波形高低电平。其实不然。我习惯用它做三件事：</p>
-
-<ul>
-  <li><strong>确认位时序</strong>：采样点位置对不对？位时间够不够？</li>
-  <li><strong>抓异常帧</strong>：错误帧、过载帧长什么样？</li>
-  <li><strong>看总线竞争</strong>：多节点同时发数据时，谁赢了？</li>
-</ul>
-
-<div class="tip">
-  <p><strong>我的小技巧</strong>：抓包时把触发条件设成“错误帧”或“ACK错误”。这样能快速定位问题节点。我在项目里用这招，半小时就揪出了一个隐性故障。</p>
-</div>
-
-<h3>25.2 总线负载率计算：别超过这个数</h3>
-
-<p>总线负载率，说白了就是总线有多忙。计算公式很简单：</p>
-
-<pre><code>负载率 = (实际数据量 / 总线带宽) × 100%</code></pre>
-
-<p>举个例子：500kbps的CAN总线，每秒最多传500,000位。如果每秒实际传了250,000位，负载率就是50%。</p>
-
-<p>我建议你记住几个关键数字：</p>
-
-<table>
-  <tr>
-    <th>负载率范围</th>
-    <th>状态</th>
-    <th>建议</th>
-  </tr>
-  <tr>
-    <td>&lt; 30%</td>
-    <td>空闲</td>
-    <td>可以加节点</td>
-  </tr>
-  <tr>
-    <td>30% - 60%</td>
-    <td>正常</td>
-    <td>合理范围</td>
-  </tr>
-  <tr>
-    <td>60% - 80%</td>
-    <td>偏高</td>
-    <td>需要优化</td>
-  </tr>
-  <tr>
-    <td>&gt; 80%</td>
-    <td>危险</td>
-    <td>必须降负载</td>
-  </tr>
-</table>
-
-<div class="warning">
-  <p><strong>注意</strong>：负载率超过80%时，总线延迟会急剧增加。我曾经在一个项目中，负载率到了85%，结果ECU之间的同步信号总是丢帧。后来把一些非关键报文降了优先级，问题才解决。</p>
-</div>
-
-<h3>25.3 常见故障排查：三板斧</h3>
-
-<p>遇到CAN总线故障，别慌。我总结了三板斧：</p>
-
-<h4>第一斧：看物理层</h4>
-<ul>
-  <li>CAN_H和CAN_L的电压对不对？隐性时约2.5V，显性时差2V左右。</li>
-  <li>终端电阻有没有？两端各120Ω，总阻值60Ω。</li>
-  <li>线缆长度超没超？1Mbps时最长40米。</li>
-</ul>
-
-<h4>第二斧：看数据链路层</h4>
-<ul>
-  <li>有没有错误帧？连续出现15个以上显性位就是错误帧。</li>
-  <li>ACK位对不对？发送节点没收到ACK，说明接收节点有问题。</li>
-  <li>CRC校验过没过？不过的话，数据可能被干扰了。</li>
-</ul>
-
-<h4>第三斧：看应用层</h4>
-<ul>
-  <li>ID冲突了没？两个节点发同一个ID，总线会乱。</li>
-  <li>数据长度对不对？DLC和实际数据长度要一致。</li>
-  <li>发送间隔合理吗？别让一个节点把总线占满了。</li>
-</ul>
-
-<div class="highlight">
-  <p><strong>避坑指南</strong>：我曾经遇到一个怪问题——总线偶尔丢帧，但波形看着没问题。查了两天，最后发现是某个节点的CAN控制器时钟不准，导致采样点偏移。从那以后，我每次调试都会先检查各节点的时钟精度。</p>
-</div>
-
-<h3>25.4 实战：用逻辑分析仪抓一个错误帧</h3>
-
-<p>来，我带你走一遍流程：</p>
-
-<ol>
-  <li>把逻辑分析仪的通道1接CAN_H，通道2接CAN_L。</li>
-  <li>设置采样率：至少4倍于CAN波特率。比如500kbps，采样率设2MHz以上。</li>
-  <li>触发条件选“下降沿”，因为错误帧通常从显性位开始。</li>
-  <li>抓包后，看波形：正常帧有SOF、ID、控制场、数据场、CRC、ACK、EOF。</li>
-  <li>如果看到连续6个显性位后突然变隐性，那就是错误帧的标志。</li>
-</ol>
-
-<div class="tip">
-  <p><strong>我的习惯</strong>：抓包时顺便把CAN控制器的寄存器状态也读出来。比如看TEC（发送错误计数）和REC（接收错误计数）。如果TEC或REC超过127，节点就会进入被动错误状态。超过255，节点就离线了。</p>
-</div>
-
-<h3>25.5 总结一下</h3>
-
-<p>调试CAN总线，说白了就是三步：看波形、算负载、查错误。逻辑分析仪是你的眼睛，负载率是你的尺子，故障排查是你的手术刀。多练几次，你也能成为总线调试高手。</p>
-
-<p>嗯，这章就到这里。下一章我们聊聊CAN FD——那个更快、更猛的升级版。</p>
-        <div class="footer-nav">
+    </nav>
+<main class="main-content" id="content"><article class="chapter-article">
+<header class="hero"><p class="eyebrow">CAN ENGINEERING / CHAPTER 25</p><h1>第25章 · 从波形到根因的 CAN 调试</h1><p class="lead">抓到了报文却找不到故障？先把差分电气信号、帧错误、控制器状态和应用超时拆开观察。</p><nav class="toc" aria-label="本章目录"><a href="#phys25">证据链</a><a href="#err25">错误帧</a><a href="#load25">负载计算</a><a href="#check25">排查流程</a></nav></header>
+<section id="phys25"><h2>25.1 把四种不同证据摆在同一时间轴</h2><p>一次丢帧可能由线缆反射、ACK/CRC 错误、硬件 RX FIFO 溢出或应用层超时造成。它们表现相似，根因完全不同。</p><figure tabindex="0"><img src="assets/olah-ch25-evidence.svg" width="900" height="230" alt="CAN故障定位依次检查物理、协议、控制器及应用四层"><figcaption>图25-1 · 先判断哪一层的证据异常，再改变单一变量进行复现。任何一个错误帧都不能直接锁定故障 ECU。</figcaption></figure><ol><li><b>测波形：</b>用适当探头和示波器观察 CAN_H/CAN_L 差分信号、振铃及共模；普通数字逻辑分析仪更适合连接符合其输入电平的收发器 RXD，不应直接把总线电压当 TTL。</li><li><b>解帧：</b>记录帧格式、ID、DLC、时间戳、ACK、CRC、错误信息。</li><li><b>读控制器：</b>读取 TEC/REC、bus-off、RX FIFO 溢出计数。</li><li><b>看业务：</b>记录最后有效消息时间戳，区分未收帧与信号超时。</li></ol><div class="warning">接地参考不确定时，不要随意将接地式示波器探头夹到车载线束；确认测量方法和探头额定值。</div></section>
+<section id="err25"><h2>25.2 错误标志不等于“连续 6 个显性位就是一帧”</h2><p>经典 CAN 的主动错误标志为 6 个显性位，可能与其他节点错误标志重叠；被动错误标志为 6 个隐性位。判断时要结合位填充、错误定界符与控制器状态，不能只数显性脉冲。<a href="https://kvaser.com/lesson/can-error-handling/">参见 Kvaser 错误机制</a>。</p><p>发送端没有看到 ACK 可能是没有其他正常模式节点、测试接口处于 listen-only、时序不一致或连接问题；不能直接断言“接收节点损坏”。TEC/REC 达到 128 进入错误被动相关状态；<b>bus-off 针对发送错误计数 TEC 超过 255</b>，不是任意计数大于 255。</p><table><tr><th>现象</th><th>先查什么</th><th>不要急于推断</th></tr><tr><td>ACK Error</td><td>是否有第二个正常模式节点，速率/采样点及连接</td><td>对方 MCU 损坏</td></tr><tr><td>CRC/Bit Error</td><td>电气波形、时钟、线束、收发器</td><td>必定是应用解析错误</td></tr><tr><td>无总线错误但业务超时</td><td>过滤器、FIFO、队列和任务调度</td><td>总线绝无问题</td></tr></table></section>
+<section id="load25"><h2>25.3 总线负载按完整帧位数计算</h2><p>实际总线占用包含 SOF、仲裁、控制、数据、CRC、ACK、EOF、帧间隔、位填充，以及可能的错误重发。理想无填充的经典 CAN 数据帧基线可估为标准帧 <code>47 + 8×DLC</code> 位、扩展帧 <code>67 + 8×DLC</code> 位（含 3 位帧间隔）。</p><div class="mathbox" tabindex="0" aria-label="总线负载率公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>U</mi><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>f</mi><mi>i</mi></msub><mo>·</mo><msub><mi>B</mi><mi>i</mi></msub></mrow><mi>R</mi></mfrac><mo>×</mo><mn>100</mn><mo>%</mo></mrow></math></div><p><code>fᵢ</code> 是每秒帧数，<code>Bᵢ</code> 是每帧总线位数，<code>R</code> 是 bit/s。位填充和重发需另计；这不是 CAN FD 或实测精确模型。</p><div id="demo25" class="demo"><h3>动手试算：500 kbit/s，8 字节，1000 帧/秒</h3><div class="controls"><label>标称速率<select id="rate25"><option value="125000">125 kbit/s</option><option value="250000">250 kbit/s</option><option value="500000" selected>500 kbit/s</option><option value="1000000">1 Mbit/s</option></select></label><label>格式<select id="base25"><option value="47">标准 ID</option><option value="67">扩展 ID</option></select></label><label>DLC (0–8)<input id="dlc25" type="number" min="0" max="8" value="8"></label><label>频率 (帧/秒)<input id="fps25" type="number" min="0" max="100000" value="1000"></label><label>额外开销（情景假设）<select id="extra25"><option value="0">0%</option><option value="0.15">15%</option><option value="0.25">25%</option></select></label></div><p class="output" id="out25" aria-live="polite">22.2%（111 bit/帧）</p><p class="detail">附加百分比是情景系数，并非精确填充上限；超过 100% 表示提供的流量不可持续。真实设计要核算峰值、优先级、截止期限及重发。</p></div><p>“80% 一定危险”“30% 一定安全”都不是协议保证。只给报文改优先级并不会减少物理总线占用，低优先级周期任务反而可能被延迟。</p></section>
+<section id="check25"><h2>25.4 五步复现和验收</h2><ol><li>固定节点数、线束拓扑、供电、位速率、采样点及报文周期。</li><li>全部断电后，典型双端 120Ω 的高速 CAN 总线测约 60Ω；其他拓扑不适用此简化判断。</li><li>同步抓波形/帧/TEC/REC/FIFO 计数和应用时间戳。</li><li>一次只变更一个变量，例如仅调整线束或报文周期。</li><li>用最坏工况下的延迟、丢帧、错误状态与业务超时作为验收指标。</li></ol><div class="tip">记住：先观察证据，再推断根因；不要只凭“日志里没有错误帧”断定应用状态必然正确。</div></section><section id="references"><h2>依据与延伸阅读</h2><p><a href="https://kvaser.com/lesson/can-error-handling/">Kvaser · Error Handling</a> · <a href="https://kvaser.com/knowledge-base/get-error-frames/">Kvaser · Why do I get error frames?</a> · <a href="https://kvaser.com/can-protocol-tutorial/">Kvaser · CAN Protocol Tutorial</a>。计算器是教学估算，需以实测总线负载校验。</p></section><script>(()=>{'use strict';const ids=['rate25','base25','dlc25','fps25','extra25'];const x=ids.map(id=>document.getElementById(id));function update(){const [r,b,d,f,e]=x.map(a=>Number(a.value));const bits=b+8*Math.max(0,Math.min(8,Math.round(d)||0));const load=100*bits*Math.max(0,f||0)*(1+e)/r;document.getElementById('out25').textContent=load.toFixed(1)+'%（'+bits+' bit/帧，基线）';}x.forEach(v=>v.addEventListener('input',update));update()})();</script>
+<div class="footer-nav">
             <a href="24.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="26.html">下一章 →</a>
         </div>
-        
-    </div>
+</article></main>
 </div>
 </div>
 </body>

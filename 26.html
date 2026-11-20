@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第26章 CAN总线硬件设计</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -114,12 +114,15 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
-    </style>
+    </style><style id="chapter-visual-reading">
+:root{--ink:#213b39;--accent:#127b79;--paper:#fffdf9}html{scroll-behavior:smooth}body{background:#edf3ee}.double-border{border:1px solid #d4e1d8;box-shadow:0 12px 35px #213b3912;background:var(--paper)}.container{grid-template-columns:235px minmax(0,1fr)}.sidebar{position:sticky;top:0;max-height:100vh;overflow:auto;align-self:start;background:#f7faf7}.sidebar .active{background:var(--accent)}.main-content{padding:44px min(5vw,64px);min-width:0;background:var(--paper)}.chapter-article{max-width:840px;margin:auto;font-size:17px;line-height:1.85;color:var(--ink)}.chapter-article p,.chapter-article li{line-height:1.85}.chapter-article h1{font-size:clamp(1.8rem,3vw,2.65rem);line-height:1.35;color:#164846}.chapter-article h2{border:0;padding:0;margin:3rem 0 1rem;font-size:1.53rem;color:#164846}.chapter-article h3{font-size:1.15rem}.chapter-article .hero{border-bottom:1px solid #d8e6df;padding-bottom:1.5rem}.chapter-article .eyebrow{letter-spacing:.16em;font-weight:700;color:var(--accent);font-size:.78rem}.chapter-article .lead{font-size:1.12rem;color:#516963}.chapter-article .toc{display:flex;gap:9px;flex-wrap:wrap}.chapter-article .toc a{border:1px solid #c6dbd1;border-radius:20px;padding:2px 12px;color:#127b79;text-decoration:none;font-size:.87rem}.chapter-article figure{background:#f6faf8;padding:14px;border:1px solid #d3e3da;border-radius:14px;margin:25px 0;overflow-x:auto}.chapter-article figure img{width:100%;height:auto;min-width:620px}.chapter-article figcaption{font-size:.86rem;color:#566b64;line-height:1.7}.chapter-article .demo{background:#f3f9f6;padding:18px;border:1px solid #c9ddd2;border-radius:12px;margin:24px 0}.chapter-article .controls{display:flex;flex-wrap:wrap;gap:12px}.chapter-article label{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px;font-size:.86rem;font-weight:bold}.chapter-article select,.chapter-article input,.chapter-article button{font:inherit;border:1px solid #b7c9be;border-radius:7px;padding:8px;background:white;max-width:100%}.chapter-article button{background:#137f7b;color:white;border:0;cursor:pointer}.chapter-article .output{font-size:1.35rem;font-weight:750;color:#176662}.chapter-article .detail{font-size:.87rem;color:#516963}.chapter-article table{display:block;overflow-x:auto;background:transparent}.chapter-article td,.chapter-article th{border-color:#d5e3db}.chapter-article th{background:#e7f1eb}.chapter-article .tip,.chapter-article .warning{background:#f4f9f6;border:1px solid #ceddd5;border-left:4px solid #17857f;border-radius:8px;padding:12px 16px}.chapter-article .warning{background:#fff7f0;border-left-color:#be7946}.chapter-article pre{background:#253942;color:#fff;overflow:auto}.chapter-article pre code{background:transparent;color:inherit}.chapter-article a{color:#127b79}.chapter-article .mathbox{overflow:auto;background:#f6f5ed;padding:8px;border-radius:8px}.skip-link{position:absolute;left:12px;top:-60px;background:white;padding:12px}.skip-link:focus{top:12px}:focus-visible{outline:3px solid #127b79;outline-offset:3px}
+@media(max-width:900px){.container{grid-template-columns:minmax(0,1fr)}.sidebar{position:static;max-height:185px;overflow-y:auto}.main-content{padding:28px 22px}}@media(max-width:480px){body{padding:0}.double-border{border:0;border-radius:0}.main-content{padding:22px 17px}.chapter-article{font-size:16px}.chapter-article figure{padding:8px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@media print{.sidebar,.skip-link,.demo button{display:none}.container{display:block}.main-content{padding:0}.double-border{border:0;box-shadow:none}.chapter-article figure{break-inside:avoid}}
+</style>
 </head>
-<body>
+<body><a class="skip-link" href="#content">跳转至正文</a>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="全部章节">
         <h3>📚 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
@@ -153,150 +156,19 @@
 <li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第26章 CAN总线硬件设计：PCB布局要点、隔离设计、ESD保护</h2>
-
-<p>各位工程师朋友，咱们今天聊点硬核的。CAN总线通信，协议搞懂了，软件调通了，结果一上电，通信时好时坏，甚至烧片子。这种事，我见过太多次了。说白了，硬件设计才是CAN通信的基石。这一章，我就把PCB布局、隔离设计和ESD保护这三个硬骨头，掰开了揉碎了讲给你听。</p>
-
-<h3>26.1 PCB布局：别让走线毁了你的CAN</h3>
-
-<p>PCB布局这事儿，很多人觉得差不多就行。我告诉你，差一点都不行。CAN总线是差分信号，对噪声极其敏感。布局不好，轻则误码，重则通信中断。</p>
-
-<h4>26.1.1 差分走线的黄金法则</h4>
-
-<p>CAN_H和CAN_L必须紧挨着走，而且要等长。为什么？因为差分信号是靠两根线的电压差来传递信息的。如果两根线走得太远，或者长度不一样，外界噪声对它们的影响就不一样，差分信号的优势就没了。</p>
-
-<p>我个人习惯，差分对之间的间距控制在3倍线宽以内。比如线宽10mil，间距就控制在30mil以内。走线时尽量少打过孔，实在要打，就成对打，保持对称。</p>
-
-<div class="highlight">
-  <p><strong>关键参数速查表</strong></p>
-  <table>
-    <tr><th>参数</th><th>推荐值</th><th>说明</th></tr>
-    <tr><td>差分对间距</td><td>≤3倍线宽</td><td>保持耦合紧密</td></tr>
-    <tr><td>线宽</td><td>10-20mil</td><td>根据板厚和阻抗要求调整</td></tr>
-    <tr><td>等长误差</td><td>≤5mm</td><td>越长要求越严</td></tr>
-    <tr><td>参考平面</td><td>完整地平面</td><td>不要跨分割</td></tr>
-  </table>
-</div>
-
-<h4>26.1.2 终端电阻的摆放</h4>
-
-<p>终端电阻必须放在总线的最两端。这个道理大家都懂，但实际项目中，我见过有人把电阻放在离CAN收发器很近的地方，而不是靠近连接器。结果呢？总线反射严重，通信速率一高就出错。</p>
-
-<p>嗯，这里要注意：电阻要靠近CAN连接器放置，走线要短而粗。我一般用1206封装的电阻，功率够，散热也好。</p>
-
-<h4>26.1.3 电源和地的处理</h4>
-
-<p>CAN收发器对电源噪声很敏感。我建议在收发器的电源引脚旁边放一个0.1μF的陶瓷电容，再加一个10μF的电解电容。电容要尽量靠近引脚，走线越短越好。</p>
-
-<p>地线处理更关键。CAN收发器的地，要单独走一条粗线回到电源地，不要和数字地混在一起。我在项目中遇到过，数字地和CAN地共用一段走线，结果数字噪声直接耦合到CAN总线上，通信一塌糊涂。</p>
-
-<div class="tip">
-  <p><strong>我的小技巧：</strong>在CAN收发器下面铺一块完整的地铜皮，然后用多个过孔连接到主地平面。这样散热好，抗干扰能力也强。</p>
-</div>
-
-<h3>26.2 隔离设计：保护你的主控</h3>
-
-<p>为什么要隔离？因为CAN总线是暴露在外的，可能连接到各种设备上。万一哪台设备出了问题，高压窜进来，你的主控芯片就完了。隔离，说白了就是花钱买安全。</p>
-
-<h4>26.2.1 光耦隔离</h4>
-
-<p>光耦隔离是传统方案，技术成熟，价格便宜。但缺点也很明显：速度慢，功耗大，寿命有限。</p>
-
-<p>选光耦时要注意几个参数：</p>
-<ul>
-  <li><strong>传输速率：</strong>CAN总线最高1Mbps，光耦的速率至少要能覆盖。我一般选10Mbps以上的光耦，留点余量。</li>
-  <li><strong>共模抑制比：</strong>这个参数越高越好，至少10kV/μs以上。</li>
-  <li><strong>输入输出电容：</strong>越小越好，影响信号边沿。</li>
-</ul>
-
-<p>我曾经在一个项目中用了低速光耦，结果CAN通信速率只能跑到125kbps，再高就丢包。后来换了高速光耦，问题才解决。所以，别在光耦上省钱。</p>
-
-<h4>26.2.2 磁隔离</h4>
-
-<p>磁隔离是近年来的主流方案。像ADI的ADuM系列、TI的ISO系列，都是磁隔离的代表。相比光耦，磁隔离速度快、功耗低、寿命长，而且集成度高，一个芯片就能搞定隔离电源和信号隔离。</p>
-
-<p>我个人更推荐磁隔离，尤其是对空间有限的设计。比如我最近做的一个车载控制器，板子只有巴掌大，用磁隔离方案，一个芯片就解决了隔离问题，省了不少空间。</p>
-
-<div class="highlight">
-  <p><strong>光耦 vs 磁隔离对比</strong></p>
-  <table>
-    <tr><th>项目</th><th>光耦隔离</th><th>磁隔离</th></tr>
-    <tr><td>传输速率</td><td>一般≤10Mbps</td><td>可达150Mbps</td></tr>
-    <tr><td>功耗</td><td>较高（需驱动LED）</td><td>低（CMOS工艺）</td></tr>
-    <tr><td>寿命</td><td>有限（LED老化）</td><td>长（无磨损）</td></tr>
-    <tr><td>集成度</td><td>低（需外围电路）</td><td>高（集成电源+信号）</td></tr>
-    <tr><td>成本</td><td>低</td><td>较高</td></tr>
-  </table>
-</div>
-
-<h4>26.2.3 隔离电源的设计</h4>
-
-<p>隔离了信号，电源也得隔离。最简单的办法是用隔离DC-DC模块。比如B0505S，输入5V，输出5V，隔离电压3000V。注意，隔离电源的输出要单独给CAN收发器供电，不能和主控共地。</p>
-
-<p>如果你用磁隔离芯片，很多型号已经集成了隔离电源，比如ADuM5401，一个芯片搞定信号和电源隔离，省事多了。</p>
-
-<div class="warning">
-  <p><strong>警告：</strong>隔离电源的输出电容不能太大，否则上电瞬间电流冲击可能损坏隔离芯片。我一般控制在10μF以内。</p>
-</div>
-
-<h3>26.3 ESD保护：给CAN总线穿上铠甲</h3>
-
-<p>CAN总线是暴露在外的，插拔连接器、静电放电，都是家常便饭。没有ESD保护，芯片随时可能报废。</p>
-
-<h4>26.3.1 ESD保护器件选型</h4>
-
-<p>常用的ESD保护器件有TVS管和压敏电阻。对于CAN总线，我推荐用TVS管，响应速度快，钳位电压低。</p>
-
-<p>选TVS管时要注意：</p>
-<ul>
-  <li><strong>工作电压：</strong>要高于CAN总线的最大电压。CAN总线标称12V，但实际可能有24V甚至更高。我一般选工作电压24V或36V的TVS管。</li>
-  <li><strong>钳位电压：</strong>越低越好，但不要低于总线电压。一般选40V左右的钳位电压。</li>
-  <li><strong>功率：</strong>至少400W，最好600W以上。</li>
-</ul>
-
-<p>我曾经在一个项目中用了工作电压12V的TVS管，结果总线上一有浪涌，TVS管就击穿了，反而把总线拉低。后来换了24V的，问题解决。</p>
-
-<h4>26.3.2 保护电路布局</h4>
-
-<p>TVS管要放在连接器旁边，越近越好。走线要短而粗，最好用铜皮直接连接。TVS管的接地也要直接回到地平面，不要绕路。</p>
-
-<p>我习惯在CAN_H和CAN_L之间也加一个TVS管，做差模保护。这样共模和差模都能防住。</p>
-
-<div class="highlight">
-  <p><strong>推荐电路结构：</strong></p>
-  <pre><code>连接器 → 共模扼流圈 → TVS管(对地) → TVS管(差分) → CAN收发器</code></pre>
-  <p>共模扼流圈可以抑制共模噪声，TVS管吸收浪涌能量。这个组合，我用了很多年，没出过问题。</p>
-</div>
-
-<h4>26.3.3 实际项目中的避坑指南</h4>
-
-<p>我曾经在一个项目中，ESD保护做得很好，但通信还是不稳定。查了半天，发现是共模扼流圈的选型问题。扼流圈的阻抗太高，把信号衰减了。后来换了阻抗合适的扼流圈，问题解决。</p>
-
-<p>所以，选共模扼流圈时要注意：</p>
-<ul>
-  <li>阻抗不要太大，一般100Ω@100MHz就够了。</li>
-  <li>额定电流要大于总线电流，至少200mA。</li>
-  <li>封装要小，便于布局。</li>
-</ul>
-
-<div class="tip">
-  <p><strong>我的经验：</strong>ESD保护不是越强越好。保护器件太强，反而会影响信号质量。找到平衡点，才是关键。</p>
-</div>
-
-<h3>26.4 总结</h3>
-
-<p>好了，这一章的内容就这些。PCB布局、隔离设计、ESD保护，这三块做好了，你的CAN总线硬件就稳了。记住，硬件设计没有捷径，细节决定成败。下次调试遇到通信问题，先看看你的PCB布局合不合理，隔离做没做好，ESD保护到位不到位。很多时候，问题就出在这些地方。</p>
-
-<p>下一章，咱们聊聊CAN总线的测试与验证。到时候，我会分享一些实用的测试方法和工具，帮你快速定位问题。咱们下章见。</p>
-        <div class="footer-nav">
+    </nav>
+<main class="main-content" id="content"><article class="chapter-article">
+<header class="hero"><p class="eyebrow">CAN ENGINEERING / CHAPTER 26</p><h1>第26章 · 让终端、保护与隔离各守边界</h1><p class="lead">硬件不稳定时，先问：反射从哪里来？瞬态在哪里回流？隔离栅有没有被别的铜线跨过？</p><nav class="toc" aria-label="本章目录"><a href="#term26">终端</a><a href="#layout26">布局</a><a href="#iso26">隔离</a><a href="#check26">测试</a></nav></header>
+<section id="term26"><h2>26.1 两只 120Ω 只放在主干两端</h2><p>高速经典 CAN 的线性主干应在物理两端做匹配终端，支线尽量短。每块板都放 120Ω 会过度加载总线。两只 120Ω 并联是 60Ω；测阻前应确保所有设备断电，并注意其他偏置/电子终端带来的差异。</p><figure tabindex="0"><img src="assets/olah-ch26-termination.svg" width="900" height="260" alt="CAN物理主干左右两端各120欧姆，中间节点不额外增加终端"><figcaption>图26-1 · 端点终端决定反射，接口保护和共模器件解决的是不同问题。</figcaption></figure><div class="demo"><h3>动手实验：多装一个终端的后果</h3><label>并联的 120Ω 电阻数量<select id="n26"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label><p id="r26" class="output" aria-live="polite">60 Ω</p><p class="detail">理想并联电阻模型，不含电缆与收发器输入阻抗。</p></div></section>
+<section id="layout26"><h2>26.2 摆放逻辑：TVS 靠连接器，CMC 靠收发器</h2><p>不同问题的器件应在不同位置：ESD/瞬态 TVS（如需要）靠近线束入口，尽量缩短浪涌返回路径；可选共模扼流圈靠近收发器 CANH/CANL 引脚。<a href="https://www.nxp.com/docs/en/supporting-information/AH1014.pdf">NXP AH1014 第 8.1、8.3、8.9 节</a>详细列出了这一布局原则。CMC 也可能引入漏感与振铃，不能无条件添加。</p><table><tr><th>器件/结构</th><th>摆放与验证原则</th></tr><tr><td>CAN_H / CAN_L</td><td>成对、对称、尽量短，控制支线和不连续；避免与干扰信号长距离并行</td></tr><tr><td>VCC / VIO 去耦</td><td>靠近收发器电源脚，低阻抗回流，按型号手册选容值</td></tr><tr><td>终端 / 分裂终端</td><td>只在主干端点；分裂终端两只约 60Ω 串联总计仍 120Ω</td></tr><tr><td>数字地 / 收发器地</td><td>在同一非隔离侧保持低阻抗共同参考，避免随意割裂或串联地滤波器</td></tr></table><div class="warning"><b>纠正一个常见误解：</b>CAN_H/L 不是固定“12V/24V 电源线”。TVS 的反向工作电压、钳位电压、寄生电容、能量额定值须根据收发器允许的共模与故障电压，以及整车/工业浪涌标准共同选型；固定规定 24V、36V 或 600W 没有普适性。</div></section>
+<section id="iso26"><h2>26.3 隔离的关键是完整的系统边界</h2><p>隔离设计必须同时考虑数字信号通道与总线侧隔离供电。集成隔离 CAN 收发器并不一定包含隔离电源；不能把“磁隔离速度快”代替传播延迟、CMTI、工作电压、爬电距离、电气间隙和隔离寿命的核算。</p><ul><li><b>非隔离板：</b>MCU 和收发器使用合适的低阻抗地参考；不应无原则地分割地平面。</li><li><b>隔离板：</b>跨隔离栅避免非预期的铜皮、测试点或走线桥接，隔离电源与隔离器的额定值要匹配。</li><li><b>保护回路：</b>TVS 钳位路径、机壳地与逻辑地的连接策略要由系统 EMC 与安全要求决定。</li></ul></section>
+<section id="check26"><h2>26.4 从设计假设走向实测</h2><ol><li>校核芯片供电、VIO、控制脚和 CAN/CAN FD 速率范围。</li><li>断电检查终端总数、电阻值与隔离侧意外短接。</li><li>带电检查差分波形、共模与最不利线束的反射。</li><li>按应用规范实施 EMC/ESD/浪涌、温度、电源扰动和通信压力测试。</li><li>改动 TVS/CMC/终端后做完整回归，不以“一帧发送成功”作为验收。</li></ol><div class="tip">元件数量不是可靠性的指标。先定义目标测试规范，再选择器件和回路。</div></section><section id="references"><h2>技术依据</h2><p><a href="https://www.nxp.com/docs/en/supporting-information/AH1014.pdf">NXP AH1014，章节 7–9：终端、ESD、CMC 和 PCB</a>；<a href="https://www.ti.com/lit/ds/symlink/tcan3403-q1.pdf">TI TCAN3403-Q1/TCAN3404-Q1 数据手册</a>。具体器件以所选型号最新版手册为准。</p></section><script>(()=>{'use strict';const n=document.getElementById('n26'),r=document.getElementById('r26');function u(){const x=Number(n.value);r.textContent=x?((120/x).toFixed(1)+' Ω'):'∞ Ω（理想开路）'}n.addEventListener('change',u);u()})();</script>
+<div class="footer-nav">
             <a href="25.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="27.html">下一章 →</a>
         </div>
-        
-    </div>
+</article></main>
 </div>
 </div>
 </body>

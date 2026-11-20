@@ -1,0 +1,19 @@
+{
+  "chapter": 26,
+  "sources": [
+    "https://www.nxp.com/docs/en/supporting-information/AH1014.pdf",
+    "https://www.ti.com/lit/ds/symlink/tcan3403-q1.pdf"
+  ],
+  "claims": [
+    {
+      "claim": "CMC near transceiver; ESD near connector",
+      "status": "verified",
+      "source": "NXP AH1014 section 8.9"
+    },
+    {
+      "claim": "Two parallel 120 ohm resistors yield 60 ohm",
+      "status": "derived",
+      "formula": "120/2"
+    }
+  ]
+}

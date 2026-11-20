@@ -1,0 +1,20 @@
+{
+  "chapter": 25,
+  "sources": [
+    "https://kvaser.com/lesson/can-error-handling/",
+    "https://kvaser.com/knowledge-base/get-error-frames/",
+    "https://kvaser.com/can-protocol-tutorial/"
+  ],
+  "claims": [
+    {
+      "claim": "500kbit/s, standard ID, DLC8, 1000fps ≈22.2% without stuffing",
+      "status": "derived",
+      "formula": "(47+8*8)*1000/500000"
+    },
+    {
+      "claim": "Error flags and ACK behavior",
+      "status": "verified",
+      "source": "Kvaser CAN Error Handling"
+    }
+  ]
+}
