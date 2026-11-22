@@ -160,6 +160,20 @@ details.question{border-bottom:1px solid #dce6e2;padding:12px 0}
 <button type="button" data-format="extended" aria-pressed="false">29 位数据帧 · 8 B</button>
 <button type="button" data-format="remote" aria-pressed="false">11 位远程帧 · DLC 8</button>
 </div>
+<svg class="scale-svg" viewBox="0 0 360 96" role="img" aria-labelledby="w02-t w02-d" style="display:block;width:100%;height:auto;max-height:190px;margin:8px 0">
+<title id="w02-t">三种帧格式的未填充位长度按比例对比</title>
+<desc id="w02-d">按真实位数比例排列 SOF、仲裁场、控制场、数据场、CRC、ACK、EOF 与至少三位帧间间歇，可直接比较标准帧、扩展帧与远程帧的总位长。</desc>
+<rect id="s02-sof"  x="20" y="26" width="2.4" height="34" fill="#d9b26a"/>
+<rect id="s02-arb"  x="22.4" y="26" width="29.3" height="34" fill="#4f9d8f"/>
+<rect id="s02-ctrl" x="51.7" y="26" width="14.7" height="34" fill="#8fb8c9"/>
+<rect id="s02-data" x="66.4" y="26" width="156.3" height="34" fill="#c2410c"/>
+<rect id="s02-crc"  x="222.7" y="26" width="39.1" height="34" fill="#7a9e7e"/>
+<rect id="s02-ack"  x="261.8" y="26" width="4.9" height="34" fill="#b98fd0"/>
+<rect id="s02-eof"  x="266.7" y="26" width="17.1" height="34" fill="#8aa39c"/>
+<rect id="s02-ifs"  x="283.8" y="26" width="7.3" height="34" fill="#cdd8d3"/>
+<text x="20" y="18" font-size="10" fill="#5b716c">同一比例尺下比较总长度：SOF · 仲裁 · 控制 · 数据 · CRC · ACK · EOF · 间歇</text>
+<text id="w02-total" x="20" y="88" font-size="11" fill="#3f5a54">标准数据帧：未计填充 111 位（含 3 位间歇）</text>
+</svg>
 <div class="frame-strip" id="frame-strip" tabindex="0" aria-label="帧字段序列；可水平滚动">
 <div class="frame-block" data-group="frame"><b>SOF</b><span>1 bit</span></div>
 <div class="frame-block" data-group="identity"><b>仲裁场</b><span>12 bit</span></div>
@@ -284,4 +298,5 @@ print(frame_bits() + 3)                   # 最小帧间间歇：111 bit</code><
   buttons.forEach(button => button.addEventListener("click", () => selectFrame(button.dataset.format)));
 })();
 </script>
+<script>(function(){const F={base:[1,12,6,64,16,2,7,3],extended:[1,32,6,64,16,2,7,3],remote:[1,12,6,0,16,2,7,3]},N={base:"标准数据帧：未计填充 111 位（含 3 位间歇）",extended:"扩展数据帧：未计填充 131 位（含 3 位间歇）",remote:"标准远程帧：未计填充 47 位（含 3 位间歇）"},keys=["sof","arb","ctrl","data","crc","ack","eof","ifs"],seg=keys.map(k=>document.getElementById("s02-"+k)),tot=document.getElementById("w02-total");function upd(key){const f=F[key];if(!f)return;const s=320/131;let x=20;seg.forEach((e,i)=>{e.setAttribute("x",x);e.setAttribute("width",f[i]*s);x+=f[i]*s;});tot.textContent=N[key];}document.querySelectorAll("[data-format]").forEach(b=>b.addEventListener("click",()=>upd(b.dataset.format)));upd("base");})();</script>
 </body></html>

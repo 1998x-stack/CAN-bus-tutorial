@@ -151,6 +151,15 @@ details.question{border-bottom:1px solid #dce6e2;padding:12px 0}
 <caption>逐位表：从左到右比较，显性 0 覆盖隐性 1。</caption>
 </table>
 </div>
+<svg id="arb-svg" viewBox="0 0 360 128" role="img" aria-labelledby="w03-t w03-d" style="display:block;width:100%;height:auto;max-height:230px;margin:8px 0">
+<title id="w03-t">节点 A、B 的逐位电平与总线仲裁结果</title>
+<desc id="w03-d">橙色表示显性位 0，绿色表示隐性位 1；总线结果是两者按位相与。两个节点首次发送不同位时，发隐性位的一方退出仲裁，虚线标出该位。</desc>
+<text x="2" y="34" font-size="10" fill="#3f5a54">A</text>
+<text x="2" y="64" font-size="10" fill="#3f5a54">B</text>
+<text x="2" y="94" font-size="10" fill="#3f5a54">总线</text>
+<g id="arb-cells"></g>
+<line id="arb-decision" x1="30" y1="14" x2="30" y2="104" stroke="#0b3b3b" stroke-dasharray="4 3" opacity="0"/>
+</svg>
 <p class="demo-result" id="arbitration-status" aria-live="polite">第 1 位：A、B 都发送 0，总线为 0，仍在竞争。</p>
 </div>
 </section>
@@ -274,4 +283,5 @@ prev.addEventListener("click",()=>{if(step>0){step--;draw()}});
 next.addEventListener("click",()=>{if(step<(scenario==="extended"?13:12)-1){step++;draw()}});
 draw();
 })();
-</script></body></html>
+</script>
+<script>(function(){const NS="http://www.w3.org/2000/svg",body=document.getElementById("trace-body"),g=document.getElementById("arb-cells"),line=document.getElementById("arb-decision");function draw(){const rows=[...body.querySelectorAll("tr")].slice(0,3);const n=rows[0]?rows[0].querySelectorAll("td").length:0;g.textContent="";if(!n)return;const x0=30,w=330/n;let dec=-1;const a=rows[0].querySelectorAll("td"),bb=rows[1]?rows[1].querySelectorAll("td"):[];a.forEach((td,i)=>{if(dec<0&&bb[i]&&td.textContent.trim()!==bb[i].textContent.trim())dec=i;});rows.forEach((tr,r)=>{tr.querySelectorAll("td").forEach((td,i)=>{const bit=td.textContent.trim(),rect=document.createElementNS(NS,"rect");rect.setAttribute("x",x0+i*w+1);rect.setAttribute("y",18+r*30);rect.setAttribute("width",Math.max(w-2,1));rect.setAttribute("height",24);rect.setAttribute("rx",3);rect.setAttribute("fill",bit==="0"?"#c2410c":bit==="1"?"#4f9d8f":"#eef4f1");g.appendChild(rect);const t=document.createElementNS(NS,"text");t.setAttribute("x",x0+i*w+w/2);t.setAttribute("y",18+r*30+17);t.setAttribute("font-size","12");t.setAttribute("text-anchor","middle");t.setAttribute("fill",bit==="0"||bit==="1"?"#ffffff":"#5b716c");t.textContent=bit;g.appendChild(t);});});if(dec>=0){line.setAttribute("opacity","0.8");line.setAttribute("x1",x0+dec*w);line.setAttribute("x2",x0+dec*w);}else{line.setAttribute("opacity","0");}}document.querySelectorAll("[data-scenario],#step-next,#step-prev").forEach(b=>b.addEventListener("click",()=>setTimeout(draw,0)));draw();})();</script></body></html>
