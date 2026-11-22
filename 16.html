@@ -3,6 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第16章 CAN总线电平与差分信号</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -184,8 +185,7 @@
 <section id="differential" aria-labelledby="diff-h">
   <h2 id="diff-h">16.2 差分为什么能抑制共同干扰？</h2>
   <p>接收器比较两线的差电压 <code>Vdiff</code>，同时两线的平均值称为共模电压 <code>Vcm</code>。两者是两种不同的观察角度：</p>
-  <div class="formula" tabindex="0" role="group" aria-label="差分和共模电压公式">
-    <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>V</mi><mtext>diff</mtext></msub><mo>=</mo><msub><mi>V</mi><mtext>CAN_H</mtext></msub><mo>−</mo><msub><mi>V</mi><mtext>CAN_L</mtext></msub><mspace width="1.7em"/><msub><mi>V</mi><mtext>cm</mtext></msub><mo>=</mo><mfrac><mrow><msub><mi>V</mi><mtext>CAN_H</mtext></msub><mo>+</mo><msub><mi>V</mi><mtext>CAN_L</mtext></msub></mrow><mn>2</mn></mfrac></mrow></math>
+  <div class="formula" tabindex="0" aria-label="差分和共模电压公式" role="region" data-math-scroll="true"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML" aria-label="差分和共模电压公式"><mrow><msub><mi>V</mi><mtext>diff</mtext></msub><mo>=</mo><msub><mi>V</mi><mtext>CAN_H</mtext></msub><mo>−</mo><msub><mi>V</mi><mtext>CAN_L</mtext></msub><mspace width="1.7em"/><msub><mi>V</mi><mtext>cm</mtext></msub><mo>=</mo><mfrac><mrow><msub><mi>V</mi><mtext>CAN_H</mtext></msub><mo>+</mo><msub><mi>V</mi><mtext>CAN_L</mtext></msub></mrow><mn>2</mn></mfrac></mrow></math>
   </div>
   <p>例如显性状态的示意值为 3.5 V 与 1.5 V。若外界使两根线<strong>同时</strong>上移 1 V，差值仍为 2 V，但平均电位从 2.5 V 变为 3.5 V。这里有一个重要前提：两线受到近似相同的耦合，且没有超出接收器允许的工作范围。</p>
   <div class="demo" id="c16-demo">

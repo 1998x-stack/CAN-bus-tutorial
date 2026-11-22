@@ -3,6 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第17章 CAN总线通信速率</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -165,8 +166,7 @@
 <section id="rate" aria-labelledby="rate-h">
   <h2 id="rate-h">17.1 先把速率翻译成“每位有多长”</h2>
   <p>经典 CAN 的常见标称速率包括 125、250、500 和 1000 kbit/s，但具体应由网络规格、节点能力、线缆和时序预算共同决定。<strong>不是“默认选 500k 就最兼容”</strong>：总线上每个节点都必须使用可互通的标称位速率，设备还可能受自身协议或硬件限制。<a href="https://www.can-cia.org/can-knowledge/canopen">[CiA：CANopen CC 位速率]</a></p>
-  <div class="formula" tabindex="0" role="group" aria-label="位时间等于位速率倒数">
-    <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>t</mi><mtext>bit</mtext></msub><mo>=</mo><mfrac><mn>1</mn><msub><mi>R</mi><mtext>bit</mtext></msub></mfrac></mrow></math>
+  <div class="formula" tabindex="0" aria-label="位时间等于位速率倒数" role="region" data-math-scroll="true"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML" aria-label="位时间等于位速率倒数"><mrow><msub><mi>t</mi><mtext>bit</mtext></msub><mo>=</mo><mfrac><mn>1</mn><msub><mi>R</mi><mtext>bit</mtext></msub></mfrac></mrow></math>
   </div>
   <div class="table-wrap"><table><thead><tr><th>标称速率</th><th>每比特时间</th><th>工程读法</th></tr></thead><tbody>
     <tr><td>125 kbit/s</td><td>8 μs</td><td>位时间更长，传播预算相对宽裕</td></tr>
@@ -211,8 +211,7 @@
     </svg>
     <figcaption>图 17-2｜示例采用 bxCAN 的 BS1/BS2 写法。采样点 = (1 + 14) / (1 + 14 + 3) = 83.33%；并不是所有网络都必须设置同一个固定百分比。</figcaption>
   </figure>
-  <div class="formula" tabindex="0" role="group" aria-label="bxCAN 位速率与采样点公式">
-  <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>R</mi><mtext>bit</mtext></msub><mo>=</mo><mfrac><msub><mi>f</mi><mtext>PCLK</mtext></msub><mrow><mi>BRP</mi><mo>×</mo><mo>(</mo><mn>1</mn><mo>+</mo><mi>BS1</mi><mo>+</mo><mi>BS2</mi><mo>)</mo></mrow></mfrac><mspace width="1.2em"/><mi>SP</mi><mo>=</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mi>BS1</mi></mrow><mrow><mn>1</mn><mo>+</mo><mi>BS1</mi><mo>+</mo><mi>BS2</mi></mrow></mfrac></mrow></math>
+  <div class="formula" tabindex="0" aria-label="bxCAN 位速率与采样点公式" role="region" data-math-scroll="true"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML" aria-label="bxCAN 位速率与采样点公式"><mrow><msub><mi>R</mi><mtext>bit</mtext></msub><mo>=</mo><mfrac><msub><mi>f</mi><mtext>PCLK</mtext></msub><mrow><mi>BRP</mi><mo>×</mo><mo>(</mo><mn>1</mn><mo>+</mo><mi>BS1</mi><mo>+</mo><mi>BS2</mi><mo>)</mo></mrow></mfrac><mspace width="1.2em"/><mi>SP</mi><mo>=</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mi>BS1</mi></mrow><mrow><mn>1</mn><mo>+</mo><mi>BS1</mi><mo>+</mo><mi>BS2</mi></mrow></mfrac></mrow></math>
   </div>
   <p>以上 <code>BS1</code>、<code>BS2</code> 和 <code>BRP</code> 都指<strong>实际物理计数值</strong>，而非某些寄存器字段的零起始编码值。<code>fPCLK</code> 是 CAN 外设实际输入时钟，不能想当然把晶振频率代入。偏晚的采样点一般可给传播留下更多时间，但 BS2 与 SJW 还需满足同步裕量与硬件范围。</p>
 </section>
