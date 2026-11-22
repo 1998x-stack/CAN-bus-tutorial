@@ -207,6 +207,21 @@ assert crc15_can("1") == 0x4599</code></pre>
 <button type="button" data-preset="rx-high" aria-pressed="false">0 / 255</button>
 <button type="button" data-preset="off" aria-pressed="false">256 / 0</button>
 </div>
+<svg class="state-svg" viewBox="0 0 360 96" role="img" aria-labelledby="w04-t w04-d" style="display:block;width:100%;height:auto;max-height:170px;margin:10px 0">
+<title id="w04-t">错误主动、错误被动与 Bus-Off 三个状态</title>
+<desc id="w04-d">根据当前 TEC 与 REC 值，高亮节点所处的错误状态：两个计数均低于 128 为错误主动，达到或超过 128 为错误被动，TEC 达到 256 进入 Bus-Off。</desc>
+<rect id="st-active" x="8" y="30" width="104" height="38" rx="9" fill="#4f9d8f"/>
+<rect id="st-passive" x="128" y="30" width="104" height="38" rx="9" fill="#eef4f1" stroke="#c3d6cf"/>
+<rect id="st-off" x="248" y="30" width="104" height="38" rx="9" fill="#eef4f1" stroke="#c3d6cf"/>
+<text x="60" y="54" font-size="12" fill="#ffffff" text-anchor="middle">Error Active</text>
+<text x="180" y="54" font-size="12" fill="#1b525a" text-anchor="middle">Error Passive</text>
+<text x="300" y="54" font-size="12" fill="#1b525a" text-anchor="middle">Bus-Off</text>
+<line x1="112" y1="49" x2="126" y2="49" stroke="#8aa39c" marker-end="url(#a04)"/>
+<line x1="232" y1="49" x2="246" y2="49" stroke="#8aa39c" marker-end="url(#a04)"/>
+<text x="119" y="26" font-size="9" fill="#5b716c" text-anchor="middle">≥128</text>
+<text x="239" y="26" font-size="9" fill="#5b716c" text-anchor="middle">TEC=256</text>
+<defs><marker id="a04" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L5,3 L0,6 z" fill="#8aa39c"/></marker></defs>
+</svg>
 <div class="state-result" data-state="active" id="state-result" aria-live="polite"><strong id="state-status">Error Active · 错误主动</strong><p id="state-reason">TEC=0，REC=0：均低于 128，正常参与总线并可发主动错误标志。</p></div>
 <p class="small">输入值限定为 TEC 0～256、REC 0～255，用于教学展示临界状态；部分硬件寄存器的可见范围和恢复模式可能不同。</p>
 </div>
@@ -312,4 +327,5 @@ buttons.forEach(b=>b.addEventListener("click",()=>{
 tec.addEventListener("input",update);rec.addEventListener("input",update);
 update();
 })();
-</script></body></html>
+</script>
+<script>(function(){const map={active:"st-active",passive:"st-passive",off:"st-off"},fill={active:"#4f9d8f",passive:"#e0a15c",off:"#c2410c"};const el=document.getElementById("state-result");function upd(){const s=el.dataset.state;for(const k in map){const box=document.getElementById(map[k]);box.setAttribute("fill",k===s?fill[k]:"#eef4f1");}}setTimeout(upd,0);["tec-input","rec-input"].forEach(id=>document.getElementById(id).addEventListener("input",()=>setTimeout(upd,0)));document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>setTimeout(upd,0)));})();</script></body></html>

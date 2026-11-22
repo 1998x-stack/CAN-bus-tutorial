@@ -185,6 +185,17 @@ sample = (1 + BS1) / n_tq      # 0.875
 <label for="sjw">SJW（TQ）<input id="sjw" type="number" min="1" max="4" step="1" value="2" inputmode="numeric"></label>
 </div>
 <p><button id="preset-b" type="button">切换到 36 MHz 示例</button></p>
+<svg class="bitsvg" viewBox="0 0 360 96" role="img" aria-labelledby="w05-t w05-d" style="display:block;width:100%;height:auto;max-height:170px;margin:10px 0">
+<title id="w05-t">一个位时间的 SYNC、BS1、BS2 比例与采样点</title>
+<desc id="w05-d">按当前 BRP、BS1、BS2 参数按比例绘制一个标称位时间的三个位段，并在采样时刻位置标出竖线。</desc>
+<rect x="20" y="30" width="320" height="34" fill="#eef4f1" stroke="#c3d6cf"/>
+<rect id="b05-sync" x="20" y="30" width="20" height="34" fill="#d9b26a"/>
+<rect id="b05-bs1" x="40" y="30" width="220" height="34" fill="#4f9d8f"/>
+<rect id="b05-bs2" x="260" y="30" width="80" height="34" fill="#8fb8c9"/>
+<line id="b05-sp" x1="260" y1="16" x2="260" y2="76" stroke="#c2410c" stroke-width="2"/>
+<text x="30" y="88" font-size="11" fill="#3f5a54">SYNC（1 TQ） · BS1 · BS2</text>
+<text id="b05-splabel" x="260" y="12" font-size="10" fill="#c2410c" text-anchor="middle">采样点</text>
+</svg>
 <p class="lab-result" id="calc-result" role="status" aria-live="polite"><b>500.000 kbit/s · 87.50%</b>，共 16 TQ，单 TQ 125.0 ns。</p>
 <p class="small">输入非整数、超出 bxCAN 范围或 SJW 超过 BS2 时，计算器会给出提醒；数值“合法”不代表整网已通过时序预算验证。</p>
 </div>
@@ -268,5 +279,6 @@ sample = (1 + BS1) / n_tq      # 0.875
   render();
 }());
 </script>
+<script>(function(){const g=id=>document.getElementById(id),bs1=g("bs1"),bs2=g("bs2"),ss=g("b05-sync"),s1=g("b05-bs1"),s2=g("b05-bs2"),sp=g("b05-sp");function upd(){const b1=Number(bs1.value),b2=Number(bs2.value);if(!(Number.isInteger(b1)&&Number.isInteger(b2)&&b1>=1&&b2>=1)){return;}const tq=1+b1+b2,u=320/tq,sx=20+u+b1*u;ss.setAttribute("width",u);s1.setAttribute("x",20+u);s1.setAttribute("width",b1*u);s2.setAttribute("x",sx);s2.setAttribute("width",b2*u);sp.setAttribute("x1",sx);sp.setAttribute("x2",sx);g("b05-splabel").setAttribute("x",sx);}["bs1","bs2"].forEach(id=>g(id).addEventListener("input",upd));upd();})();</script>
 </body>
 </html>
