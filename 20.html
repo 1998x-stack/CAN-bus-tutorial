@@ -62,7 +62,7 @@ RX 0x585 [8] 80 00 20 01 00 00 02 06</code></pre>
 <li>客户端发第一段请求 <code>0x60</code>（toggle = 0），服务端返回 7 字节。响应控制字 <code>0x00</code> 表示“7 字节均有效，且尚未结束”。</li>
 <li>客户端发第二段请求 <code>0x70</code>（toggle = 1），服务端返回剩余 3 字节。响应控制字 <code>0x19</code> = toggle 为 1、4 个未使用字节、最后一段标志为 1。</li>
 <li>客户端拼接 7 + 3 字节。任何 toggle 不匹配、非法命令或超时都应中止当前传输并上报原因。</li></ol>
-<div class="equation" tabindex="0" aria-label="分段响应控制字结构"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>cmd</mi><mo>=</mo><msup><mn>2</mn><mn>4</mn></msup><mi>t</mi><mo>+</mo><mn>2</mn><mi>n</mi><mo>+</mo><mi>c</mi><mo>,</mo><mspace width="1em"/><mn>0</mn><mo>≤</mo><mi>n</mi><mo>≤</mo><mn>7</mn></mrow></math><p class="micro">t：本段 toggle（0 或 1）；n：7 字节负载中未使用的字节数；c：末段标志。分段 <em>upload 响应</em>和分段 <em>download 请求</em>采用该控制位布局。</p></div>
+<div class="equation" tabindex="0" aria-label="分段响应控制字结构" role="region" data-math-scroll="true"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML" aria-label="分段响应控制字结构"><mrow><mi>cmd</mi><mo>=</mo><msup><mn>2</mn><mn>4</mn></msup><mi>t</mi><mo>+</mo><mn>2</mn><mi>n</mi><mo>+</mo><mi>c</mi><mo>,</mo><mspace width="1em"/><mn>0</mn><mo>≤</mo><mi>n</mi><mo>≤</mo><mn>7</mn></mrow></math><p class="micro">t：本段 toggle（0 或 1）；n：7 字节负载中未使用的字节数；c：末段标志。分段 <em>upload 响应</em>和分段 <em>download 请求</em>采用该控制位布局。</p></div>
 <figure><div class="figure-pan"><img src="assets/chapter20-segments.svg" alt="客户端上传请求与服务端分段回复的交替时序，toggle 由 0 变 1" width="900" height="313"></div><figcaption>图 20-2｜分段模式每段最多 7 字节，且要等待对应确认/下一次请求。这里的 toggle 与块传输的 1–127 段序号不是一回事。</figcaption></figure>
 <p>反过来，如果是向节点写入长对象，客户端先发送 <code>0x21</code> 等初始化下载请求（在指示总大小时），服务端回 <code>0x60</code>；随后客户端携带至多 7 字节/段并等待服务端 <code>0x20</code>/<code>0x30</code> 等分段应答。切勿用简单的“每段等固定 10 ms”代替状态机和超时机制。</p>
 </section>
@@ -83,6 +83,19 @@ RX 0x585 [8] 80 00 20 01 00 00 02 06</code></pre>
 <div class="lab"><h3>加速上传 / Abort 解码器</h3><p class="micro">假设响应索引为 <code>0x2000:01</code>，只改变命令字与 Byte 4–7 的内容。</p>
 <div class="controls"><label for="cmd">Byte 0<select id="cmd"><option value="4B">4B · 2 字节</option><option value="4F">4F · 1 字节</option><option value="47">47 · 3 字节</option><option value="43">43 · 4 字节</option><option value="42">42 · 未指示长度</option><option value="80">80 · Abort</option></select></label>
 <label for="payload">Byte 4–7（十六进制）<input id="payload" value="34 12 00 00" aria-label="四个十六进制字节"></label></div>
+<svg class="sdo-svg" viewBox="0 0 360 104" role="img" aria-labelledby="w20-t w20-d" style="display:block;width:100%;height:auto;max-height:200px;margin:8px 0">
+<title id="w20-t">加速 SDO 的 8 字节帧结构与有效数据字节</title>
+<desc id="w20-d">第一个字节是命令，接着两个字节是对象索引、一个字节是子索引，最后四个字节是数据；命令字节决定其中多少个数据字节有效。</desc>
+<g font-size="9" fill="#5b716c" text-anchor="middle"><text x="35" y="18">cmd</text><text x="117" y="18">index(2)</text><text x="158" y="18">sub</text><text x="239" y="18">data 0..3</text></g>
+<rect id="s20-cmd" x="16" y="26" width="38" height="34" rx="4" fill="#d9b26a" stroke="#c3d6cf"/>
+<rect x="57" y="26" width="79" height="34" rx="4" fill="#eef4f1" stroke="#c3d6cf"/>
+<rect x="139" y="26" width="38" height="34" rx="4" fill="#eef4f1" stroke="#c3d6cf"/>
+<rect id="s20-d0" x="180" y="26" width="38" height="34" rx="4" fill="#4f9d8f"/>
+<rect id="s20-d1" x="221" y="26" width="38" height="34" rx="4" fill="#eef4f1" stroke="#c3d6cf"/>
+<rect id="s20-d2" x="262" y="26" width="38" height="34" rx="4" fill="#eef4f1" stroke="#c3d6cf"/>
+<rect id="s20-d3" x="303" y="26" width="38" height="34" rx="4" fill="#eef4f1" stroke="#c3d6cf"/>
+<text id="w20-note" x="180" y="84" font-size="11" fill="#c2410c" text-anchor="middle">命令 4F：1 个有效数据字节</text>
+</svg>
 <div id="result" class="result" role="status" aria-live="polite">等待计算。</div></div>
 </section>
 <section id="summary"><h2>把 SDO 放回网络调试流程</h2>
@@ -92,4 +105,5 @@ RX 0x585 [8] 80 00 20 01 00 00 02 06</code></pre>
 <ol class="refs"><li><a href="https://canopennode.github.io/CANopenNode/group__CO__SDOserver.html">CANopenNode — SDO server</a>：加速、分段、块传输字节格式与 Abort 代码。</li>
 <li><a href="https://canopennode.github.io/CANopenNode/group__CO__SDOclient.html">CANopenNode — SDO client</a>：客户端状态机、超时与协议选项。</li>
 <li><a href="https://www.can-cia.org/can-knowledge/sdo-protocol">CiA — Service Data Objects</a>：协议定位与传输类型概述。</li></ol>
-</section><nav class="chapter-nav" aria-label="章节前后导航"><a href="19.html">← 第 19 章：NMT 与心跳</a><a href="index.html">返回目录</a><a href="21.html">第 21 章：PDO →</a></nav></article></main></div><script>(()=>{'use strict';const c=document.getElementById('cmd'),p=document.getElementById('payload'),r=document.getElementById('result');function run(){const s=p.value.trim().split(/[\s,]+/);if(s.length!==4||!s.every(x=>/^[0-9a-fA-F]{2}$/.test(x))){r.textContent='请输入四个两位十六进制字节，例如 34 12 00 00。';return;}const a=s.map(x=>parseInt(x,16));const cmd=c.value;if(cmd==='80'){const code=(a[0]|a[1]<<8|a[2]<<16|a[3]<<24)>>>0;r.textContent='SDO Abort：0x'+code.toString(16).toUpperCase().padStart(8,'0')+'；不应按正常对象值解码。';return;}if(cmd==='42'){r.textContent='成功的加速上传：命令未指示有效字节数，请根据对象字典的数据类型判断；不能默认就是四字节。';return;}const n=({'4F':1,'4B':2,'47':3,'43':4})[cmd];let v=0;for(let i=0;i<n;i++)v+=a[i]*Math.pow(256,i);r.textContent='成功：有效 '+n+' 字节，小端无符号教学解释 = 0x'+v.toString(16).toUpperCase().padStart(n*2,'0')+'（'+v+'）。真实对象还需按 EDS 的有符号性/比例解释。';}for(const x of [c,p])x.addEventListener('input',run);run();})();</script></body></html>
+</section><nav class="chapter-nav" aria-label="章节前后导航"><a href="19.html">← 第 19 章：NMT 与心跳</a><a href="index.html">返回目录</a><a href="21.html">第 21 章：PDO →</a></nav></article></main></div><script>(()=>{'use strict';const c=document.getElementById('cmd'),p=document.getElementById('payload'),r=document.getElementById('result');function run(){const s=p.value.trim().split(/[\s,]+/);if(s.length!==4||!s.every(x=>/^[0-9a-fA-F]{2}$/.test(x))){r.textContent='请输入四个两位十六进制字节，例如 34 12 00 00。';return;}const a=s.map(x=>parseInt(x,16));const cmd=c.value;if(cmd==='80'){const code=(a[0]|a[1]<<8|a[2]<<16|a[3]<<24)>>>0;r.textContent='SDO Abort：0x'+code.toString(16).toUpperCase().padStart(8,'0')+'；不应按正常对象值解码。';return;}if(cmd==='42'){r.textContent='成功的加速上传：命令未指示有效字节数，请根据对象字典的数据类型判断；不能默认就是四字节。';return;}const n=({'4F':1,'4B':2,'47':3,'43':4})[cmd];let v=0;for(let i=0;i<n;i++)v+=a[i]*Math.pow(256,i);r.textContent='成功：有效 '+n+' 字节，小端无符号教学解释 = 0x'+v.toString(16).toUpperCase().padStart(n*2,'0')+'（'+v+'）。真实对象还需按 EDS 的有符号性/比例解释。';}for(const x of [c,p])x.addEventListener('input',run);run();})();</script>
+<script>(function(){const n={"4F":1,"4B":2,"47":3,"43":4,"42":0,"80":0},labels={"4F":"命令 4F：1 个有效数据字节","4B":"命令 4B：2 个有效数据字节","47":"命令 47：3 个有效数据字节","43":"命令 43：4 个有效数据字节","42":"命令 42：未指示长度，需按数据类型判断","80":"Abort：不包含对象值，不应解码"};const c=document.getElementById("cmd"),note=document.getElementById("w20-note"),boxes=[0,1,2,3].map(i=>document.getElementById("s20-d"+i));function upd(){const k=n[c.value]||0;boxes.forEach((b,i)=>{const on=i<k;b.setAttribute("fill",on?"#4f9d8f":"#eef4f1");b.setAttribute("stroke",on?"#4f9d8f":"#c3d6cf");});note.textContent=labels[c.value]||"";}c.addEventListener("input",upd);upd();})();</script></body></html>

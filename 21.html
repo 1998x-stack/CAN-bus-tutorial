@@ -46,8 +46,7 @@
 </section>
 <section id="mapping"><h2>PDO 映射：如何把 64 位对象精确装进 8 字节</h2>
 <p>以支持 CiA 402 对象的驱动器为例：<code>0x606C:00</code> 是 Velocity actual value（32 位）、<code>0x6064:00</code> 是 Position actual value（32 位）。<code>0x6041:00</code> 则是 <strong>16 位 Statusword</strong>，不能误写成速度。设备的数据单位、范围、访问权限以及是否允许 PDO 映射必须核对 EDS / 文档。</p>
-<div class="equation" tabindex="0" aria-label="CANopen PDO 单条映射参数编码公式">
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Map</mi><mo>=</mo><mi>Index</mi><mo>×</mo><msup><mn>2</mn><mn>16</mn></msup><mo>+</mo><mi>Subindex</mi><mo>×</mo><msup><mn>2</mn><mn>8</mn></msup><mo>+</mo><mi>LengthBits</mi></mrow></math><p class="micro">高 16 bit 是对象索引，中 8 bit 是子索引，低 8 bit 是映射长度（单位 bit）；如 <code>0x606C0020</code> = 0x606C:00，32 bit。</p></div>
+<div class="equation" tabindex="0" aria-label="CANopen PDO 单条映射参数编码公式" role="region" data-math-scroll="true"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML" aria-label="CANopen PDO 单条映射参数编码公式"><mrow><mi>Map</mi><mo>=</mo><mi>Index</mi><mo>×</mo><msup><mn>2</mn><mn>16</mn></msup><mo>+</mo><mi>Subindex</mi><mo>×</mo><msup><mn>2</mn><mn>8</mn></msup><mo>+</mo><mi>LengthBits</mi></mrow></math><p class="micro">高 16 bit 是对象索引，中 8 bit 是子索引，低 8 bit 是映射长度（单位 bit）；如 <code>0x606C0020</code> = 0x606C:00，32 bit。</p></div>
 <figure><div class="figure-pan"><img src="assets/chapter21-mapping.svg" alt="速度实际值与位置实际值两个 32 位对象按照字节序构成 8 字节 TPDO1" width="900" height="320"></div><figcaption>图 21-2｜速度与位置各占 4 字节。图中的字段分界不表示物理单位；下面的示例解码按小端有符号整数进行。</figcaption></figure>
 <p>两条映射条目合计 <code>32 + 32 = 64 bit</code>。若速度原始值 <code>1000</code>，位置原始值 <code>-2000</code>（仅演示有符号 32 位），则 TPDO 负载为：</p>
 <pre><code>COB-ID 0x185, DLC 8
@@ -84,12 +83,27 @@ E8 03 00 00 | 30 F8 FF FF
 </section>
 <section id="load"><h2>小实验：先算出带宽下界，再谈实时性</h2>
 <p>以经典 11 位数据帧、8 数据字节为例，不计位填充、错误帧和重传，含帧间隔的基本长度可按 <code>111 bit</code> 估算。若 50 个节点每 10 ms 各发送一次这样的 TPDO，500 kbit/s 总线的<strong>理论下界负载</strong>为：</p>
-<div class="equation" tabindex="0" aria-label="总线负载下界公式"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Load</mi><mo>≥</mo><mfrac><mrow><mn>50</mn><mo>×</mo><mn>100</mn><mo>×</mo><mn>111</mn></mrow><mn>500000</mn></mfrac><mo>=</mo><mn>1.11</mn><mo>=</mo><mn>111</mn><mo>%</mo></mrow></math></div>
+<div class="equation" tabindex="0" aria-label="总线负载下界公式" role="region" data-math-scroll="true"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML" aria-label="总线负载下界公式"><mrow><mi>Load</mi><mo>≥</mo><mfrac><mrow><mn>50</mn><mo>×</mo><mn>100</mn><mo>×</mo><mn>111</mn></mrow><mn>500000</mn></mfrac><mo>=</mo><mn>1.11</mn><mo>=</mo><mn>111</mn><mo>%</mo></mrow></math></div>
 <p>仅这一类流量就已经不可能全部按目标周期发送，实际带宽压力还更大。解决思路是减少不必要的周期上报、合理设计映射与优先级、分配同步相位并实测最坏延迟，而不是相信“PDO 比 SDO 快所以不会拥塞”。</p>
 </section>
 <section id="lab"><h2>交互实验：把两个 CiA 402 原始值装入 PDO</h2>
 <div class="lab"><h3>小端 int32 TPDO1 编码器</h3><p class="micro">本地模拟，不接真实硬件；固定演示两项映射 <code>606C0020</code>、<code>60640020</code>。</p>
 <div class="controls"><label for="node">Node-ID（1–127）<input id="node" type="number" min="1" max="127" value="5"></label><label for="speed">速度原始值 int32<input id="speed" type="number" value="1000" min="-2147483648" max="2147483647"></label><label for="pos">位置原始值 int32<input id="pos" type="number" value="-2000" min="-2147483648" max="2147483647"></label></div>
+<svg class="pdo-svg" viewBox="0 0 360 104" role="img" aria-labelledby="w21-t w21-d" style="display:block;width:100%;height:auto;max-height:200px;margin:8px 0">
+<title id="w21-t">8 字节 PDO 负载中两个 int32 的字节排列</title>
+<desc id="w21-d">TPDO1 的 8 字节负载：前四个字节是速度原始值，后四个字节是位置原始值，均按小端序存放。下方字节随输入实时更新。</desc>
+<text x="86" y="18" font-size="10" fill="#0e7490" text-anchor="middle">速度 int32（小端序）</text>
+<text x="259" y="18" font-size="10" fill="#7a5a1e" text-anchor="middle">位置 int32（小端序）</text>
+<rect x="16" y="30" width="38" height="36" rx="4" fill="#e0f0f4" stroke="#8fb8c9"/>
+<rect x="57" y="30" width="38" height="36" rx="4" fill="#e0f0f4" stroke="#8fb8c9"/>
+<rect x="98" y="30" width="38" height="36" rx="4" fill="#e0f0f4" stroke="#8fb8c9"/>
+<rect x="139" y="30" width="38" height="36" rx="4" fill="#e0f0f4" stroke="#8fb8c9"/>
+<rect x="180" y="30" width="38" height="36" rx="4" fill="#f6ecd8" stroke="#d9b26a"/>
+<rect x="221" y="30" width="38" height="36" rx="4" fill="#f6ecd8" stroke="#d9b26a"/>
+<rect x="262" y="30" width="38" height="36" rx="4" fill="#f6ecd8" stroke="#d9b26a"/>
+<rect x="303" y="30" width="38" height="36" rx="4" fill="#f6ecd8" stroke="#d9b26a"/>
+<g font-size="13" text-anchor="middle" fill="#1b525a" font-family="ui-monospace,Consolas,monospace"><text id="p21-b0" x="35" y="54">E8</text><text id="p21-b1" x="76" y="54">03</text><text id="p21-b2" x="117" y="54">00</text><text id="p21-b3" x="158" y="54">00</text><text id="p21-b4" x="199" y="54">30</text><text id="p21-b5" x="240" y="54">F8</text><text id="p21-b6" x="281" y="54">FF</text><text id="p21-b7" x="322" y="54">FF</text></g>
+</svg>
 <div class="result" role="status" aria-live="polite" id="result">示例：0x185，E8 03 00 00 30 F8 FF FF。</div></div>
 <details class="qa"><summary>每次收到 SYNC 都一定会收到 4 个 TPDO 吗？</summary><p>不一定。TPDO 的类型可能为 0 或 N=3 等；设备是否在线、是否处于 Operational、PDO 是否启用，以及总线仲裁都会改变观察结果。</p></details>
 <details class="qa"><summary>能否用 RTR 远程帧请求所有 TPDO？</summary><p>不能。历史经典 CANopen 对某些 RTR 模式有定义，但具体设备可不支持，现代实现常将 252/253 视为保留或禁用。优先使用明确配置的同步/事件型 PDO。</p></details>
@@ -98,4 +112,5 @@ E8 03 00 00 | 30 F8 FF FF
 <p>本章讨论的是经典 CANopen、11 位默认标识符与经典 CAN 的 8 字节 PDO；CANopen FD、特殊设备 Profile 和具有专有映射约束的驱动器需要另行验证。</p>
 <ol class="refs"><li><a href="https://canopennode.github.io/md_tutorial_2PDO.html">CANopenNode PDO Tutorial</a>：通信参数、映射字编码、传输类型实现范围。</li><li><a href="https://www.analog.com/cn/resources/app-notes/an-076.html">Analog Devices AN-076</a>：设备映射步骤与同步/异步类型。</li><li><a href="https://infosys.beckhoff.com/content/1033/bk51x0/2519207947.html">Beckhoff Process Data Objects</a>：SYNC 语义、历史 RTR 类型与触发分类。</li><li><a href="https://www.can-cia.org/can-knowledge/pdo-protocol/">CAN in Automation — Process Data Objects</a>：CANopen PDO 的概念与职责。</li></ol>
 <p>下一章切换协议体系：J1939 的 PGN、SPN 与地址声明规则不直接沿用 CANopen 的对象字典与 PDO 映射。</p>
-</section><nav class="chapter-nav" aria-label="章节前后导航"><a href="20.html">← 第 20 章：SDO</a><a href="index.html">返回目录</a><a href="22.html">第 22 章：J1939 →</a></nav></article></main></div><script>(()=>{'use strict';const n=document.getElementById('node'),v=document.getElementById('speed'),p=document.getElementById('pos'),o=document.getElementById('result');const hex=(x,w)=>x.toString(16).toUpperCase().padStart(w,'0');function render(){const a=[Number(n.value),Number(v.value),Number(p.value)];if(!a.every(Number.isInteger)||a[0]<1||a[0]>127||a.slice(1).some(x=>x<(-2147483648)||x>2147483647)){o.textContent='输入无效：Node-ID 应在 1–127，两个原始值应为 32 位有符号整数。';return;}const b=new ArrayBuffer(8),dv=new DataView(b);dv.setInt32(0,a[1],true);dv.setInt32(4,a[2],true);const bytes=Array.from(new Uint8Array(b),x=>hex(x,2)).join(' ');o.textContent='TPDO1: CAN-ID 0x'+hex(0x180+a[0],3)+', DLC 8\n'+bytes+'\n映射: 606C0020 + 60640020 = 64 bit\n单位/比例：仍须参考设备对象字典。';}for(const el of [n,v,p])el.addEventListener('input',render);render();})();</script></body></html>
+</section><nav class="chapter-nav" aria-label="章节前后导航"><a href="20.html">← 第 20 章：SDO</a><a href="index.html">返回目录</a><a href="22.html">第 22 章：J1939 →</a></nav></article></main></div><script>(()=>{'use strict';const n=document.getElementById('node'),v=document.getElementById('speed'),p=document.getElementById('pos'),o=document.getElementById('result');const hex=(x,w)=>x.toString(16).toUpperCase().padStart(w,'0');function render(){const a=[Number(n.value),Number(v.value),Number(p.value)];if(!a.every(Number.isInteger)||a[0]<1||a[0]>127||a.slice(1).some(x=>x<(-2147483648)||x>2147483647)){o.textContent='输入无效：Node-ID 应在 1–127，两个原始值应为 32 位有符号整数。';return;}const b=new ArrayBuffer(8),dv=new DataView(b);dv.setInt32(0,a[1],true);dv.setInt32(4,a[2],true);const bytes=Array.from(new Uint8Array(b),x=>hex(x,2)).join(' ');o.textContent='TPDO1: CAN-ID 0x'+hex(0x180+a[0],3)+', DLC 8\n'+bytes+'\n映射: 606C0020 + 60640020 = 64 bit\n单位/比例：仍须参考设备对象字典。';}for(const el of [n,v,p])el.addEventListener('input',render);render();})();</script>
+<script>(function(){const hex=x=>x.toString(16).toUpperCase().padStart(2,"0"),sp=document.getElementById("speed"),po=document.getElementById("pos"),bs=[0,1,2,3,4,5,6,7].map(i=>document.getElementById("p21-b"+i));function upd(){const b=new ArrayBuffer(8),dv=new DataView(b);dv.setInt32(0,Number(sp.value)||0,true);dv.setInt32(4,Number(po.value)||0,true);const a=new Uint8Array(b);bs.forEach((e,i)=>e.textContent=hex(a[i]));}sp.addEventListener("input",upd);po.addEventListener("input",upd);upd();})();</script></body></html>

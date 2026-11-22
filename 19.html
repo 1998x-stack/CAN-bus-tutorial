@@ -82,7 +82,26 @@ CAN-ID = 0x000, DLC = 2, DATA = 82 05</code></pre>
 <label for="cmd">NMT 命令<select id="cmd"><option value="01">01 Start</option><option value="02">02 Stop</option><option value="80">80 Pre-op</option><option value="81">81 Reset node</option><option value="82">82 Reset comm.</option></select></label>
 <label for="period">生产者周期（ms）<input id="period" type="number" min="1" max="65535" value="200"></label>
 <label for="timeout">消费者超时（ms）<input id="timeout" type="number" min="1" max="65535" value="600"></label>
-</div><div class="result" id="result" role="status" aria-live="polite">示例值：节点 5，NMT 01 05。</div></div>
+</div><svg class="nmt-svg" viewBox="0 0 360 146" role="img" aria-labelledby="w19-t w19-d" style="display:block;width:100%;height:auto;max-height:220px;margin:8px 0">
+<title id="w19-t">CANopen NMT 状态机与当前命令目标状态</title>
+<desc id="w19-d">四个状态按上电与 NMT 命令切换：初始化后可进入预操作，再按启动或停止命令在可操作与停止之间切换；高亮框表示当前 NMT 命令将到达的状态。</desc>
+<rect id="nmt-init" x="10" y="10" width="150" height="38" rx="9" fill="#eef4f1" stroke="#c3d6cf"/>
+<rect id="nmt-preop" x="200" y="10" width="150" height="38" rx="9" fill="#4f9d8f"/>
+<rect id="nmt-op" x="10" y="98" width="150" height="38" rx="9" fill="#eef4f1" stroke="#c3d6cf"/>
+<rect id="nmt-stop" x="200" y="98" width="150" height="38" rx="9" fill="#eef4f1" stroke="#c3d6cf"/>
+<text x="85" y="34" font-size="12" fill="#1b525a" text-anchor="middle">Initialisation</text>
+<text x="275" y="34" font-size="12" fill="#ffffff" text-anchor="middle">Pre-operational</text>
+<text x="85" y="122" font-size="12" fill="#1b525a" text-anchor="middle">Operational</text>
+<text x="275" y="122" font-size="12" fill="#1b525a" text-anchor="middle">Stopped</text>
+<line x1="160" y1="29" x2="198" y2="29" stroke="#8aa39c" marker-end="url(#a19)"/>
+<line x1="85" y1="48" x2="85" y2="96" stroke="#8aa39c" marker-end="url(#a19)"/>
+<line x1="275" y1="48" x2="275" y2="96" stroke="#8aa39c" marker-end="url(#a19)"/>
+<text x="183" y="24" font-size="9" fill="#5b716c" text-anchor="middle">上电/复位</text>
+<text x="96" y="74" font-size="9" fill="#5b716c">01 Start</text>
+<text x="286" y="74" font-size="9" fill="#5b716c">02 Stop</text>
+<defs><marker id="a19" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L5,3 L0,6 z" fill="#8aa39c"/></marker></defs>
+</svg>
+<div class="result" id="result" role="status" aria-live="polite">示例值：节点 5，NMT 01 05。</div></div>
 </section>
 <section id="scenario"><h2>把管理与监控接成可观测的启动流程</h2>
 <ol><li>节点 3（传感器）与节点 5（执行器）上电，分别等待 <code>0x703 00</code> 与 <code>0x705 00</code> Boot-up；没有收到应记录原因，不能假设节点准备好。</li>
@@ -98,4 +117,5 @@ CAN-ID = 0x000, DLC = 2, DATA = 82 05</code></pre>
 <li><a href="https://canopennode.github.io/CANopenNode/group__CO__NMT__Heartbeat.html">CANopenNode — NMT and Heartbeat</a>：命令、0x1017 与启动心跳的实现语义。</li>
 <li><a href="https://infosys.beckhoff.com/content/1033/fc510x/2519205899.html">Beckhoff — Network Management</a>：Node Guarding toggle 与状态示例。</li></ol>
 <p>下一章从“节点是否可以通信”走向“怎样用 SDO 读写它的对象字典”。</p>
-</section><nav class="chapter-nav" aria-label="章节前后导航"><a href="18.html">← 第 18 章：CANopen 入门</a><a href="index.html">返回目录</a><a href="20.html">第 20 章：SDO →</a></nav></article></main></div><script>(function(){'use strict';const node=document.getElementById('node'),cmd=document.getElementById('cmd'),period=document.getElementById('period'),timeout=document.getElementById('timeout'),out=document.getElementById('result');const hx=(n,w)=>Number(n).toString(16).toUpperCase().padStart(w,'0');function render(){let n=Number(node.value),p=Number(period.value),t=Number(timeout.value);if(!Number.isInteger(n)||n<1||n>127||!Number.isInteger(p)||p<1||p>65535||!Number.isInteger(t)||t<1||t>65535){out.textContent='输入越界：Node-ID 为 1–127，周期与超时为 1–65535 ms。';return;}let od=(n<<16)|t;out.textContent='NMT: CAN-ID 000, DLC 2, DATA '+cmd.value+' '+hx(n,2)+'\nHeartbeat: CAN-ID '+hx(0x700+n,3)+', DLC 1, DATA 7F / 05 / 04\n0x1017 = '+p+' ms；0x1016 条目 = 0x'+hx(od>>>0,8)+'\n余量 = '+(t-p)+' ms（配置选择，不代表已验证实时性）';}for(const el of [node,cmd,period,timeout])el.addEventListener('input',render);render();})();</script></body></html>
+</section><nav class="chapter-nav" aria-label="章节前后导航"><a href="18.html">← 第 18 章：CANopen 入门</a><a href="index.html">返回目录</a><a href="20.html">第 20 章：SDO →</a></nav></article></main></div><script>(function(){'use strict';const node=document.getElementById('node'),cmd=document.getElementById('cmd'),period=document.getElementById('period'),timeout=document.getElementById('timeout'),out=document.getElementById('result');const hx=(n,w)=>Number(n).toString(16).toUpperCase().padStart(w,'0');function render(){let n=Number(node.value),p=Number(period.value),t=Number(timeout.value);if(!Number.isInteger(n)||n<1||n>127||!Number.isInteger(p)||p<1||p>65535||!Number.isInteger(t)||t<1||t>65535){out.textContent='输入越界：Node-ID 为 1–127，周期与超时为 1–65535 ms。';return;}let od=(n<<16)|t;out.textContent='NMT: CAN-ID 000, DLC 2, DATA '+cmd.value+' '+hx(n,2)+'\nHeartbeat: CAN-ID '+hx(0x700+n,3)+', DLC 1, DATA 7F / 05 / 04\n0x1017 = '+p+' ms；0x1016 条目 = 0x'+hx(od>>>0,8)+'\n余量 = '+(t-p)+' ms（配置选择，不代表已验证实时性）';}for(const el of [node,cmd,period,timeout])el.addEventListener('input',render);render();})();</script>
+<script>(function(){const pick={"01":"nmt-op","02":"nmt-stop","80":"nmt-preop","81":"nmt-init","82":"nmt-init"},hl={"nmt-op":"#4f9d8f","nmt-stop":"#e0a15c","nmt-preop":"#4f9d8f","nmt-init":"#8fb8c9"},ids=["nmt-init","nmt-preop","nmt-op","nmt-stop"];const sel=document.getElementById("cmd");function upd(){const cur=pick[sel.value];ids.forEach(id=>{const e=document.getElementById(id),on=id===cur;e.setAttribute("fill",on?hl[id]:"#eef4f1");e.setAttribute("stroke",on?hl[id]:"#c3d6cf");});}sel.addEventListener("input",upd);upd();})();</script></body></html>
