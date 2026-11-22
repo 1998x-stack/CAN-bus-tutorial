@@ -3,6 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第14章 CAN总线网络拓扑</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -175,7 +176,7 @@
 </section>
 <section class="dive-section" id="delay"><span class="kicker">02 / 把距离变成纳秒</span><h2>波特率限制的关键，是远端显性位来不来得及被采样</h2>
 <p>CAN 仲裁不仅要求接收数据，还要求发送节点能及时观察到远端显性位。传播段要覆盖线缆往返、收发器等器件延迟以及必要裕量。这里先只计算线缆往返时间的<strong>示意下界</strong>，假设单程传播延迟为 <code>5 ns/m</code>。</p>
-<div class="formula" tabindex="0" role="group" aria-label="线缆往返传播延迟模型"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>t</mi><mtext>round-trip,cable</mtext></msub><mo>≈</mo><mn>2</mn><mo>×</mo><mi>L</mi><mo>×</mo><mn>5</mn><mfrac><mtext>ns</mtext><mtext>m</mtext></mfrac></mrow></math></div>
+<div class="formula" tabindex="0" aria-label="线缆往返传播延迟模型" role="region" data-math-scroll="true"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="线缆往返传播延迟模型"><mrow><msub><mi>t</mi><mtext>round-trip,cable</mtext></msub><mo>≈</mo><mn>2</mn><mo>×</mo><mi>L</mi><mo>×</mo><mn>5</mn><mfrac><mtext>ns</mtext><mtext>m</mtext></mfrac></mrow></math></div>
 <p>例如：主干长度 <code>40 m</code>，线缆往返约 <code>2 × 40 × 5 = 400 ns</code>；在 <code>1 Mbit/s</code> 下，一个位只有 <code>1000 ns</code>。<strong>400 ns 不等于完整传播延迟</strong>，也不能单凭占比判定 40 米一定可用；还需计入收发器、隔离器、时钟误差、采样点和相位缓冲等因素。</p>
 <div class="table-scroll"><table><caption>仅线缆往返延迟；5 ns/m 的教学计算，不是标准允许的最大长度</caption><thead><tr><th>主干长度</th><th>线缆往返延迟</th><th>500 kbit/s 的位时间占比</th></tr></thead><tbody><tr><td>20 m</td><td>200 ns</td><td>10%</td></tr><tr><td>40 m</td><td>400 ns</td><td>20%</td></tr><tr><td>100 m</td><td>1000 ns</td><td>50%</td></tr></tbody></table></div>
 <p>网络长度与速率的工程经验表在不同设备和线缆下差异很大。不能把“1 Mbit/s 只能 40 m、500 kbit/s 能 100 m”等典型经验值称为 ISO 11898-2 的统一最大长度表。</p>
@@ -186,6 +187,16 @@
 <div class="choice-row" role="group" aria-label="选择主干长度" data-choices="length"><button type="button" data-length="20" aria-pressed="false">20 m</button><button type="button" data-length="40" aria-pressed="true">40 m</button><button type="button" data-length="100" aria-pressed="false">100 m</button></div>
 <p>通信速率</p>
 <div class="choice-row" role="group" aria-label="选择通信速率" data-choices="rate"><button type="button" data-rate="500" aria-pressed="true">500 kbit/s</button><button type="button" data-rate="1000" aria-pressed="false">1 Mbit/s</button></div>
+<svg class="timing-svg" viewBox="0 0 360 120" role="img" aria-labelledby="w14-t w14-d" style="display:block;width:100%;height:auto;max-height:210px;margin:6px 0">
+<title id="w14-t">线缆往返时间与单个位时间的比例</title>
+<desc id="w14-d">整条横条代表一个位时间；橙色部分代表线缆往返传播时间。主干越长或速率越高，橙色占比越大。</desc>
+<text x="20" y="26" font-size="11" fill="#3f5a54">一个位时间（100%）</text>
+<rect x="20" y="34" width="320" height="30" rx="4" fill="#eef4f1" stroke="#c3d6cf"/>
+<rect id="rt-bar" x="20" y="34" width="64" height="30" rx="4" fill="#e0a15c"/>
+<text id="rt-label" x="20" y="86" font-size="11" fill="#c2410c">往返 ≈ 400 ns</text>
+<text id="bit-label" x="340" y="86" font-size="11" fill="#3f5a54" text-anchor="end">位时间 2000 ns</text>
+<text id="ratio-label" x="180" y="112" font-size="12" fill="#3f5a54" text-anchor="middle">占位时间 ≈ 20.0%</text>
+</svg>
 <p class="demo-result" data-output aria-live="polite">40 m 主干，500 kbit/s：仅线缆往返约 400 ns；单个位时间 2000 ns；占位时间约 20.0%（未计收发器与其他时序裕量）。</p></div>
 <p class="small">假设传播延迟固定 5 ns/m，忽略分支支路与器件延迟；实际布线应依据所用收发器的时序规格重新计算。</p>
 </section>
@@ -219,5 +230,6 @@
 </div>
 </div>
 <script src="assets/olah-chapters-13-15.js"></script>
+<script>(function(){const bar=document.getElementById("rt-bar"),rt=document.getElementById("rt-label"),bt=document.getElementById("bit-label"),ra=document.getElementById("ratio-label");function upd(){const m=Number(document.querySelector('[data-choices="length"] button[aria-pressed="true"]').dataset.length);const r=Number(document.querySelector('[data-choices="rate"] button[aria-pressed="true"]').dataset.rate);const rtn=2*m*5,bn=1e6/r;bar.setAttribute("width",Math.min(320,320*rtn/bn));rt.textContent="往返 ≈ "+rtn+" ns";bt.textContent="位时间 "+bn.toFixed(0)+" ns";ra.textContent="占位时间 ≈ "+(100*rtn/bn).toFixed(1)+"%";}document.querySelectorAll('[data-demo="length"] button').forEach(b=>b.addEventListener("click",upd));upd();})();</script>
 </body>
 </html>

@@ -3,6 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第15章 CAN总线终端电阻</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -172,10 +173,10 @@
 </section>
 <section class="dive-section" id="calculation"><span class="kicker">02 / 两个问题，两种公式</span><h2>反射系数看阻抗；万用表看直流并联</h2>
 <p>对一段特性阻抗 <code>Z₀</code> 的线缆，末端负载为 <code>Rₗ</code> 时，理想传输线的电压反射系数为：</p>
-<div class="formula" tabindex="0" role="group" aria-label="电压反射系数"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>Γ</mi><mo>=</mo><mfrac><mrow><msub><mi>R</mi><mi>L</mi></msub><mo>−</mo><msub><mi>Z</mi><mn>0</mn></msub></mrow><mrow><msub><mi>R</mi><mi>L</mi></msub><mo>+</mo><msub><mi>Z</mi><mn>0</mn></msub></mrow></mfrac></mrow></math></div>
+<div class="formula" tabindex="0" aria-label="电压反射系数" role="region" data-math-scroll="true"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="电压反射系数"><mrow><mi>Γ</mi><mo>=</mo><mfrac><mrow><msub><mi>R</mi><mi>L</mi></msub><mo>−</mo><msub><mi>Z</mi><mn>0</mn></msub></mrow><mrow><msub><mi>R</mi><mi>L</mi></msub><mo>+</mo><msub><mi>Z</mi><mn>0</mn></msub></mrow></mfrac></mrow></math></div>
 <p>当 <code>Rₗ = Z₀ = 120 Ω</code> 时，理论上 <code>Γ = 0</code>；开路近似 <code>+1</code>，短路近似 <code>−1</code>。这是理想末端模型，连接器、支路、器件电容与非理想边沿还会造成反射。</p>
 <p>网络完全断电、没有其他显著并联直流通路时，两个跨线的 120 Ω 终端在电阻档下是并联关系：</p>
-<div class="formula" tabindex="0" role="group" aria-label="两个120欧姆电阻的并联等效"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>R</mi><mtext>eq</mtext></msub><mo>=</mo><mfrac><mrow><mn>120</mn><mo>×</mo><mn>120</mn></mrow><mrow><mn>120</mn><mo>+</mo><mn>120</mn></mrow></mfrac><mo>=</mo><mn>60</mn><mtext> Ω</mtext></mrow></math></div>
+<div class="formula" tabindex="0" aria-label="两个120欧姆电阻的并联等效" role="region" data-math-scroll="true"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="两个120欧姆电阻的并联等效"><mrow><msub><mi>R</mi><mtext>eq</mtext></msub><mo>=</mo><mfrac><mrow><mn>120</mn><mo>×</mo><mn>120</mn></mrow><mrow><mn>120</mn><mo>+</mo><mn>120</mn></mrow></mfrac><mo>=</mo><mn>60</mn><mtext> Ω</mtext></mrow></math></div>
 <p>显性差分电压若以 <code>2 V</code> 作教学假设，并假定每个端接两端电压都是 2 V，则单只 120 Ω 电阻耗散约 <code>P = V²/R = 4/120 ≈ 0.033 W</code>。这<strong>不是</strong>器件选型的额定功率要求：还应考虑故障、瞬态、电阻温升、环境与器件手册的限值。</p>
 <div class="note"><strong>实验边界：</strong>不是所有 CAN 物理层都采用两只离散 120 Ω；低速容错 CAN、车用特殊拓扑与某些板卡可能采用不同端接。请根据所用收发器与整车/设备规范判断，而不是拿这张图当作普适硬件标准。</div>
 </section>
@@ -183,6 +184,19 @@
 <p>下面假设每只都是 <code>120 Ω</code> 且全部直接并联在 CAN_H/CAN_L 之间，不计收发器或保护器件内部电路。选择数量，检查理想直流读数。</p>
 <div class="demo" data-demo="termination"><h3>终端数量与等效电阻</h3><div class="choice-row" data-choices="count" role="group" aria-label="选择跨线终端电阻数量">
 <button type="button" data-count="0" aria-pressed="false">0 个</button><button type="button" data-count="1" aria-pressed="false">1 个</button><button type="button" data-count="2" aria-pressed="true">2 个</button><button type="button" data-count="3" aria-pressed="false">3 个</button></div>
+<svg class="term-svg" viewBox="0 0 360 122" role="img" aria-labelledby="w15-t w15-d" style="display:block;width:100%;height:auto;max-height:210px;margin:6px 0">
+<title id="w15-t">跨线终端电阻数量与等效电阻</title>
+<desc id="w15-d">在 CANH 与 CANL 两条干线之间并联不同数量的 120 欧姆电阻，右侧显示理想等效电阻；数量越多等效值越低。</desc>
+<text x="10" y="26" font-size="11" fill="#3f5a54">CANH</text>
+<line x1="50" y1="22" x2="300" y2="22" stroke="#c2410c" stroke-width="2"/>
+<text x="10" y="104" font-size="11" fill="#3f5a54">CANL</text>
+<line x1="50" y1="98" x2="300" y2="98" stroke="#0e7490" stroke-width="2"/>
+<rect class="term-r" id="term-r1" x="110" y="33" width="16" height="54" rx="3" fill="#e7f4f1" stroke="#4f9d8f" stroke-width="2"/>
+<rect class="term-r" id="term-r2" x="172" y="33" width="16" height="54" rx="3" fill="#e7f4f1" stroke="#4f9d8f" stroke-width="2"/>
+<rect class="term-r" id="term-r3" x="234" y="33" width="16" height="54" rx="3" fill="#e7f4f1" stroke="#4f9d8f" stroke-width="2"/>
+<text id="term-count" x="180" y="116" font-size="11" fill="#3f5a54" text-anchor="middle">2 × 120Ω 并联</text>
+<text x="330" y="60" font-size="14" fill="#c2410c" text-anchor="middle" id="term-eq">60 Ω</text>
+</svg>
 <p class="demo-result" data-output aria-live="polite">2 个 120 Ω 并联：理想等效 60 Ω。常见正常断电测量值约为 60 Ω。</p></div>
 <div class="table-scroll"><table><caption>理想 120 Ω 并联模型；不能单独定位故障</caption><thead><tr><th>跨线 120 Ω 数量</th><th>理想测量值</th><th>需要进一步排查的情况</th></tr></thead><tbody>
 <tr><td>0</td><td>开路（∞ Ω）</td><td>也可能是测点与总线断线</td></tr><tr><td>1</td><td>120 Ω</td><td>遗漏或断开一端，也可能有隐藏网络</td></tr><tr><td>2</td><td>60 Ω</td><td>值正确仍可能放错位置</td></tr><tr><td>3</td><td>40 Ω</td><td>多接了终端，或存在其他并联负载</td></tr></tbody></table></div>
@@ -211,5 +225,6 @@
 </div>
 </div>
 <script src="assets/olah-chapters-13-15.js"></script>
+<script>(function(){const rs=[1,2,3].map(i=>document.getElementById("term-r"+i)),val=document.getElementById("term-eq"),cnt=document.getElementById("term-count");function upd(n){rs.forEach((r,i)=>r.style.opacity=i<n?"1":"0.12");val.textContent=n===0?"∞ Ω":(120/n)+" Ω";cnt.textContent=n+" × 120Ω 并联";}document.querySelectorAll('[data-demo="termination"] button[data-count]').forEach(b=>b.addEventListener("click",()=>upd(Number(b.dataset.count))));upd(2);})();</script>
 </body>
 </html>

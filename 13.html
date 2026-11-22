@@ -3,6 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第13章 CAN过滤器深入</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -170,7 +171,7 @@
 <figure><img src="assets/ch13-filter.svg" width="840" height="355" alt="三个报文经过本节点接收过滤器：0x200 和 0x20F 通过，0x210 被拒绝，但全部报文仍在 CAN 总线上传输。"><figcaption>图 13-1｜先分清线路上的报文与 FIFO 中的报文。此图仅展示单个掩码过滤器的结果。</figcaption></figure>
 <h3>一条式子解释 16 个 ID 的白名单</h3>
 <p>对 11 位标准标识符，以 <code>目标 ID = 0x200</code>、<code>掩码 = 0x7F0</code> 为例。掩码的 <strong>1 表示必须一致</strong>，0 表示不参与比较；低四位恰好可以变化，因此该规则匹配 <code>0x200–0x20F</code>。</p>
-<div class="formula" tabindex="0" role="group" aria-label="标识符掩码匹配公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mo>(</mo><msub><mi>ID</mi><mtext>rx</mtext></msub><mo>∧</mo><mi>M</mi><mo>)</mo><mo>=</mo><mo>(</mo><msub><mi>ID</mi><mtext>cfg</mtext></msub><mo>∧</mo><mi>M</mi><mo>)</mo></mrow></math></div>
+<div class="formula" tabindex="0" aria-label="标识符掩码匹配公式" role="region" data-math-scroll="true"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="标识符掩码匹配公式"><mrow><mo>(</mo><msub><mi>ID</mi><mtext>rx</mtext></msub><mo>∧</mo><mi>M</mi><mo>)</mo><mo>=</mo><mo>(</mo><msub><mi>ID</mi><mtext>cfg</mtext></msub><mo>∧</mo><mi>M</mi><mo>)</mo></mrow></math></div>
 <p>这是位与运算（∧），不是大小比较。想过滤连续区间，必须确认目标 ID 与掩码构成的集合恰好符合需求；掩码并不能表达任何随意指定的数值区间。</p>
 <div class="note"><strong>高频误区：</strong><code>Mask = 0</code> 意味着“所有参与比较的位都不关心”，在掩码模式下通常等于<strong>全接收</strong>，绝不是“全部拒收”。若要拒绝某类帧，应设计不匹配的规则，并核对其他已启用过滤器组；不要建立一个全零掩码组。</div>
 </section>
@@ -202,6 +203,19 @@ if (HAL_CAN_ConfigFilter(&amp;hcan1, &amp;f) != HAL_OK) {
 <p>保持 ID=<code>0x200</code>、MASK=<code>0x7F0</code>、标准数据帧不变，选择不同的接收 ID。可交互结果是上面位运算的确定性计算，不是硬件实测。</p>
 <div class="demo" data-demo="filter"><h3>过滤器匹配模拟</h3><div class="choice-row" data-choices="id" role="group" aria-label="选择报文标识符">
 <button type="button" data-id="511" aria-pressed="false">0x1FF</button><button type="button" data-id="512" aria-pressed="true">0x200</button><button type="button" data-id="527" aria-pressed="false">0x20F</button><button type="button" data-id="528" aria-pressed="false">0x210</button></div>
+<svg class="filter-svg" viewBox="0 0 360 132" role="img" aria-labelledby="w13-t w13-d" style="display:block;width:100%;height:auto;max-height:210px;margin:6px 0">
+<title id="w13-t">标准帧 ID 与过滤器掩码的逐位比较</title>
+<desc id="w13-d">接收 ID 与配置 ID 分别与掩码 0x7F0 相与，橙色显示掩码实际检查的位；两者结果相等则通过，否则拒绝。</desc>
+<text x="16" y="28" font-size="11" fill="#3f5a54">接收 ID</text>
+<rect x="150" y="14" width="90" height="24" rx="4" fill="#eef4f1" stroke="#c3d6cf"/>
+<text id="rx-id" x="195" y="31" font-size="12" text-anchor="middle" fill="#1b525a">0x200</text>
+<text x="16" y="72" font-size="11" fill="#3f5a54">接收 &amp; 0x7F0</text>
+<text id="rx-and" x="195" y="72" font-size="12" text-anchor="middle" fill="#c2410c">0x200</text>
+<text x="16" y="112" font-size="11" fill="#3f5a54">配置 &amp; 0x7F0</text>
+<text x="195" y="112" font-size="12" text-anchor="middle" fill="#c2410c">0x200</text>
+<circle id="f13-lamp" cx="300" cy="62" r="17" fill="#4f9d8f"/>
+<text id="f13-word" x="300" y="100" font-size="12" text-anchor="middle" fill="#3f5a54">通过</text>
+</svg>
 <p class="demo-result" data-output aria-live="polite">接收 ID 0x200：通过过滤器，进入指定 FIFO。</p></div>
 </section>
 <section class="dive-section" id="verification"><span class="kicker">04 / 从示例到工程</span><h2>把“匹配”与“可靠收包”分别测试</h2>
@@ -224,5 +238,6 @@ if (HAL_CAN_ConfigFilter(&amp;hcan1, &amp;f) != HAL_OK) {
 </div>
 </div>
 <script src="assets/olah-chapters-13-15.js"></script>
+<script>(function(){const rxId=document.getElementById("rx-id"),rxAnd=document.getElementById("rx-and"),lamp=document.getElementById("f13-lamp"),word=document.getElementById("f13-word");function upd(id){const and=id&0x7F0,match=and===0x200;rxId.textContent="0x"+id.toString(16).toUpperCase().padStart(3,"0");rxAnd.textContent="0x"+and.toString(16).toUpperCase().padStart(3,"0");lamp.setAttribute("fill",match?"#4f9d8f":"#c2410c");word.textContent=match?"通过":"拒绝";}document.querySelectorAll('[data-demo="filter"] button[data-id]').forEach(b=>b.addEventListener("click",()=>upd(Number(b.dataset.id))));upd(0x200);})();</script>
 </body>
 </html>
