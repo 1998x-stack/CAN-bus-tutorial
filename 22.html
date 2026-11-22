@@ -3,6 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第22章 J1939协议入门</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -222,8 +223,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
       <tr><td>SA</td><td>8 位</td><td>Source Address</td><td>0x01</td></tr>
     </tbody></table></div>
     <p>PF 为 <code>0x00–0xEF</code> 时叫 <strong>PDU1</strong>，PS 放目标地址（DA），因此 PGN 的最低字节必须清零；PF 为 <code>0xF0–0xFF</code> 时叫 <strong>PDU2</strong>，PS 是组扩展，属于 PGN。<strong>目标地址不是“源地址”</strong>，源地址永远从标识符最低 8 位读取。</p>
-    <div class="equation" tabindex="0" aria-label="PGN 计算公式">
-      <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>PGN</mi><mo>=</mo><mo>(</mo><mi>ID</mi><mo>≫</mo><mn>8</mn><mo>)</mo><mo>∧</mo><msub><mi>M</mi><mi>PF</mi></msub></mrow></math>
+    <div class="equation" tabindex="0" aria-label="PGN 计算公式" role="region" data-math-scroll="true"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="PGN 计算公式"><mrow><mi>PGN</mi><mo>=</mo><mo>(</mo><mi>ID</mi><mo>≫</mo><mn>8</mn><mo>)</mo><mo>∧</mo><msub><mi>M</mi><mi>PF</mi></msub></mrow></math>
       <p>这里的位掩码按 PF 分支取值：PDU1 用 <code>0x03FF00</code>，PDU2 用 <code>0x03FFFF</code>（结果同时保留 R/EDP 和 DP）。</p>
     </div>
     <div class="lab">

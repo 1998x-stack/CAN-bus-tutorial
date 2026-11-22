@@ -3,6 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>第23章 J1939多包传输</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -191,8 +192,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 <h2>23.1 为什么不能直接连续发送 8 帧？</h2>
 <p>Classical CAN 的一帧最多携带 8 字节。假设一个 J1939 参数组有 50 字节：即使发送方连续广播 8 个普通帧，接收方也无法只凭它们的 ID 知道“哪个是第几包、何时结束、原本属于哪个 PGN”。</p>
 <p>J1939-21 的传统 <strong>Transport Protocol（TP）</strong> 用两个专用 PGN 把这件事讲清楚：<code>TP.CM = 60416 (0xEC00)</code> 发控制信息，<code>TP.DT = 60160 (0xEB00)</code> 发连续编号的数据包。每个 TP.DT 帧第 1 字节放序号，因此只剩 <strong>7 字节有效数据空间</strong>。</p>
-<div class="equation" tabindex="0" aria-label="传统 J1939 TP 的分包数量">
-<math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>N</mi><mo>=</mo><mo>⌈</mo><mfrac><mi>L</mi><mn>7</mn></mfrac><mo>⌉</mo><mo>,</mo><mspace width="1em"/><mn>9</mn><mo>≤</mo><mi>L</mi><mo>≤</mo><mn>1785</mn></mrow></math>
+<div class="equation" tabindex="0" aria-label="传统 J1939 TP 的分包数量" role="region" data-math-scroll="true"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="传统 J1939 TP 的分包数量"><mrow><mi>N</mi><mo>=</mo><mo>⌈</mo><mfrac><mi>L</mi><mn>7</mn></mfrac><mo>⌉</mo><mo>,</mo><mspace width="1em"/><mn>9</mn><mo>≤</mo><mi>L</mi><mo>≤</mo><mn>1785</mn></mrow></math>
 <p>这里 <code>L</code> 是原始 PGN 的字节数，<code>N</code> 是 TP.DT 包数；上限是 255 包 × 7 字节 = 1785 字节。</p>
 </div>
 <div class="lab">
