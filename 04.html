@@ -213,9 +213,9 @@ assert crc15_can("1") == 0x4599</code></pre>
 <rect id="st-active" x="8" y="30" width="104" height="38" rx="9" fill="#4f9d8f"/>
 <rect id="st-passive" x="128" y="30" width="104" height="38" rx="9" fill="#eef4f1" stroke="#c3d6cf"/>
 <rect id="st-off" x="248" y="30" width="104" height="38" rx="9" fill="#eef4f1" stroke="#c3d6cf"/>
-<text x="60" y="54" font-size="12" fill="#ffffff" text-anchor="middle">Error Active</text>
-<text x="180" y="54" font-size="12" fill="#1b525a" text-anchor="middle">Error Passive</text>
-<text x="300" y="54" font-size="12" fill="#1b525a" text-anchor="middle">Bus-Off</text>
+<text id="st-active-label" x="60" y="54" font-size="12" fill="#ffffff" text-anchor="middle">Error Active</text>
+<text id="st-passive-label" x="180" y="54" font-size="12" fill="#1b525a" text-anchor="middle">Error Passive</text>
+<text id="st-off-label" x="300" y="54" font-size="12" fill="#1b525a" text-anchor="middle">Bus-Off</text>
 <line x1="112" y1="49" x2="126" y2="49" stroke="#8aa39c" marker-end="url(#a04)"/>
 <line x1="232" y1="49" x2="246" y2="49" stroke="#8aa39c" marker-end="url(#a04)"/>
 <text x="119" y="26" font-size="9" fill="#5b716c" text-anchor="middle">≥128</text>
@@ -328,4 +328,4 @@ tec.addEventListener("input",update);rec.addEventListener("input",update);
 update();
 })();
 </script>
-<script>(function(){const map={active:"st-active",passive:"st-passive",off:"st-off"},fill={active:"#4f9d8f",passive:"#e0a15c",off:"#c2410c"};const el=document.getElementById("state-result");function upd(){const s=el.dataset.state;for(const k in map){const box=document.getElementById(map[k]);box.setAttribute("fill",k===s?fill[k]:"#eef4f1");}}setTimeout(upd,0);["tec-input","rec-input"].forEach(id=>document.getElementById(id).addEventListener("input",()=>setTimeout(upd,0)));document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>setTimeout(upd,0)));})();</script></body></html>
+<script>(function(){const map={active:"st-active",passive:"st-passive",off:"st-off"},fill={active:"#4f9d8f",passive:"#e0a15c",off:"#c2410c"};const el=document.getElementById("state-result");function upd(){const s=el.dataset.state;for(const k in map){const on=k===s;document.getElementById(map[k]).setAttribute("fill",on?fill[k]:"#eef4f1");document.getElementById(map[k]+"-label").setAttribute("fill",on?"#ffffff":"#1b525a");}}setTimeout(upd,0);["tec-input","rec-input"].forEach(id=>document.getElementById(id).addEventListener("input",()=>setTimeout(upd,0)));document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>setTimeout(upd,0)));})();</script></body></html>
