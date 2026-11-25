@@ -195,6 +195,21 @@ uint8_t rdmode[] = {0x03, 0x0E, 0x00};      // READ CANSTAT，最后字节读回
 <div class="equation">MCP2515：匹配 ⇔ ((RX_ID XOR FILTER_ID) AND MASK) = 0<br>SJA1000：匹配 ⇔ ((RX_ID XOR FILTER_ID) AND (~AMR &amp; 0x7FF)) = 0</div>
 <div class="lab" id="filter-lab">
 <h3>11 位标识符掩码实验</h3>
+<svg class="filter-svg" viewBox="0 0 720 220" role="img" aria-labelledby="w06-t w06-d" style="display:block;width:100%;height:auto;max-width:660px;margin:10px auto"><title id="w06-t">11 位标识符的逐位比较</title><desc id="w06-d">接收 ID 与目标 ID 都是 0x123，十一位逐位相同，异或结果为零，因此在全比较掩码下匹配；若接收 ID 改为 0x12A，低位不同会使异或非零而不匹配。</desc>
+<rect width="720" height="220" rx="14" fill="#f6faf8"/>
+<text x="24" y="28" font-size="14" font-weight="700" fill="#164846">逐位异或：参与比较的位全部相同才匹配</text>
+<text x="24" y="72" font-size="12" fill="#3f5a54">接收</text><text x="24" y="112" font-size="12" fill="#3f5a54">目标</text><text x="24" y="152" font-size="12" fill="#3f5a54">XOR</text>
+<rect x="104" y="52" width="356" height="30" rx="5" fill="#fff0df" stroke="#cc7a3c" stroke-width="1"/>
+<rect x="104" y="92" width="356" height="30" rx="5" fill="#fff0df" stroke="#cc7a3c" stroke-width="1"/>
+<rect x="104" y="132" width="356" height="30" rx="5" fill="#dcefeb" stroke="#28867e" stroke-width="1"/>
+<g font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="17" fill="#925221" xml:space="preserve"><text x="120" y="74" textLength="324" lengthAdjust="spacing">0 0 1 0 0 1 0 0 0 1 1</text><text x="120" y="114" textLength="324" lengthAdjust="spacing">0 0 1 0 0 1 0 0 0 1 1</text></g>
+<text x="120" y="154" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="17" fill="#175e5e" textLength="324" lengthAdjust="spacing">0 0 0 0 0 0 0 0 0 0 0</text>
+<text x="480" y="72" font-size="12" fill="#3f5a54">11 位标识符（高位在左）</text>
+<text x="480" y="112" font-size="12" fill="#3f5a54">掩码 0x7FF：全部位比较</text>
+<text x="480" y="152" font-size="12" font-weight="700" fill="#175e5e">结果 0x000 → 匹配</text>
+<text x="24" y="196" font-size="12" fill="#3f5a54">把接收 ID 改为 0x12A：最低位异或为 1，在掩码=1 的位上不匹配 → 拒绝。</text>
+<text x="24" y="214" font-size="11" fill="#7a8f89">图示为 11 位抽象比较，不代表具体滤波器的寄存器排布。</text>
+</svg>
 <div class="lab-grid">
 <label for="device">控制器<select id="device"><option value="mcp2515">MCP2515</option><option value="sja1000">SJA1000</option></select></label>
 <label for="filter-id">目标 ID（hex）<input id="filter-id" type="text" value="0x123" spellcheck="false"></label>
