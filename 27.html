@@ -159,7 +159,22 @@
     </nav>
 <main class="main-content" id="content"><article class="chapter-article">
 <header class="hero"><p class="eyebrow">CAN ENGINEERING / CHAPTER 27</p><h1>第27章 · 让接收中断与业务逻辑分开</h1><p class="lead">软件分层的核心不是把代码放入三个目录，而是明确谁负责读取硬件、谁负责解码、谁负责判断数据是否仍有效。</p><nav class="toc" aria-label="本章目录"><a href="#path27">数据路径</a><a href="#contract27">接口</a><a href="#queue27">队列</a><a href="#test27">测试</a></nav></header>
-<section id="path27"><h2>27.1 一个短中断，一条可追踪的数据路径</h2><p>驱动层在 ISR 中快速读取硬件 FIFO，连同 ID、帧类型、DLC、时间戳入队；协议任务解析信号；应用层检查数据时效并执行业务动作。把复杂解析和日志打印留在中断中，可能造成下一帧来不及取出。</p><figure tabindex="0"><img src="assets/olah-ch27-queue.svg" width="900" height="230" alt="接收ISR从硬件FIFO取帧并入队，协议层解码，应用层检查数据新鲜度"><figcaption>图27-1 · 队列建立的是调度边界。队列满必须有可观测的丢弃或背压策略。</figcaption></figure><p>驱动层对业务字节含义一无所知；协议层不直接绑定某个 MCU 的 HAL；应用层不直接访问 CAN RX FIFO。驱动和协议之间可以经抽象接口传递消息，并非禁止协议发送。</p></section>
+<section id="path27"><h2>27.1 一个短中断，一条可追踪的数据路径</h2><p>驱动层在 ISR 中快速读取硬件 FIFO，连同 ID、帧类型、DLC、时间戳入队；协议任务解析信号；应用层检查数据时效并执行业务动作。把复杂解析和日志打印留在中断中，可能造成下一帧来不及取出。</p><figure tabindex="0"><img src="assets/olah-ch27-queue.svg" width="900" height="230" alt="接收ISR从硬件FIFO取帧并入队，协议层解码，应用层检查数据新鲜度"><figcaption>图27-1 · 队列建立的是调度边界。队列满必须有可观测的丢弃或背压策略。</figcaption></figure><p>驱动层对业务字节含义一无所知；协议层不直接绑定某个 MCU 的 HAL；应用层不直接访问 CAN RX FIFO。驱动和协议之间可以经抽象接口传递消息，并非禁止协议发送。</p><figure><svg viewBox="0 0 720 260" role="img" aria-labelledby="c27-t c27-d" style="width:100%;height:auto"><title id="c27-t">从硬件 FIFO 到业务动作的分层数据路径</title><desc id="c27-d">驱动中断从硬件 RX FIFO 取帧并打上时间戳，写入软件队列；协议任务解码信号，应用层检查数据新鲜度后执行业务动作；队列满时帧被拒绝并计入溢出，而不是静默丢失。</desc>
+<rect width="720" height="260" rx="14" fill="#f6faf8"/>
+<text x="24" y="30" font-size="15" font-weight="700" fill="#164846">每一层只做一件事：搬运 / 解码 / 判断时效</text>
+<g font-size="12" text-anchor="middle">
+<rect x="36" y="92" width="112" height="56" rx="9" fill="#e8f0fb" stroke="#517db6" stroke-width="1.5"/><text x="92" y="116" fill="#2e5685">硬件 RX FIFO</text><text x="92" y="134" font-size="10" fill="#2e5685">CAN 控制器</text>
+<rect x="170" y="92" width="112" height="56" rx="9" fill="#fff0df" stroke="#cc7a3c" stroke-width="1.5"/><text x="226" y="116" fill="#925221">驱动 ISR</text><text x="226" y="134" font-size="10" fill="#925221">取帧 + 时间戳</text>
+<rect x="304" y="92" width="112" height="56" rx="9" fill="#eae6fa" stroke="#7865ba" stroke-width="1.5"/><text x="360" y="116" fill="#59459c">软件队列</text><text x="360" y="134" font-size="10" fill="#59459c">调度边界</text>
+<rect x="438" y="92" width="112" height="56" rx="9" fill="#dcefeb" stroke="#28867e" stroke-width="1.5"/><text x="494" y="116" fill="#175e5e">协议任务</text><text x="494" y="134" font-size="10" fill="#175e5e">解码为信号</text>
+<rect x="572" y="92" width="112" height="56" rx="9" fill="#e8f0fb" stroke="#517db6" stroke-width="1.5"/><text x="628" y="116" fill="#2e5685">应用层</text><text x="628" y="134" font-size="10" fill="#2e5685">时效 + 业务</text>
+</g>
+<g stroke="#60767a" stroke-width="2.5" fill="none"><path d="M148 120h22 M282 120h22 M416 120h22 M550 120h22"/></g>
+<path d="M360 148v30" stroke="#c76843" stroke-width="2" stroke-dasharray="5 4"/>
+<path d="M353 172l7 10 7-10" fill="#c76843"/>
+<rect x="292" y="186" width="136" height="34" rx="8" fill="#fff7f0" stroke="#be7946" stroke-width="1.5"/><text x="360" y="208" font-size="11" text-anchor="middle" fill="#925221">队列满：拒绝并计数溢出</text>
+<text x="24" y="248" font-size="11" fill="#7a8f89">中断不打印日志、不做重解析；丢弃必须可观测，而不是静默消失。</text>
+</svg><figcaption>图27-2 · 队列把“取帧”与“处理帧”解耦，也把“丢弃”变成一个必须显式计数的决策点。把解析、日志放进中断，只会让下一帧更晚被取出。</figcaption></figure></section>
 <section id="contract27"><h2>27.2 协议解析必须给出“失败”状态</h2><p>以下是<strong>教学用私有编码</strong>：经典 CAN 标准帧 ID=0x100，字节 1、2 为小端无符号车速，系数 0.01 km/h。它不是任何标准 DBC。</p><pre><code>typedef struct { float kmh; uint32_t received_ms; } SpeedSample;
 /* CanFrame 包含 id、dlc、extended、rtr、data[8] 和 timestamp_ms。 */
 bool protocol_decode_speed(const CanFrame *f, SpeedSample *out) {
