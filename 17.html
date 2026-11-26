@@ -226,6 +226,7 @@
       <label for="c17-bs2">BS2（1–8）<input id="c17-bs2" type="number" min="1" max="8" step="1" value="3"/></label>
       <label for="c17-sjw">SJW（1–4）<input id="c17-sjw" type="number" min="1" max="4" step="1" value="1"/></label>
       <button type="button" id="c17-calc" aria-controls="c17-result">计算配置</button>
+      <button type="button" id="c17-preset">切换 500 kbit/s / 1 Mbit/s</button>
     </div>
     <output id="c17-result" aria-live="polite">500.000 kbit/s；18 TQ；采样点 83.33%；每位 2.000 μs。</output>
   </div>
@@ -262,6 +263,13 @@ assert abs(1_000_000 / bitrate - 2.0) < 1e-12
     out.textContent = rate.toFixed(3) + ' kbit/s；' + tq + ' TQ；采样点 ' + sp.toFixed(2) + '%；每位 ' + (1000 / rate).toFixed(3) + ' μs。';
   }
   document.getElementById('c17-calc').addEventListener('click', calc);
+  document.getElementById('c17-preset').addEventListener('click', () => {
+    const brp = document.getElementById('c17-brp');
+    brp.value = (Number(brp.value) === 2) ? '4' : '2';
+    const preset = { 'c17-clock': '36', 'c17-bs1': '14', 'c17-bs2': '3', 'c17-sjw': '1' };
+    Object.keys(preset).forEach(id => { document.getElementById(id).value = preset[id]; });
+    calc();
+  });
   inputs.forEach(el => el.addEventListener('change', calc));
   calc();
 }());
