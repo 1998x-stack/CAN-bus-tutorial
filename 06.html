@@ -34,7 +34,7 @@ figcaption{font-size:14px;line-height:1.7;color:var(--subtle);margin-top:12px}
 .stat{background:#eef8f4;border-left:3px solid #2b897e;padding:14px;border-radius:7px}
 .stat b{display:block;font-size:20px;line-height:1.3;color:#17645d}.stat span{font-size:13px;line-height:1.6;color:#50656a}
 .callout{border-left:4px solid #d49a4e;background:#fff7e9;padding:13px 19px;margin:25px 0;border-radius:0 9px 9px 0}
-.equation{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#eef7f4;border:1px solid #cee5df;padding:16px 18px;border-radius:9px;margin:20px 0;font-size:16px;line-height:1.8;overflow-wrap:anywhere}
+.equation{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#eef7f4;border:1px solid #cee5df;padding:16px 18px;border-radius:9px;margin:20px 0;font-size:16px;line-height:1.8;overflow-wrap:anywhere;overflow-x:auto}
 .table-scroll{max-width:100%;overflow-x:auto;margin:23px 0}
 table{border-collapse:collapse;width:100%;min-width:540px;font-size:15px;background:#fff}
 th,td{padding:12px 13px;text-align:left;vertical-align:top;border:0;border-bottom:1px solid #dce8e3}th{background:#eff7f4;color:#27574f;font-weight:750}
@@ -150,7 +150,12 @@ pre code{background:transparent;color:inherit;padding:0}code{font-family:ui-mono
 </tbody></table></div>
 <h3>一个容易算错的 BTR0 / BTR1 示例</h3>
 <p>原来常见的误解是把 SJA1000 的 <code>BRP</code> 当成 STM32 bxCAN 的直接分频值。SJA1000 的 <code>BTR0[5:0]</code> 存的是 <strong>BRP−1</strong>，且每个 TQ 由外部振荡器经过一个额外的 2 倍因素得到。以振荡器 16 MHz、BRP 实际值 1、TSEG1=13、TSEG2=2、SJW=1、单采样为例：</p>
-<div class="equation">TQ = 2 × BRP / fXTAL = 2 × 1 / 16 MHz = 125 ns<br>bitrate = fXTAL / [2 × BRP × (1 + TSEG1 + TSEG2)] = 500 kbit/s<br>sample = (1 + 13) / 16 = 87.5%<br><strong>BTR0 = 0x00，BTR1 = 0x1C（SAM=0）</strong></div>
+<div class="equation" tabindex="0" role="region" data-math-scroll="true" aria-label="SJA1000 时钟周期、位速率与采样点的计算公式">
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="时间量子等于二乘以 BRP 再除以晶振频率，代入后等于 125 纳秒"><mrow><mtext>TQ</mtext><mo>=</mo><mfrac><mrow><mn>2</mn><mo>&#xD7;</mo><mtext>BRP</mtext></mrow><msub><mi>f</mi><mtext>XTAL</mtext></msub></mfrac><mo>=</mo><mfrac><mrow><mn>2</mn><mo>&#xD7;</mo><mn>1</mn></mrow><mrow><mn>16</mn><mspace width="0.3em"/><mtext>MHz</mtext></mrow></mfrac><mo>=</mo><mn>125</mn><mspace width="0.3em"/><mtext>ns</mtext></mrow></math>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="位速率等于晶振频率除以二乘 BRP 再乘一加 TSEG1 加 TSEG2，等于 500 千位每秒"><mrow><mtext>bitrate</mtext><mo>=</mo><mfrac><msub><mi>f</mi><mtext>XTAL</mtext></msub><mrow><mn>2</mn><mo>&#xD7;</mo><mtext>BRP</mtext><mo>&#xD7;</mo><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mtext>TSEG1</mtext><mo>+</mo><mtext>TSEG2</mtext><mo>)</mo></mrow></mrow></mfrac><mo>=</mo><mn>500</mn><mspace width="0.3em"/><mtext>kbit/s</mtext></mrow></math>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="采样点比例等于一加 13 除以 16，等于 87.5%"><mrow><mtext>sample</mtext><mo>=</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mn>13</mn></mrow><mn>16</mn></mfrac><mo>=</mo><mn>87.5</mn><mo>%</mo></mrow></math>
+<p class="small"><strong>BTR0 = 0x00，BTR1 = 0x1C（SAM=0）</strong></p>
+</div>
 <p>其中 <code>BTR1=0x1C</code> 是 <code>(TSEG2−1)&lt;&lt;4 | (TSEG1−1)</code>。此前把 <code>BTR0=0x03</code> 说成与这组数相同，会在 16 MHz 时得到错误速率。参见 <a href="https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf">SJA1000 §6.5.1–6.5.2</a>。</p>
 <h3>滤波器的一个反直觉约定</h3>
 <p>SJA1000 的<strong>验收掩码 AMR 中 1 表示不比较（don't care），0 表示比较</strong>。所以“全部比较”是掩码位全 0，而不是全 1。PeliCAN 的 AFM=1 使用单个 32 位过滤视图、AFM=0 使用两个 16 位视图；字段组合与标准/扩展帧有关。<a href="https://www.nxp.com/docs/en/data-sheet/SJA1000.pdf">数据手册 §6.4.15</a></p>
@@ -192,7 +197,10 @@ uint8_t rdmode[] = {0x03, 0x0E, 0x00};      // READ CANSTAT，最后字节读回
 <span class="kicker">04 · 动手体验最容易反过来的设置</span>
 <h2 id="filter-h">同样一串掩码，在两颗芯片上为什么含义相反？</h2>
 <p>对一个纯 <strong>11 位标准 ID</strong> 的抽象比较，MCP2515 是 <code>mask=1 → 必须比较</code>；SJA1000 AMR 是 <code>mask=0 → 必须比较</code>。这不是语法风格区别，而是硬件验收规则不同。下面让滤波目标始终是 <code>0x123</code>，试着传入 <code>0x12A</code>。</p>
-<div class="equation">MCP2515：匹配 ⇔ ((RX_ID XOR FILTER_ID) AND MASK) = 0<br>SJA1000：匹配 ⇔ ((RX_ID XOR FILTER_ID) AND (~AMR &amp; 0x7FF)) = 0</div>
+<div class="equation" tabindex="0" role="region" data-math-scroll="true" aria-label="MCP2515 与 SJA1000 的接收过滤器匹配条件">
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="MCP2515 匹配当且仅当接收标识符异或过滤器标识符后与掩码按位与等于零"><mrow><mtext>MCP2515</mtext><mo>:</mo><mtext>match</mtext><mo>&#x21D4;</mo><mrow><mo>(</mo><mo>(</mo><mtext>RX_ID</mtext><mo>&#x2295;</mo><mtext>FILTER_ID</mtext><mo>)</mo><mo>&amp;</mo><mtext>MASK</mtext><mo>)</mo></mrow><mo>=</mo><mn>0</mn></mrow></math>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="SJA1000 匹配当且仅当接收标识符异或过滤器标识符后与取反的 AMR 和 0x7FF 按位与等于零"><mrow><mtext>SJA1000</mtext><mo>:</mo><mtext>match</mtext><mo>&#x21D4;</mo><mrow><mo>(</mo><mo>(</mo><mtext>RX_ID</mtext><mo>&#x2295;</mo><mtext>FILTER_ID</mtext><mo>)</mo><mo>&amp;</mo><mrow><mo>(</mo><mo>&#x223C;</mo><mtext>AMR</mtext><mo>&amp;</mo><mn>0x7FF</mn><mo>)</mo></mrow><mo>)</mo></mrow><mo>=</mo><mn>0</mn></mrow></math>
+</div>
 <div class="lab" id="filter-lab">
 <h3>11 位标识符掩码实验</h3>
 <svg class="filter-svg" viewBox="0 0 720 220" role="img" aria-labelledby="w06-t w06-d" style="display:block;width:100%;height:auto;max-width:660px;margin:10px auto"><title id="w06-t">11 位标识符的逐位比较</title><desc id="w06-d">接收 ID 与目标 ID 都是 0x123，十一位逐位相同，异或结果为零，因此在全比较掩码下匹配；若接收 ID 改为 0x12A，低位不同会使异或非零而不匹配。</desc>
