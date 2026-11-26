@@ -115,6 +115,17 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
+        .toc { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+        .toc a { border:1px solid #c6dbd1; border-radius:20px; padding:3px 13px; color:#127b79; text-decoration:none; font-size:14px; background:#f5faf7; }
+        .toc a:hover { background:#e3f1ea; }
+        .math-scroll { overflow-x:auto; background:#f6f5ed; border-radius:10px; padding:12px 16px; margin:18px 0; }
+        .demo { background:#f3f9f6; border:1px solid #c9ddd2; border-radius:12px; padding:16px 18px; margin:22px 0; }
+        .demo .controls { display:flex; flex-wrap:wrap; gap:14px; }
+        .demo label { display:flex; flex-direction:column; gap:4px; font-size:14px; font-weight:700; min-width:150px; flex:1; }
+        .demo input { font:inherit; border:1px solid #b7c9be; border-radius:7px; padding:7px; background:#fff; max-width:100%; }
+        .demo .output { font-weight:750; color:#176662; margin-top:14px; font-size:1.05rem; }
+        .demo .detail { font-size:13px; color:#516963; margin-top:6px; }
+        .demo button { font:inherit; border:0; border-radius:7px; padding:8px 14px; background:#137f7b; color:#fff; cursor:pointer; align-self:flex-end; }
     </style>
     <link rel="stylesheet" href="reading.css">
 </head>
@@ -122,7 +133,7 @@
 <a class="skip-link" href="#content">跳转至正文</a>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="全部章节">
         <h3>📚 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
@@ -156,13 +167,14 @@
 <li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
-    </div>
+    </nav>
     <main class="main-content" id="content">
 <article class="article">
 <header>
 <p class="eyebrow">CAN 总线 · 第 12 章 / 中断与实时性</p>
 <h1>中断越快，CAN 通信就越可靠吗？</h1>
 <p class="dek">答案不是简单地“把优先级调到最高”。真正决定可靠性的，是正确的启动文件向量、短且有界的 ISR、明确的标志处理，以及主循环能够持续消化报文。</p>
+<nav class="toc" aria-label="本章目录"><a href="#irq-question">延迟来源</a><a href="#irq-vectors">中断向量</a><a href="#irq-isr">标志处理</a><a href="#irq-measure">测量时间</a><a href="#irq-diagnose">故障闭环</a></nav>
 </header>
 <section id="irq-question">
 <p class="kicker">01 · 从延迟的来源开始</p>
@@ -265,6 +277,22 @@ DWT-&gt;CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 const uint32_t cycles = end_cycles - start_cycles;
 // 72 MHz 主频时：720 cycles / 72 MHz = 10 us
 // 720 仅用于演示换算，不是实测结果。</code></pre>
+<h3>把周期数换成时间和占用</h3>
+<p>DWT 统计的是周期数，需要结合主频换算成时间，再乘事件频率估计 CPU 占用。下面的估算式与工具用于建立数量级直觉，未计入中断响应开销、缓存和测量探针影响，属于教学示意。</p>
+<div class="math-scroll" tabindex="0" role="region" data-math-scroll="true" aria-label="ISR 时间的微秒数等于统计周期数除以主频兆赫数">
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="ISR 时间的微秒数等于统计周期数除以主频兆赫数"><mrow><msub><mi>t</mi><mtext>ISR</mtext></msub><mo>=</mo><mfrac><mi>N</mi><msub><mi>f</mi><mtext>cpu</mtext></msub></mfrac></mrow></math>
+</div>
+<div class="demo">
+<div class="controls">
+<label for="irqc">每次 ISR 周期数 N<input id="irqc" type="number" min="1" max="100000" value="720"></label>
+<label for="irqf">主频 f（MHz）<input id="irqf" type="number" min="1" max="1000" value="72"></label>
+<label for="irqr">事件速率（kHz）<input id="irqr" type="number" min="1" max="1000" value="1"></label>
+<button type="button" id="irqpreset">切换主频 72 / 168 MHz</button>
+</div>
+<p class="output" id="irqout" role="status" aria-live="polite"></p>
+<p class="detail">t 以微秒计；f 取 MHz 时 N/f 直接得到 µs。占用率假设每次事件触发一次 ISR，真实值还取决于 FIFO 批处理与抢占。</p>
+</div>
+<script>(function(){"use strict";var N=document.getElementById("irqc"),F=document.getElementById("irqf"),R=document.getElementById("irqr"),P=document.getElementById("irqpreset"),o=document.getElementById("irqout");function u(){var n=+N.value,f=+F.value,r=+R.value;if(!(n>0&&f>0&&r>0)){o.textContent="请输入正数。";return;}var t=n/f,load=t*r*0.1;o.textContent="ISR 约 "+t.toFixed(2)+" µs；该速率下约占用 CPU "+load.toFixed(2)+"%（教学估算）。";}[N,F,R].forEach(function(e){e.addEventListener("input",u);});P.addEventListener("click",function(){F.value=(+F.value>=168)?"72":"168";u();});u();})();</script>
 <p>使用 DWT 或 GPIO 的数据前，要核对当前系统时钟、优化等级、探针开销以及是否允许抢占。打断点会改变时序，不能拿单步调试结果代表实时运行。</p>
 </section>
 
