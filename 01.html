@@ -32,7 +32,7 @@ figcaption{font-size:14px;line-height:1.65;color:var(--muted);margin-top:12px}
 .compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px 0}.stat{border-left:3px solid #27877b;background:#f1faf7;padding:12px 16px;border-radius:7px}.stat b{display:block;font-size:23px;color:#17655e}
 .callout{border-left:4px solid #d49a4e;background:#fff7e9;padding:12px 19px;margin:25px 0;border-radius:0 9px 9px 0}
 .table-scroll{overflow-x:auto;margin:24px 0}table{width:100%;border-collapse:collapse;min-width:540px;font-size:15px;background:#fff}th,td{padding:12px;border-bottom:1px solid #dce9e4;text-align:left;vertical-align:top}th{background:#eff7f4;color:#31564e;font-weight:700}
-.equation{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:18px;background:#eff7f5;border:1px solid #d4e6e0;padding:17px;border-radius:9px;margin:20px 0;overflow-wrap:anywhere}
+.equation{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:18px;background:#eff7f5;border:1px solid #d4e6e0;padding:17px;border-radius:9px;margin:20px 0;overflow-wrap:anywhere;overflow-x:auto}
 .demo-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:15px 0}
 .demo-controls button{font:inherit;border:1px solid #8fbfb6;background:#fff;color:#235955;border-radius:999px;padding:5px 18px;cursor:pointer}
 .demo-controls button[aria-pressed="true"]{background:#166e69;color:#fff;border-color:#166e69}
@@ -124,7 +124,7 @@ details.question{border-bottom:1px solid #dce6e2;padding:12px 0}
 <section id="signals" aria-labelledby="signals-title"><span class="kicker">03 · 从逻辑位到两根线</span>
 <h2 id="signals-title">为什么 <code>0</code> 能覆盖 <code>1</code>？</h2>
 <p>在典型的 <strong>ISO 11898-2 高速 CAN</strong>物理层中，收发器把控制器的逻辑位转换成两线电压差。显性（逻辑 0）时，CAN_H 典型约 <strong>3.5 V</strong>、CAN_L 约 <strong>1.5 V</strong>；隐性（逻辑 1）时，两线都典型约 <strong>2.5 V</strong>。这些是入门示意的典型值，实际判决须查目标收发器的数据手册与标准约束。<a href="https://www.can-cia.org/can-knowledge/can-hs-transmission">CiA 高速 CAN 传输说明</a>。</p>
-<div class="equation" aria-label="差分电压等于CAN高线电压减去CAN低线电压">V<sub>diff</sub> = V<sub>CAN_H</sub> − V<sub>CAN_L</sub></div>
+<div class="equation" tabindex="0" role="region" data-math-scroll="true" aria-label="差分电压等于 CAN 高线电压减去 CAN 低线电压"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="差分电压等于 CAN 高线电压减去 CAN 低线电压"><mrow><msub><mi>V</mi><mtext>diff</mtext></msub><mo>=</mo><msub><mi>V</mi><mtext>CAN_H</mtext></msub><mo>&#x2212;</mo><msub><mi>V</mi><mtext>CAN_L</mtext></msub></mrow></math></div>
 <figure class="signal-figure">
 <svg xmlns="http://www.w3.org/2000/svg" id="signal-svg" viewBox="0 0 640 280" role="img" aria-labelledby="signal-title signal-desc" data-selected="dominant">
 <title id="signal-title">高速 CAN 的典型显性与隐性差分电平</title>
@@ -149,7 +149,7 @@ details.question{border-bottom:1px solid #dce6e2;padding:12px 0}
 <p>常见高速 CAN 布线推荐<strong>线型主干</strong>，节点经尽可能短的支线接入。主干的两个物理端点通常分别放置一只与电缆特性阻抗相匹配的 <strong>120 Ω</strong>终端电阻，帮助减少反射。这里说的是高速 CAN 的典型方案；其他 CAN 物理层不一定使用同样的终端方式。<a href="https://www.can-cia.org/can-knowledge/designing-a-can-network">CiA 网络设计建议</a>。</p>
 <figure><img src="assets/chapter01-topology.svg" width="800" height="310" alt="高速 CAN 线型总线，两端各有120欧姆终端电阻，三个中间节点接在同一 CAN_H 与 CAN_L 主干线上。" loading="lazy"/><figcaption>图 3 · 终端位于主干的两个物理端点，不在每个节点重复增加；支线长度需根据速率、传播延迟和信号完整性评估。</figcaption></figure>
 <p>在<strong>总线断电</strong>且可确认两只 120 Ω 终端并联、没有其他影响测量的负载时，用万用表测 CAN_H 与 CAN_L 之间的等效电阻，预期约为 <strong>60 Ω</strong>：</p>
-<div class="equation">R<sub>eq</sub> = (1/120 Ω + 1/120 Ω)<sup>−1</sup> = 60 Ω</div>
+<div class="equation" tabindex="0" role="region" data-math-scroll="true" aria-label="两个 120 欧姆终端并联后的等效电阻等于 60 欧姆"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="两个 120 欧姆终端并联后的等效电阻等于 60 欧姆"><mrow><msub><mi>R</mi><mtext>eq</mtext></msub><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mn>1</mn><mn>120</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>120</mn></mfrac><mo>)</mo></mrow><mrow><mo>&#x2212;</mo><mn>1</mn></mrow></msup><mo>=</mo><mn>60</mn><mspace width="0.3em"/><mi>&#x3A9;</mi></mrow></math></div>
 <p>这是<strong>电阻并联的推导结果</strong>，不是“任何车辆插座都必须测出精确 60 Ω”的规则。测量前应断电、排除主动电路影响，且不能拿该数字替代对线束与节点电路的检查。</p>
 <div class="callout"><strong>诊断提示：</strong>若测到约 120 Ω，可以优先检查是否仅有一个终端参与测量；若接近 0 Ω，则排查短路。不过这只是排查线索，不是故障的唯一诊断结论。</div>
 </section>
