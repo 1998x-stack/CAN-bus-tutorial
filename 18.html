@@ -250,7 +250,7 @@
   <div class="demo">
     <strong>交互小实验｜改变 Node-ID，观察默认 SDO 通道</strong>
     <p>只更改节点号，数据域请求依旧在读 <code>0x1017:00</code>。这是预定义连接集示例；实际设备可能重配置 SDO COB-ID。</p>
-    <div class="demo-grid"><label for="c18-node">Node-ID（1–127）<input id="c18-node" type="number" min="1" max="127" value="1" step="1"/></label><button type="button" id="c18-generate" aria-controls="c18-result">生成读请求</button></div>
+    <div class="demo-grid"><label for="c18-node">Node-ID（1–127）<input id="c18-node" type="number" min="1" max="127" value="1" step="1"/></label><button type="button" id="c18-generate" aria-controls="c18-result">生成读请求</button><button type="button" id="c18-preset">切换 Node-ID 1 / 5</button></div>
     <output id="c18-result" aria-live="polite">请求 COB-ID 0x601：40 17 10 00 00 00 00 00；应答 COB-ID 0x581。</output>
   </div>
   <pre><code># Python 3 · 预定义连接集 SDO 请求编码（不访问真实设备）
@@ -289,6 +289,10 @@ assert (0x606C << 16) | (0 << 8) | 32 == 0x606C0020
     result.textContent = '请求 COB-ID ' + request + '：40 17 10 00 00 00 00 00；应答 COB-ID ' + response + '。';
   }
   document.getElementById('c18-generate').addEventListener('click', render);
+  document.getElementById('c18-preset').addEventListener('click', function () {
+    input.value = (Number(input.value) === 5) ? '1' : '5';
+    render();
+  });
   input.addEventListener('change', render);
   render();
 }());
