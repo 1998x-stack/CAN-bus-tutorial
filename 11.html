@@ -115,6 +115,17 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
+        .toc { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+        .toc a { border:1px solid #c6dbd1; border-radius:20px; padding:3px 13px; color:#127b79; text-decoration:none; font-size:14px; background:#f5faf7; }
+        .toc a:hover { background:#e3f1ea; }
+        .math-scroll { overflow-x:auto; background:#f6f5ed; border-radius:10px; padding:12px 16px; margin:18px 0; }
+        .demo { background:#f3f9f6; border:1px solid #c9ddd2; border-radius:12px; padding:16px 18px; margin:22px 0; }
+        .demo .controls { display:flex; flex-wrap:wrap; gap:14px; }
+        .demo label { display:flex; flex-direction:column; gap:4px; font-size:14px; font-weight:700; min-width:150px; flex:1; }
+        .demo input { font:inherit; border:1px solid #b7c9be; border-radius:7px; padding:7px; background:#fff; max-width:100%; }
+        .demo .output { font-weight:750; color:#176662; margin-top:14px; font-size:1.05rem; }
+        .demo .detail { font-size:13px; color:#516963; margin-top:6px; }
+        .demo button { font:inherit; border:0; border-radius:7px; padding:8px 14px; background:#137f7b; color:#fff; cursor:pointer; align-self:flex-end; }
     </style>
     <link rel="stylesheet" href="reading.css">
 </head>
@@ -122,7 +133,7 @@
 <a class="skip-link" href="#content">跳转至正文</a>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="全部章节">
         <h3>📚 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
@@ -156,13 +167,14 @@
 <li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
-    </div>
+    </nav>
     <main class="main-content" id="content">
 <article class="article">
 <header>
 <p class="eyebrow">CAN 总线 · 第 11 章 / 接收路径</p>
 <h1>为什么 CAN 收到了报文，应用却仍然会丢数据？</h1>
 <p class="dek">过滤器、硬件 FIFO、RX 中断、软件缓冲和时效性判断是一条连续的链。任何一段变慢，都可能把“总线收到”变成“业务没处理到”。</p>
+<nav class="toc" aria-label="本章目录"><a href="#rx-path">接收路径</a><a href="#rx-overrun">FIFO 容量</a><a href="#rx-filter">过滤器匹配</a><a href="#rx-isr">ISR 与时效</a><a href="#rx-checklist">实验</a></nav>
 </header>
 <section id="rx-path">
 <p class="kicker">01 · 从线缆追踪一条报文</p>
@@ -218,6 +230,22 @@ filter.CAN_FilterMaskIdLow = 0x0006u;      // 必须为标准帧且是数据帧
 filter.CAN_FilterFIFOAssignment = CAN_FIFO0;
 filter.CAN_FilterActivation = ENABLE;
 CAN_FilterInit(&amp;filter);</code></pre>
+<h3>亲手验证掩码匹配</h3>
+<p>下面的小工具只演示标准 11 位 ID 的“掩码 + 值”匹配，与 bxCAN 寄存器把 ID 左移到高半字等价；不涉及 IDE/RTR，也不模拟硬件队列，属于教学示意。</p>
+<div class="math-scroll" tabindex="0" role="region" data-math-scroll="true" aria-label="匹配成立当且仅当接收标识符与掩码按位与的结果等于过滤器值">
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="匹配成立当且仅当接收标识符与掩码按位与的结果等于过滤器值"><mrow><mtext>match</mtext><mo>=</mo><mrow><mo>(</mo><mi>id</mi><mo>&amp;</mo><mi>M</mi><mo>)</mo></mrow><mo>=</mo><mi>V</mi></mrow></math>
+</div>
+<div class="demo">
+<div class="controls">
+<label for="fxid">接收 ID（十六进制）<input id="fxid" type="text" value="0x105"></label>
+<label for="fxmask">掩码 M（十六进制）<input id="fxmask" type="text" value="0x7F0"></label>
+<label for="fxval">过滤器值 V（十六进制）<input id="fxval" type="text" value="0x100"></label>
+<button type="button" id="fxpreset">切换示例 ID 0x105 / 0x110</button>
+</div>
+<p class="output" id="fxout" role="status" aria-live="polite"></p>
+<p class="detail">标准 ID 有效范围 0x000–0x7FF；M 的某位为 1 表示该位必须与 V 一致，为 0 表示不关心。</p>
+</div>
+<script>(function(){"use strict";var I=document.getElementById("fxid"),M=document.getElementById("fxmask"),V=document.getElementById("fxval"),P=document.getElementById("fxpreset"),o=document.getElementById("fxout");function u(){var i=parseInt(I.value,16),m=parseInt(M.value,16),v=parseInt(V.value,16);if([i,m,v].some(function(x){return !Number.isFinite(x);})||i<0||i>0x7FF){o.textContent="请输入 0x000–0x7FF 范围内的十六进制整数。";return;}var a=(i&m);o.textContent="" + I.value + " & " + M.value + " = 0x" + a.toString(16).toUpperCase() + " → " + (a===v?"匹配，进入 FIFO":"不匹配，丢弃") + "。";}[I,M,V].forEach(function(e){e.addEventListener("input",u);});P.addEventListener("click",function(){I.value=(I.value.trim().toLowerCase()==="0x105")?"0x110":"0x105";u();});u();})();</script>
 <p>这里选的是 STM32F1 的寄存器排列方式，不可把这些位移常数原样搬到 FDCAN 或其他控制器。改好过滤器后可依次测试 0x100、0x10F、0x110、扩展帧与远程帧。</p>
 </section>
 
