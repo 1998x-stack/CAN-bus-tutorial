@@ -115,6 +115,17 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
+        .toc { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+        .toc a { border:1px solid #c6dbd1; border-radius:20px; padding:3px 13px; color:#127b79; text-decoration:none; font-size:14px; background:#f5faf7; }
+        .toc a:hover { background:#e3f1ea; }
+        .math-scroll { overflow-x:auto; background:#f6f5ed; border-radius:10px; padding:12px 16px; margin:18px 0; }
+        .demo { background:#f3f9f6; border:1px solid #c9ddd2; border-radius:12px; padding:16px 18px; margin:22px 0; }
+        .demo .controls { display:flex; flex-wrap:wrap; gap:14px; }
+        .demo label { display:flex; flex-direction:column; gap:4px; font-size:14px; font-weight:700; min-width:150px; flex:1; }
+        .demo input { font:inherit; border:1px solid #b7c9be; border-radius:7px; padding:7px; background:#fff; max-width:100%; }
+        .demo .output { font-weight:750; color:#176662; margin-top:14px; font-size:1.05rem; }
+        .demo button { font:inherit; border:0; border-radius:7px; padding:8px 14px; background:#137f7b; color:#fff; cursor:pointer; align-self:flex-end; }
+        .demo .detail { font-size:13px; color:#516963; margin-top:6px; }
     </style>
     <link rel="stylesheet" href="reading.css">
 </head>
@@ -122,7 +133,7 @@
 <a class="skip-link" href="#content">跳转至正文</a>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="全部章节">
         <h3>📚 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html" class="">第1章 CAN总线概述</a></li>
@@ -156,13 +167,14 @@
 <li><a href="29.html" class="">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html" class="">第30章 CAN总线项目实战</a></li>
         </ul>
-    </div>
+    </nav>
     <main class="main-content" id="content">
 <article class="article">
 <header>
 <p class="eyebrow">CAN 总线 · 第 10 章 / 发送路径</p>
 <h1>一条 CAN 报文，何时才算真正发出去？</h1>
 <p class="dek">从软件提交、三个 bxCAN 发送邮箱，到线上逐位仲裁与完成状态：区分“接受发送请求”和“总线上成功发送”，才能写出可诊断的发送程序。</p>
+<nav class="toc" aria-label="本章目录"><a href="#tx-problem">先厘清误解</a><a href="#tx-mailboxes">本地调度</a><a href="#tx-code">代码与状态</a><a href="#tx-diagnose">故障定位</a></nav>
 </header>
 <section id="tx-problem">
 <p class="kicker">01 · 先厘清一个误解</p>
@@ -271,6 +283,22 @@ void USB_HP_CAN1_TX_IRQHandler(void)
 <tr><td>长期没有成功完成</td><td>ACK 缺失、线缆与终端、波特率、总线关闭</td><td>检查另一节点、ESR、收发器状态</td></tr>
 <tr><td>低 ID 帧仍超时</td><td>本地队列、TXFP、总线负载与仲裁竞争</td><td>度量“入队→TXOK”延迟分位数</td></tr>
 </tbody></table>
+<h3>发送一帧至少占用多久？</h3>
+<p>总线是共享介质：在某个位速率下，一帧的线上时间由它实际占用的位数决定。用下面的估算式可以粗估期限 D 内最多能排几帧；不含位填充、仲裁失败与错误重传，属于教学示意。</p>
+<div class="math-scroll" tabindex="0" role="region" data-math-scroll="true" aria-label="单帧发送时间等于每帧总位数除以位速率">
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="单帧发送时间 t 等于每帧总位数 B 除以位速率 R"><mrow><msub><mi>t</mi><mtext>frame</mtext></msub><mo>=</mo><mfrac><mi>B</mi><mi>R</mi></mfrac></mrow></math>
+</div>
+<div class="demo">
+<div class="controls">
+<label for="txbits">每帧估算位数 B<input id="txbits" type="number" min="47" max="2000" value="130"></label>
+<label for="txrate">位速率 R（kbit/s）<input id="txrate" type="number" min="10" max="1000" value="500"></label>
+<label for="txddl">期限 D（ms）<input id="txddl" type="number" min="1" max="1000" value="10"></label>
+<button type="button" id="txpreset">切换位速率 500 / 1000 kbit/s</button>
+</div>
+<p class="output" id="txout" role="status" aria-live="polite"></p>
+<p class="detail">B 默认取第 02 节的教学估算；实机应以总线抓包测得的位填充后长度与延迟分位数为准。</p>
+</div>
+<script>(function(){"use strict";var B=document.getElementById("txbits"),R=document.getElementById("txrate"),D=document.getElementById("txddl"),P=document.getElementById("txpreset"),o=document.getElementById("txout");function u(){var b=+B.value,r=+R.value,d=+D.value;if(!(b>0&&r>0&&d>0)){o.textContent="请输入正数。";return;}var t=b/r,n=Math.floor(d/t);o.textContent="单帧约 "+t.toFixed(3)+" ms；"+d+" ms 内最多约 "+n+" 帧（不含填充与重传）。";}[B,R,D].forEach(function(e){e.addEventListener("input",u);});P.addEventListener("click",function(){R.value=(+R.value>=1000)?"500":"1000";u();});u();})();</script>
 <p><strong>练习：</strong>同时排队 ID=0x300 与 ID=0x100，分别测试 TXFP 两种设置；记录请求顺序、实际 TXOK 次序与错误计数。在两节点且物理层正确的网络上验证，不要用单节点无 ACK 的情形误判为发送 API 错误。</p>
 <p class="source-note">依据：ST <a href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">RM0008，bxCAN Transmission Handling / CAN_TSR</a>；STM32F10x SPL 的 CAN_Transmit / CAN_TransmitStatus 接口。下一章把镜头转向接收 FIFO。</p>
 </section>
