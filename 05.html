@@ -35,6 +35,8 @@ figcaption{font-size:14px;line-height:1.7;color:var(--subtle);margin-top:12px}
 .stat b{display:block;font-size:20px;line-height:1.3;color:#17645d}.stat span{font-size:13px;line-height:1.6;color:#50656a}
 .callout{border-left:4px solid #d49a4e;background:#fff7e9;padding:13px 19px;margin:25px 0;border-radius:0 9px 9px 0}
 .equation{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#eef7f4;border:1px solid #cee5df;padding:16px 18px;border-radius:9px;margin:20px 0;font-size:16px;line-height:1.8;overflow-wrap:anywhere}
+.math-scroll{max-width:100%;overflow-x:auto;background:#eef7f4;border:1px solid #cee5df;padding:12px 18px;border-radius:9px;margin:20px 0}
+.math-scroll math{font-size:1.05em}
 .table-scroll{max-width:100%;overflow-x:auto;margin:23px 0}
 table{border-collapse:collapse;width:100%;min-width:540px;font-size:15px;background:#fff}
 th,td{padding:12px 13px;text-align:left;vertical-align:top;border:0;border-bottom:1px solid #dce8e3}th{background:#eff7f4;color:#27574f;font-weight:750}
@@ -151,7 +153,12 @@ pre code{background:transparent;color:inherit;padding:0}code{font-family:ui-mono
 <span class="kicker">04 · 从概念转成寄存器数字</span>
 <h2 id="formula-h">算出同一个 500 kbit/s，并不只剩一个答案</h2>
 <p>下列公式使用 <strong>STM32 bxCAN 的语义</strong>：<code>fCAN</code> 必须是实际提供给该 CAN 外设的时钟，不是随意拿 MCU CPU 主频代入。这里的 <code>BRP</code> 表示物理分频系数；寄存器编码值通常比它小 1。<code>BS1</code>、<code>BS2</code> 均表示实际 TQ 数，不是原始寄存器位模式。</p>
-<div class="equation">TQ = BRP / fCAN<br>位时间 = (1 + BS1 + BS2) × TQ<br>bitrate = fCAN / [BRP × (1 + BS1 + BS2)]<br>sample point = (1 + BS1) / (1 + BS1 + BS2)</div>
+<div class="math-scroll" tabindex="0" role="region" data-math-scroll="true" aria-label="bxCAN 位时序的四条计算公式">
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="时间量子 TQ 等于分频系数 BRP 除以 CAN 时钟频率"><mrow><mtext>TQ</mtext><mo>=</mo><mfrac><mtext>BRP</mtext><msub><mi>f</mi><mtext>CAN</mtext></msub></mfrac></mrow></math>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="位时间等于一加上 BS1 再加 BS2 之和，再乘以时间量子"><mrow><msub><mi>t</mi><mtext>bit</mtext></msub><mo>=</mo><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mtext>BS1</mtext><mo>+</mo><mtext>BS2</mtext><mo>)</mo></mrow><mo>&#xD7;</mo><mtext>TQ</mtext></mrow></math>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="位速率等于 CAN 时钟频率除以分频系数与每位数时间量子数之积"><mrow><mtext>bitrate</mtext><mo>=</mo><mfrac><msub><mi>f</mi><mtext>CAN</mtext></msub><mrow><mtext>BRP</mtext><mo>&#xD7;</mo><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mtext>BS1</mtext><mo>+</mo><mtext>BS2</mtext><mo>)</mo></mrow></mrow></mfrac></mrow></math>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="采样点比例等于一加 BS1 除以一加 BS1 再加 BS2"><mrow><mtext>sample point</mtext><mo>=</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mtext>BS1</mtext></mrow><mrow><mn>1</mn><mo>+</mo><mtext>BS1</mtext><mo>+</mo><mtext>BS2</mtext></mrow></mfrac></mrow></math>
+</div>
 <div class="table-scroll"><table><thead><tr><th>可复算示例</th><th>fCAN / BRP</th><th>BS1 / BS2 / SJW</th><th>结果</th></tr></thead><tbody>
 <tr><td>A · 16 MHz</td><td>16 MHz / 2</td><td>13 / 2 / 2</td><td>16 TQ；500 kbit/s；87.5%</td></tr>
 <tr><td>B · 36 MHz</td><td>36 MHz / 4</td><td>14 / 3 / 2</td><td>18 TQ；500 kbit/s；83.33%</td></tr>
