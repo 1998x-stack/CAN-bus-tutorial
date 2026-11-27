@@ -127,7 +127,10 @@ pre code{background:transparent;color:inherit;padding:0}code{font-family:ui-mono
 <span class="kicker">02 · 再问采样为何不能太早</span>
 <h2 id="delay-h">采样点必须等到远端的电平“来得及被看见”</h2>
 <p>在 <strong>采样点</strong>，接收逻辑判断当前位是显性（0）还是隐性（1）。单点采样可写为：从一位起点到采样点，经过 <code>SYNC_SEG + PROP_SEG + PHASE_SEG1</code>。采样点位置是该累计长度占整个位时间的比例。</p>
-<div class="equation">采样点 = (1 + BS1) / (1 + BS1 + BS2)<br>在 1 + 13 + 2 = 16 TQ 时：14 / 16 = <strong>87.5%</strong></div>
+<div class="math-scroll" tabindex="0" role="region" data-math-scroll="true" aria-label="采样点位置比例，以及在 16 TQ 时的计算">
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="采样点比例等于一加 BS1 除以一加 BS1 再加 BS2"><mrow><mtext>sample point</mtext><mo>=</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mtext>BS1</mtext></mrow><mrow><mn>1</mn><mo>+</mo><mtext>BS1</mtext><mo>+</mo><mtext>BS2</mtext></mrow></mfrac></mrow></math>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="当一加 BS1 再加 BS2 等于 16 时，采样点为 14 除以 16，等于 87.5%"><mrow><mfrac><mn>14</mn><mn>16</mn></mfrac><mo>=</mo><mn>87.5</mn><mo>%</mo><mspace width="0.4em"/><mo>(</mo><mn>1</mn><mo>+</mo><mn>13</mn><mo>+</mo><mn>2</mn><mo>=</mo><mn>16</mn><mspace width="0.3em"/><mtext>TQ</mtext><mo>)</mo></mrow></math>
+</div>
 <p>CAN 的无损仲裁要求节点能够在自己的仲裁位采样时刻看见别的节点拉出的显性电平。若只把“20 米线缆的一次单程传播时间”填入传播补偿，就漏掉了回程影响，以及 TX/RX 电子器件和可能的隔离延迟。</p>
 <figure><div class="figure-scroll" tabindex="0" aria-label="可横向滚动的技术示意图"><img src="assets/chapter05-propagation.svg" width="980" height="314" loading="lazy" alt="CAN 仲裁传播预算：从A到B再返回A，包含双向线缆、发送器和接收器延迟。"></div><figcaption>图 2 · 用往返路径建立传播延迟的直觉。对于近似对称节点可用 <code>2 × (线缆单程延迟 + 驱动器延迟 + 接收器延迟)</code> 估算；非对称节点必须逐方向计算最坏值。参见 <a href="https://www.analog.com/en/resources/analog-dialogue/articles/configure-can-bit-timing.html">Analog Devices 位时序分析</a>。</figcaption></figure>
 <p>“采样点越晚越好”也不准确：采样点后面还需要足够的相位段 2、SJW 和处理时间余量。工程上常见的 <strong>75%～87.5%</strong> 只是可考虑的范围，不是标准对所有拓扑规定的万能答案。必须同时满足速率、传播延迟、振荡器容差、控制器寄存器范围和整网一致性。</p>
@@ -144,7 +147,9 @@ pre code{background:transparent;color:inherit;padding:0}code{font-family:ui-mono
 <div class="step"><b>② 判断偏差方向</b><p>合格边沿落在期望同步段之后为正误差；落在前面为负误差。<strong>不要倒置符号与补偿方向。</strong></p></div>
 <div class="step"><b>③ 限幅修正</b><p>调整量的绝对值由相位误差与同步跳转宽度 SJW 共同限制，不能无限延长或缩短。</p></div>
 </div>
-<div class="equation">|实际重同步调整| ≤ min(|相位误差|, SJW)</div>
+<div class="math-scroll" tabindex="0" role="region" data-math-scroll="true" aria-label="重同步调整量的限幅条件">
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="实际重同步调整量的绝对值，小于等于相位误差绝对值与 SJW 中的较小者"><mrow><mo>|</mo><mtext>实际重同步调整</mtext><mo>|</mo><mo>&#x2264;</mo><mi>min</mi><mo>(</mo><mo>|</mo><mtext>相位误差</mtext><mo>|</mo><mo>,</mo><mtext>SJW</mtext><mo>)</mo></mrow></math>
+</div>
 <p>例如允许 <code>SJW = 2 TQ</code> 时，若合格边沿产生 <code>e = +1 TQ</code>，可延长相位段 1 共 1 TQ；若 <code>e = +3 TQ</code>，单次调整最多 2 TQ。<strong>这只是位时间跟踪，不是修改所有节点的永久晶振频率。</strong></p>
 <p>在 Microchip 对经典 CAN 的说明中，一位时间内最多进行一次重同步，使用隐性 → 显性跳变，并对发送节点的正相位误差重同步有额外例外。具体细节见 <a href="https://www.microchip.com/content/dam/mchp/documents/OTH/ApplicationNotes/ApplicationNotes/00754.pdf">AN754 · Understanding Microchip's CAN Module Bit Timing</a>。</p>
 </section>
