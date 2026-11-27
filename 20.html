@@ -29,7 +29,7 @@
 <li><a href="28.html">第28章 CAN总线多节点通信实战</a></li>
 <li><a href="29.html">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html">第30章 CAN总线项目实战</a></li>
-        </ol></details></nav><main class="paper" id="content"><article><header><div class="eyebrow">第 20 章 / CANopen · 服务数据</div><h1>SDO：八字节里，先读懂第一个字节</h1><p class="dek">一个 <code>0x4B</code> 为什么代表读取成功？顺着真实字节拆解加速读写、分段 toggle、块确认与超时处理。</p><div class="jump"><a href="#expedited">加速上传</a><a href="#segments">分段</a><a href="#blocks">块传输</a><a href="#lab">解码实验</a></div></header>
+        </ol></details></nav><main class="paper" id="content"><article><header><div class="eyebrow">第 20 章 / CANopen · 服务数据</div><h1>SDO：八字节里，先读懂第一个字节</h1><p class="dek">一个 <code>0x4B</code> 为什么代表读取成功？顺着真实字节拆解加速读写、分段 toggle、块确认与超时处理。</p><nav class="jump" aria-label="本章目录"><a href="#expedited">加速上传</a><a href="#segments">分段</a><a href="#blocks">块传输</a><a href="#lab">解码实验</a></nav></header>
 <section id="problem"><h2>参数明明读到了 0x4B，为什么软件却判“失败”？</h2>
 <p>假设你向节点 5 请求对象 <code>0x2000:01</code>。总线上返回 <code>4B 00 20 01 34 12 00 00</code>。有人把 <code>0x4B</code> 误当成报错，但这恰好是<strong>读取成功，且数据长度为两字节</strong>：数值的小端表示为 <code>0x1234</code>。</p>
 <p>要读懂 SDO，先分清两种方向：<strong>Upload = 客户端读取服务端对象</strong>；<strong>Download = 客户端写入服务端对象</strong>。这里的“客户端/服务端”是协议角色，不要求它们永远等同于 NMT 主站/从站。默认预定义连接集中，节点 5 的请求 CAN-ID 为 <code>0x605</code>，响应 CAN-ID 为 <code>0x585</code>；这些 COB-ID 可以因设备通信参数而改变。</p>

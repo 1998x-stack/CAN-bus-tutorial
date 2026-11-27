@@ -31,7 +31,7 @@
 <li><a href="28.html">第28章 CAN总线多节点通信实战</a></li>
 <li><a href="29.html">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html">第30章 CAN总线项目实战</a></li>
-        </ol></details></nav><main id="content" class="paper"><article><header><div class="eyebrow">第 19 章 / CANopen · 网络管理</div><h1>控制状态，不等于节点存活</h1><p class="dek">从一次“看得见心跳却收不到过程数据”的故障出发，逐层理解 NMT、Boot-up、Heartbeat 和 Node Guarding。</p><div class="jump"><a href="#states">状态许可</a><a href="#commands">命令帧</a><a href="#heartbeats">心跳监控</a><a href="#lab">交互实验</a></div></header>
+        </ol></details></nav><main id="content" class="paper"><article><header><div class="eyebrow">第 19 章 / CANopen · 网络管理</div><h1>控制状态，不等于节点存活</h1><p class="dek">从一次“看得见心跳却收不到过程数据”的故障出发，逐层理解 NMT、Boot-up、Heartbeat 和 Node Guarding。</p><nav class="jump" aria-label="本章目录"><a href="#states">状态许可</a><a href="#commands">命令帧</a><a href="#heartbeats">心跳监控</a><a href="#lab">交互实验</a></nav></header>
 <section id="question"><h2>为什么“节点在线”不代表“设备可以动作”？</h2>
 <p>监控器收到了节点 5 的 <code>0x705</code> 报文，执行器却没有响应过程数据。问题可能不在 CAN 线缆：该报文只说明某一时刻节点报告了自己的 <strong>NMT 状态</strong>。它可能处于预操作或停止状态，PDO 并不允许运行。</p>
 <p>CANopen 把两件事拆开：<strong>NMT 命令控制通信状态</strong>；<strong>Boot-up / Heartbeat 报告状态与存活</strong>。这比“收得到帧就启动电机”的判断更可验证，也更安全。<a href="https://www.can-cia.org/can-knowledge/network-management/">CiA 对 NMT 和预操作通信限制的说明</a>。</p>

@@ -29,7 +29,7 @@
 <li><a href="28.html">第28章 CAN总线多节点通信实战</a></li>
 <li><a href="29.html">第29章 CAN总线低功耗设计</a></li>
 <li><a href="30.html">第30章 CAN总线项目实战</a></li>
-        </ol></details></nav><main id="content" class="paper"><article><header><div class="eyebrow">第 21 章 / CANopen · 过程数据</div><h1>PDO：同步的是节拍，不是每一帧的发送瞬间</h1><p class="dek">把对象字典的变量装入 8 字节，再区分映射、COB-ID、传输类型与 SYNC；用可复算的负载例子判断配置是否现实。</p><div class="jump"><a href="#roles">TPDO / RPDO</a><a href="#mapping">映射布局</a><a href="#timing">触发类型</a><a href="#lab">编码器</a></div></header>
+        </ol></details></nav><main id="content" class="paper"><article><header><div class="eyebrow">第 21 章 / CANopen · 过程数据</div><h1>PDO：同步的是节拍，不是每一帧的发送瞬间</h1><p class="dek">把对象字典的变量装入 8 字节，再区分映射、COB-ID、传输类型与 SYNC；用可复算的负载例子判断配置是否现实。</p><nav class="jump" aria-label="本章目录"><a href="#roles">TPDO / RPDO</a><a href="#mapping">映射布局</a><a href="#timing">触发类型</a><a href="#lab">编码器</a></nav></header>
 <section id="question"><h2>同一个 SYNC 触发多个节点，为什么波形不可能“同时上总线”？</h2>
 <p>假设四台驱动器收到同一个 <code>0x080</code> SYNC，四台设备都准备上报状态。它们不可能在同一条经典 CAN 总线上把四个 PDO 帧同时送完：<strong>帧要通过 CAN 仲裁依次占用总线</strong>。SYNC 提供的是逻辑节拍与设备采样/应用数据的共同参考点，而不是让所有 PDO 数据帧零延迟传输。</p>
 <p>理解 PDO，必须同时回答三个独立的问题：<strong>哪组对象被映射到负载？</strong><strong>哪个 CAN-ID 对应这路 PDO？</strong><strong>它在什么事件或 SYNC 节拍上发送/应用？</strong>第三个问题必须与前两个配套，不能只看“同步 / 异步”二选一。</p>
