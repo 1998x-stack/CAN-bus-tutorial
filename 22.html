@@ -135,7 +135,7 @@
 .main-content article .lab{background:#f1f7f8;border:1px solid #bfd8db;border-radius:16px;padding:1.1rem 1.3rem;margin:1.6rem 0}
 .main-content article .lab label{font-weight:700;display:block}.main-content article .lab input,.main-content article .lab select{font:inherit;max-width:100%;margin:.4rem 0 .8rem;padding:.45rem .65rem;border:1px solid #829c9f;border-radius:8px;background:white}
 .main-content article .lab output{display:block;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:.89rem;overflow-wrap:anywhere}
-.skip-link{position:absolute;top:-60px;left:12px;z-index:50;background:white;padding:10px}.skip-link:focus{top:6px}
+.jump{display:flex;flex-wrap:wrap;gap:9px;margin:1.5rem 0}.jump a{display:inline-block;padding:5px 13px;border:1px solid #cce0d8;border-radius:20px;background:#f6fbf7;text-decoration:none;font-size:14px;color:#126b76}.jump a:hover{background:#e3f1ea}.skip-link{position:absolute;top:-60px;left:12px;z-index:50;background:white;padding:10px}.skip-link:focus{top:6px}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #147f80;outline-offset:3px}
 @media(max-width:900px){body{padding:8px}.container{grid-template-columns:minmax(0,1fr)}.sidebar{border-right:0;border-bottom:1px solid #e8d6af;padding:12px 16px;max-height:185px;overflow:auto}.sidebar h3{font-size:1rem;margin:0 0 .5rem}.chapter-list{display:flex;flex-wrap:wrap;gap:3px}.chapter-list li{margin:0}.chapter-list a{font-size:.78rem;padding:5px 8px}.double-border{border-radius:12px}.footer-nav{gap:8px;flex-wrap:wrap}.footer-nav a{padding:7px 12px}}
 @media(max-width:480px){.main-content{padding:18px 14px}.main-content article{font-size:16px}.main-content article h2{font-size:1.3rem}.main-content article figure{padding:7px}.main-content article figure{overflow-x:auto}.main-content article figure svg{min-width:720px}.main-content article .lab{padding:.8rem}}
@@ -190,6 +190,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
     <h1>第22章 J1939：29 位 ID 如何变成可理解的发动机数据？</h1>
     <p class="dek">从一帧 <code>0x0CF00401</code> 出发，沿着“标识符 → PGN → SPN → 设备身份”逐层解码。</p>
   </header>
+  <div class="jump" role="navigation" aria-label="本章目录"><a href="#ch22-id">拆解 ID</a><a href="#ch22-spn">解码数据</a><a href="#ch22-name">设备身份</a><a href="#ch22-sources">证据与边界</a></div>
   <section id="ch22-problem">
     <h2>22.1 一串十六进制，为什么能表示发动机转速？</h2>
     <p>CAN 只规定怎样把一帧可靠地送上总线，却不会告诉你 <code>E0 2E</code> 是电压、温度还是转速。SAE J1939 为重型车辆等网络增加了一层共同语言：<strong>PGN 指明这一帧属于哪一组参数，SPN 再指明组内的具体信号</strong>。设备还需要通过地址声明告诉网络“谁在发送”。</p>

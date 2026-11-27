@@ -134,7 +134,7 @@
 .main-content article .lab{background:#f1f7f8;border:1px solid #bfd8db;border-radius:16px;padding:1.1rem 1.3rem;margin:1.6rem 0}
 .main-content article .lab label{font-weight:700;display:block}.main-content article .lab input,.main-content article .lab select{font:inherit;max-width:100%;margin:.4rem 0 .8rem;padding:.45rem .65rem;border:1px solid #829c9f;border-radius:8px;background:white}
 .main-content article .lab output{display:block;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:.89rem;overflow-wrap:anywhere}
-.skip-link{position:absolute;top:-60px;left:12px;z-index:50;background:white;padding:10px}.skip-link:focus{top:6px}
+.jump{display:flex;flex-wrap:wrap;gap:9px;margin:1.5rem 0}.jump a{display:inline-block;padding:5px 13px;border:1px solid #cce0d8;border-radius:20px;background:#f6fbf7;text-decoration:none;font-size:14px;color:#126b76}.jump a:hover{background:#e3f1ea}.skip-link{position:absolute;top:-60px;left:12px;z-index:50;background:white;padding:10px}.skip-link:focus{top:6px}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #147f80;outline-offset:3px}
 @media(max-width:900px){body{padding:8px}.container{grid-template-columns:minmax(0,1fr)}.sidebar{border-right:0;border-bottom:1px solid #e8d6af;padding:12px 16px;max-height:185px;overflow:auto}.sidebar h3{font-size:1rem;margin:0 0 .5rem}.chapter-list{display:flex;flex-wrap:wrap;gap:3px}.chapter-list li{margin:0}.chapter-list a{font-size:.78rem;padding:5px 8px}.double-border{border-radius:12px}.footer-nav{gap:8px;flex-wrap:wrap}.footer-nav a{padding:7px 12px}}
 @media(max-width:480px){.main-content{padding:18px 14px}.main-content article{font-size:16px}.main-content article h2{font-size:1.3rem}.main-content article figure{padding:7px}.main-content article figure{overflow-x:auto}.main-content article figure svg{min-width:720px}.main-content article .lab{padding:.8rem}}
@@ -187,6 +187,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 <article id="chapter-23">
 <header><h1>第23章 J1939 多包传输：50 字节怎样通过 8 字节 CAN 帧？</h1>
 <p class="dek">从“拆成 8 包”这个简单答案出发，逐步认识 BAM、RTS/CTS、TP.DT，以及真正决定连接完成的是谁。</p></header>
+  <div class="jump" role="navigation" aria-label="本章目录"><a href="#ch23-route">BAM 与 RTS/CTS</a><a href="#ch23-frames">控制帧与数据帧</a><a href="#ch23-timer">超时状态机</a><a href="#ch23-impl">分包与重组</a><a href="#ch23-sources">参考规范</a></div>
 
 <section id="ch23-problem">
 <h2>23.1 为什么不能直接连续发送 8 帧？</h2>

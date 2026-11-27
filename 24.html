@@ -134,7 +134,7 @@
 .main-content article .lab{background:#f1f7f8;border:1px solid #bfd8db;border-radius:16px;padding:1.1rem 1.3rem;margin:1.6rem 0}
 .main-content article .lab label{font-weight:700;display:block}.main-content article .lab input,.main-content article .lab select{font:inherit;max-width:100%;margin:.4rem 0 .8rem;padding:.45rem .65rem;border:1px solid #829c9f;border-radius:8px;background:white}
 .main-content article .lab output{display:block;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:.89rem;overflow-wrap:anywhere}
-.skip-link{position:absolute;top:-60px;left:12px;z-index:50;background:white;padding:10px}.skip-link:focus{top:6px}
+.jump{display:flex;flex-wrap:wrap;gap:9px;margin:1.5rem 0}.jump a{display:inline-block;padding:5px 13px;border:1px solid #cce0d8;border-radius:20px;background:#f6fbf7;text-decoration:none;font-size:14px;color:#126b76}.jump a:hover{background:#e3f1ea}.skip-link{position:absolute;top:-60px;left:12px;z-index:50;background:white;padding:10px}.skip-link:focus{top:6px}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #147f80;outline-offset:3px}
 @media(max-width:900px){body{padding:8px}.container{grid-template-columns:minmax(0,1fr)}.sidebar{border-right:0;border-bottom:1px solid #e8d6af;padding:12px 16px;max-height:185px;overflow:auto}.sidebar h3{font-size:1rem;margin:0 0 .5rem}.chapter-list{display:flex;flex-wrap:wrap;gap:3px}.chapter-list li{margin:0}.chapter-list a{font-size:.78rem;padding:5px 8px}.double-border{border-radius:12px}.footer-nav{gap:8px;flex-wrap:wrap}.footer-nav a{padding:7px 12px}}
 @media(max-width:480px){.main-content{padding:18px 14px}.main-content article{font-size:16px}.main-content article h2{font-size:1.3rem}.main-content article figure{padding:7px}.main-content article figure{overflow-x:auto}.main-content article figure svg{min-width:720px}.main-content article .lab{padding:.8rem}}
@@ -187,6 +187,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 <article id="chapter-24">
 <header><h1>第24章 CAN 测试工具：为什么抓到报文还不够？</h1>
 <p class="dek">同一条总线，把“协议正确”“电气正确”“容错可靠”分开测。工具不是清单，而是三种不同的观察能力。</p></header>
+  <div class="jump" role="navigation" aria-label="本章目录"><a href="#ch24-capture">抓报文</a><a href="#ch24-physical">看物理层</a><a href="#ch24-inject">故障注入</a><a href="#ch24-flow">定位顺序</a><a href="#ch24-sources">官方资料</a></div>
 <section id="ch24-problem"><h2>24.1 先定位观察层：报文、波形与故障</h2>
 <p>一台控制器偶发 Bus Off，PCAN-View 记录却只显示一些正常的 CAN 帧。究竟是软件漏处理、位时序不匹配、线束反射，还是硬件在干扰下退出？<strong>仅能读取成功接收的报文，并不能证明总线上没有错误位或物理异常。</strong>因此需要三条互相补充的证据链。</p>
 <figure>
